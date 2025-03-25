@@ -22,7 +22,7 @@ const Sidebar = () => {
         </li>
         <li>
           <Link to="/google-map" className="sidebar-link">
-            <FaMapMarkerAlt className="sidebar-icon" /> Google Map Location
+            <FaMapMarkerAlt className="sidebar-icon" /> Signal Location
           </Link>
         </li>
         <li>

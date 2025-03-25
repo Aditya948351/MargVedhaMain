@@ -1,8 +1,12 @@
 import React from "react";
 import { Card, Row, Col, Button } from "react-bootstrap";
 import { FaTrafficLight, FaBus, FaLock, FaExclamationTriangle, FaMoneyBill, FaCar } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+
+
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   return (
     <div className="p-4">
       <h2>📊 Dashboard - Traffic Monitoring System</h2>
@@ -17,7 +21,7 @@ const Dashboard = () => {
                 <FaTrafficLight className="text-danger" /> Real-time Traffic Monitoring
               </Card.Title>
               <Card.Text>Live traffic updates using AI-based YOLOv8 vehicle detection.</Card.Text>
-              <Button variant="primary">🔴 Live Feed</Button>
+              <Button variant="primary" onClick={() => navigate("/live-Feed")}>🔴 Live Feed</Button>
             </Card.Body>
           </Card>
         </Col>
@@ -63,7 +67,7 @@ const Dashboard = () => {
       </Row>
 
       {/* 💰 Fare Adjustments & 🚗 YOLOv8 Vehicle Counting */}
-      <Row className="mb-4">
+      <Row className="mt-4">
         <Col md={6}>
           <Card className="shadow-lg border-0">
             <Card.Body>
@@ -82,7 +86,7 @@ const Dashboard = () => {
               <Card.Title>
                 <FaCar className="text-primary" /> YOLOv8 Traffic Calculation
               </Card.Title>
-              <Card.Text>Live vehicle count based on AI object detection.</Card.Text>
+              <Card.Text>Live vehicle count based on AI object detection and Historical Analysis.</Card.Text>
               <Button variant="dark">🚗 View Traffic Data</Button>
             </Card.Body>
           </Card>

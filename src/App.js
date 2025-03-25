@@ -2,12 +2,13 @@ import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
-import TrafficMonitor from "./components/TrafficMonitor";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Alerts from "./pages/Alerts";
+import LiveFeed from "./pages/LiveFeed";
 import MapLocation from "./pages/MapLocation";
 import CameraFeeds from "./pages/CameraFeeds";
+
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
           <Route path="/traffic-alerts" element={<Alerts />} />
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/live-Feed" element={<LiveFeed />} />
         </Routes>
       </div>
     </div>
