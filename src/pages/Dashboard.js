@@ -1,20 +1,18 @@
 import React from "react";
-import { Card, Row, Col, Button } from "react-bootstrap";
+import { Card, Row, Col, Button, Container } from "react-bootstrap";  // Add Container
 import { FaTrafficLight, FaBus, FaLock, FaExclamationTriangle, FaMoneyBill, FaCar } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-
 
 const Dashboard = () => {
   const navigate = useNavigate();
   return (
-    <div className="p-4">
+    <Container className="p-4">
       <h2>📊 Dashboard - Traffic Monitoring System</h2>
       <p>Monitor real-time traffic conditions and optimize routes efficiently.</p>
 
       {/* 🚦 Real-time Traffic & Bus Route Optimization */}
       <Row className="mb-4">
-        <Col md={6}>
+        <Col xs={12} md={6} className="mb-3"> {/* Full width on mobile */}
           <Card className="shadow-lg border-0">
             <Card.Body>
               <Card.Title>
@@ -26,7 +24,7 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        <Col md={6}>
+        <Col xs={12} md={6} className="mb-3">
           <Card className="shadow-lg border-0">
             <Card.Body>
               <Card.Title>
@@ -41,7 +39,7 @@ const Dashboard = () => {
 
       {/* 🔐 Blockchain Ticketing & 🚨 Emergency Response */}
       <Row className="mb-4">
-        <Col md={6}>
+        <Col xs={12} md={6} className="mb-3">
           <Card className="shadow-lg border-0">
             <Card.Body>
               <Card.Title>
@@ -53,7 +51,7 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        <Col md={6}>
+        <Col xs={12} md={6} className="mb-3">
           <Card className="shadow-lg border-0">
             <Card.Body>
               <Card.Title>
@@ -68,7 +66,7 @@ const Dashboard = () => {
 
       {/* 💰 Fare Adjustments & 🚗 YOLOv8 Vehicle Counting */}
       <Row className="mt-4">
-        <Col md={6}>
+        <Col xs={12} md={6} className="mb-3">
           <Card className="shadow-lg border-0">
             <Card.Body>
               <Card.Title>
@@ -80,7 +78,7 @@ const Dashboard = () => {
           </Card>
         </Col>
 
-        <Col md={6}>
+        <Col xs={12} md={6} className="mb-3">
           <Card className="shadow-lg border-0">
             <Card.Body>
               <Card.Title>
@@ -92,7 +90,7 @@ const Dashboard = () => {
           </Card>
         </Col>
       </Row>
-    </div>
+    </Container>
   );
 };
 
