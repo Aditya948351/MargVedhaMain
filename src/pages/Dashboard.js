@@ -60,7 +60,7 @@ const Dashboard = () => {
                 <FaExclamationTriangle className="text-danger" /> Emergency Response
               </Card.Title>
               <Card.Text>Integrates with emergency services for quick accident response.</Card.Text>
-              <Button variant="danger">🚑 Emergency Alerts</Button>
+              <Button variant="danger" onClick={() => navigate("/EmergencyAlerts")}>🚑 Emergency Alerts</Button>
             </Card.Body>
           </Card>
         </Col>

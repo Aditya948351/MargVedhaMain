@@ -8,6 +8,7 @@ import Alerts from "./pages/Alerts";
 import LiveFeed from "./pages/LiveFeed";
 import MapLocation from "./pages/MapLocation";
 import CameraFeeds from "./pages/CameraFeeds";
+import EmergencyAlerts from "./pages/EmergencyAlerts";
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/reports" element={<Reports />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/live-Feed" element={<LiveFeed />} />
+          <Route path="/EmergencyAlerts" element={<EmergencyAlerts/>} />
         </Routes>
       </div>
     </div>
