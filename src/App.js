@@ -9,6 +9,8 @@ import LiveFeed from "./pages/LiveFeed";
 import MapLocation from "./pages/MapLocation";
 import CameraFeeds from "./pages/CameraFeeds";
 import EmergencyAlerts from "./pages/EmergencyAlerts";
+import TrafficCounting from "./pages/TrafficCounting";
+import BusRouteOptimization from "./pages/BusRouteOptimization";
 
 
 function App() {
@@ -25,6 +27,8 @@ function App() {
           <Route path="/settings" element={<Settings />} />
           <Route path="/live-Feed" element={<LiveFeed />} />
           <Route path="/EmergencyAlerts" element={<EmergencyAlerts/>} />
+          <Route path="/TrafficCounting" element={<TrafficCounting/>} />
+          <Route path="/BusRouteOptimization" element={<BusRouteOptimization/>} />
         </Routes>
       </div>
     </div>

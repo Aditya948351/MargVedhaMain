@@ -33,7 +33,7 @@ const Dashboard = () => {
                 <FaBus className="text-success" /> Bus Route Optimization
               </Card.Title>
               <Card.Text>Dynamic route planning based on passenger demand & traffic.</Card.Text>
-              <Button variant="success">🗺️ View Routes</Button>
+              <Button variant="success" onClick={() => navigate("/BusRouteOptimization")}>🗺️ View Routes</Button>
             </Card.Body>
           </Card>
         </Col>
@@ -86,8 +86,8 @@ const Dashboard = () => {
               <Card.Title>
                 <FaCar className="text-primary" /> YOLOv8 Traffic Calculation
               </Card.Title>
-              <Card.Text>Live vehicle count based on AI object detection and Historical Analysis.</Card.Text>
-              <Button variant="dark">🚗 View Traffic Data</Button>
+              <Card.Text>Live vehicle count based on AI object detection from roads.</Card.Text>
+              <Button variant="dark" onClick={() => navigate("/TrafficCounting")}>🚗 View Traffic Data</Button>
             </Card.Body>
           </Card>
         </Col>
