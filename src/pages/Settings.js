@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Card, Row, Col, Button, Form } from "react-bootstrap";
 import { FaCog, FaBell, FaPalette, FaLanguage, FaQuestionCircle } from "react-icons/fa";
 
+
 const Settings = () => {
   const [theme, setTheme] = useState(localStorage.getItem("theme") || "light");
   const [fontSize, setFontSize] = useState(localStorage.getItem("fontSize") || "medium");
