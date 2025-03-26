@@ -46,7 +46,7 @@ const Dashboard = () => {
                 <FaLock className="text-info" /> Blockchain Ticketing
               </Card.Title>
               <Card.Text>Secure & transparent ticketing system for public transport.</Card.Text>
-              <Button variant="info">💳 View Transactions</Button>
+              <Button variant="info" onClick={() => navigate("/BlockChainTicketing")}>💳 View Transactions</Button>
             </Card.Body>
           </Card>
         </Col>
@@ -73,7 +73,7 @@ const Dashboard = () => {
                 <FaMoneyBill className="text-warning" /> Automatic Fare Adjustments
               </Card.Title>
               <Card.Text>Dynamic fare calculation for taxis & rickshaws based on traffic.</Card.Text>
-              <Button variant="warning">💵 View Fare Updates</Button>
+              <Button variant="warning" onClick={() => navigate("/AutoFareAdjustments")}>💵 View Fare Updates</Button>
             </Card.Body>
           </Card>
         </Col>

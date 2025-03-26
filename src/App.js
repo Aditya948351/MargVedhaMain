@@ -11,6 +11,8 @@ import CameraFeeds from "./pages/CameraFeeds";
 import EmergencyAlerts from "./pages/EmergencyAlerts";
 import TrafficCounting from "./pages/TrafficCounting";
 import BusRouteOptimization from "./pages/BusRouteOptimization";
+import BlockChainTicketing from "./pages/BlockChainTicketing";
+import AutoFareAdjustments from "./pages/AutoFareAdjustments";
 
 
 function App() {
@@ -29,6 +31,8 @@ function App() {
           <Route path="/EmergencyAlerts" element={<EmergencyAlerts/>} />
           <Route path="/TrafficCounting" element={<TrafficCounting/>} />
           <Route path="/BusRouteOptimization" element={<BusRouteOptimization/>} />
+          <Route path="/BlockChainTicketing" element={<BlockChainTicketing/>} />
+          <Route path="/AutoFareAdjustments" element={<AutoFareAdjustments/>} />
         </Routes>
       </div>
     </div>
