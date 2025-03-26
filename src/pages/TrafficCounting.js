@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Card, Button, Table, Spinner } from "react-bootstrap";
-import { FaCar, FaChartLine, FaSyncAlt } from "react-icons/fa";
+import { FaCar, FaSyncAlt } from "react-icons/fa";
 
 const TrafficCounting = () => {
   const [trafficStats, setTrafficStats] = useState([]);
