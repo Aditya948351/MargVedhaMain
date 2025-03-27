@@ -26,7 +26,7 @@ const Settings = () => {
       <h2>⚙️ Settings</h2>
       <p>Customize your preferences for a better experience.</p>
 
-      {/* Navigation Tabs */}
+      
       <Row className="mb-4">
         <Col md={2}>
           <Button variant={activeTab === "account" ? "primary" : "light"} onClick={() => setActiveTab("account")}>
@@ -55,7 +55,7 @@ const Settings = () => {
         </Col>
       </Row>
 
-      {/* Account Settings */}
+      
       {activeTab === "account" && (
         <Card className="shadow-lg border-0">
           <Card.Body>
@@ -66,7 +66,7 @@ const Settings = () => {
         </Card>
       )}
 
-      {/* Notification Settings */}
+      
       {activeTab === "notifications" && (
         <Card className="shadow-lg border-0">
           <Card.Body>
@@ -77,7 +77,7 @@ const Settings = () => {
         </Card>
       )}
 
-      {/* Appearance Settings */}
+      
       {activeTab === "appearance" && (
         <Card className="shadow-lg border-0">
           <Card.Body>
@@ -118,7 +118,7 @@ const Settings = () => {
         </Card>
       )}
 
-      {/* Language Settings */}
+      
       {activeTab === "language" && (
         <Card className="shadow-lg border-0">
           <Card.Body>
@@ -139,7 +139,7 @@ const Settings = () => {
         </Card>
       )}
 
-      {/* Help & Updates */}
+      
       {activeTab === "help" && (
         <Card className="shadow-lg border-0">
           <Card.Body>
