@@ -12,7 +12,7 @@ const TrafficCounting = () => {
   useEffect(() => {
     const trafficRef = collection(db, "traffic_data");
 
-    // Query to get the latest record (ordered by timestamp)
+    
     const q = query(trafficRef, orderBy("timestamp", "desc"), limit(1));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -21,7 +21,7 @@ const TrafficCounting = () => {
       }
     });
 
-    // Fetch all historical data
+    
     const fetchHistoricalData = async () => {
       const querySnapshot = await getDocs(query(trafficRef, orderBy("timestamp", "desc")));
       const historyData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -43,7 +43,7 @@ const TrafficCounting = () => {
     }, 2000);
   };
 
-  // Function to determine congestion level
+  
   const getCongestionLevel = (totalVehicles) => {
     if (totalVehicles > 50) {
       return <span className="text-danger">🔴 High</span>;
@@ -95,7 +95,7 @@ const TrafficCounting = () => {
         </Card.Body>
       </Card>
 
-      {/* 📜 Historical Data Card - All Records */}
+      
       <Card className="shadow-lg border-0">
         <Card.Body>
           <Card.Title>📜 Historical Traffic Data <FaHistory /></Card.Title>
