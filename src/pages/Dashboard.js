@@ -20,7 +20,7 @@ const Dashboard = ({ onLogout }) => {
       <h2>📊 Dashboard - Traffic Monitoring System</h2>
       <p>Monitor real-time traffic conditions and optimize routes efficiently.</p>
 
-      {/* 🚦 Real-time Traffic & Bus Route Optimization */}
+     
       <Row className="mb-4">
         <Col xs={12} md={6} className="mb-3">
           <Card className="shadow-lg border-0">
@@ -47,7 +47,7 @@ const Dashboard = ({ onLogout }) => {
         </Col>
       </Row>
 
-      {/* 🔐 Blockchain Ticketing & 🚨 Emergency Response */}
+      
       <Row className="mb-4">
         <Col xs={12} md={6} className="mb-3">
           <Card className="shadow-lg border-0">
@@ -74,7 +74,7 @@ const Dashboard = ({ onLogout }) => {
         </Col>
       </Row>
 
-      {/* 💰 Fare Adjustments & 🚗 YOLOv8 Vehicle Counting */}
+      
       <Row className="mt-4">
         <Col xs={12} md={6} className="mb-3">
           <Card className="shadow-lg border-0">
