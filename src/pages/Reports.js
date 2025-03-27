@@ -11,7 +11,7 @@ const Reports = () => {
   const [subTab, setSubTab] = useState("activeIncident");
   const [historicalSubTab, setHistoricalSubTab] = useState("trafficTrends");
 
-  // Sample Data for Graphs
+  
   const dailyTrafficVolume = [
     { day: "Mon", volume: 1200 },
     { day: "Tue", volume: 1500 },
@@ -63,7 +63,7 @@ const Reports = () => {
     { condition: "Foggy", traffic: 800, congestion: 60 },
     { condition: "Windy", traffic: 1100, congestion: 40 },
   ];
-   // Incident Data
+   
    const [activeIncidents, setActiveIncidents] = useState([
     { id: 1, time: "14:50:00", location: "Downtown Junction", type: "Roadblock", severity: "Medium", lat: 37.7749, lng: -122.4194 },
     { id: 2, time: "14:45:00", location: "Highway 1", type: "Accident", severity: "High", lat: 37.7849, lng: -122.4094 }
@@ -73,7 +73,7 @@ const Reports = () => {
     { id: 3, time: "14:30:00", location: "Amrutdham", type: "Stalled Vehicle", severity: "Low" }
   ]);
 
-  // Move incident from Active to Resolved
+ 
   const handleResolve = (id) => {
     const resolvedItem = activeIncidents.find((incident) => incident.id === id);
     setResolvedIncidents([...resolvedIncidents, resolvedItem]);
@@ -98,7 +98,7 @@ const Reports = () => {
         </Col>
       </Row>
 
-      {/* Sub-Tabs for "Incident" */}
+      
       {activeTab === "incident" && (
         <Row className="mb-3 d-flex gap-2">
           <Col md="auto">
@@ -119,7 +119,7 @@ const Reports = () => {
         </Row>
       )}
 
-      {/* Active Incidents */}
+      
       {activeTab === "incident" && subTab === "activeIncident" && (
         <div>
           <h3>Active Incidents</h3>
@@ -146,7 +146,7 @@ const Reports = () => {
         </div>
       )}
 
-      {/* Resolved Incidents */}
+      
       {activeTab === "incident" && subTab === "resolvedIncident" && (
         <div>
           <h3>Resolved Incidents</h3>
@@ -171,7 +171,7 @@ const Reports = () => {
         </div>
       )}
 
-      {/* Incident Map */}
+     
       {activeTab === "incident" && subTab === "incidentMap" && (
         <div>
           <h3>Incident Map</h3>
@@ -188,7 +188,7 @@ const Reports = () => {
 
      
 
-      {/* Sub-Tabs for "Historical Analysis" */}
+      
       {activeTab === "historicalAnalysis" && (
         <Row className="mb-3 d-flex gap-2">
           <Col md="auto">
@@ -227,7 +227,7 @@ const Reports = () => {
             )}
       
           
-      {/* Content Section */}
+      
       <div className="mt-3 p-3 border rounded">
         {activeTab === "historicalAnalysis" && historicalSubTab === "trafficTrends" && (
           <>
