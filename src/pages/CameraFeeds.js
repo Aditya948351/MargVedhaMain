@@ -4,7 +4,7 @@ import { Card, Button, Row, Col, Modal } from "react-bootstrap";
 import { FaVideo, FaMapMarkerAlt, FaTrafficLight } from "react-icons/fa";
 import "leaflet/dist/leaflet.css";
 
-// Signal Locations & Corresponding Camera
+
 const signalLocations = [
   { id: 1, name: "Vidya Vikas Circle", lat: 20.01021, lon: 73.76414, camera: 1 },
   { id: 2, name: "Spectrum", lat: 20.00724, lon: 73.77148, camera: 2 },
@@ -12,7 +12,7 @@ const signalLocations = [
   { id: 4, name: "Theatre", lat: 20.00587, lon: 73.76331, camera: 4 },
 ];
 
-// Video sources for each camera
+
 const videoSources = {
   1: "/vidya_vikas_camera1.mp4",
   2: "/spectrum_camera2.mp4",
@@ -23,9 +23,9 @@ const videoSources = {
 const CameraFeed = () => {
   const [showVideo, setShowVideo] = useState(false);
   const [selectedSignal, setSelectedSignal] = useState(null);
-  const [videoKey, setVideoKey] = useState(Date.now()); // Refresh video on change
+  const [videoKey, setVideoKey] = useState(Date.now()); 
 
-  // Function to open video modal
+  
   const handleShowVideo = (signal) => {
     setSelectedSignal(signal);
     setVideoKey(Date.now()); // Refresh video source
@@ -34,20 +34,20 @@ const CameraFeed = () => {
 
   return (
     <div className="p-4">
-      {/* Page Header */}
+      
       <h2>
         <FaTrafficLight className="text-danger" /> Traffic Camera Feeds
       </h2>
       <p>Monitor live camera feeds from different traffic signals.</p>
 
-      {/* OpenStreetMap Section */}
+      
       <Card className="shadow-lg mb-4">
         <Card.Body>
           <Card.Title>
             <FaMapMarkerAlt className="text-primary" /> Signal Locations on Map
           </Card.Title>
           <MapContainer
-            center={[20.00724, 73.77148]} // Centered around Spectrum
+            center={[20.00724, 73.77148]} 
             zoom={15}
             style={{ height: "400px", width: "100%" }}
           >
@@ -61,7 +61,7 @@ const CameraFeed = () => {
         </Card.Body>
       </Card>
 
-      {/* Single Camera Feed for Each Signal */}
+     
       {signalLocations.map((signal) => (
         <Card key={signal.id} className="shadow-lg mb-4">
           <Card.Body>
@@ -83,7 +83,7 @@ const CameraFeed = () => {
         </Card>
       ))}
 
-      {/* Video Modal */}
+     
       <Modal show={showVideo} onHide={() => setShowVideo(false)} size="lg" centered>
         <Modal.Header closeButton>
           <Modal.Title>
