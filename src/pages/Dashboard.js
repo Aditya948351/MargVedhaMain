@@ -1,18 +1,28 @@
 import React from "react";
-import { Card, Row, Col, Button, Container } from "react-bootstrap";  // Add Container
-import { FaTrafficLight, FaBus, FaLock, FaExclamationTriangle, FaMoneyBill, FaCar } from "react-icons/fa";
+import { Card, Row, Col, Button, Container } from "react-bootstrap";
+import { FaTrafficLight, FaBus, FaLock, FaExclamationTriangle, FaMoneyBill, FaCar, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-const Dashboard = () => {
+const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
+
   return (
     <Container className="p-4">
+      {/* Logout Button */}
+      <Row className="mb-3">
+        <Col className="text-end">
+          <Button variant="danger" onClick={onLogout}>
+            <FaSignOutAlt className="me-2" /> Logout
+          </Button>
+        </Col>
+      </Row>
+
       <h2>📊 Dashboard - Traffic Monitoring System</h2>
       <p>Monitor real-time traffic conditions and optimize routes efficiently.</p>
 
       {/* 🚦 Real-time Traffic & Bus Route Optimization */}
       <Row className="mb-4">
-        <Col xs={12} md={6} className="mb-3"> {/* Full width on mobile */}
+        <Col xs={12} md={6} className="mb-3">
           <Card className="shadow-lg border-0">
             <Card.Body>
               <Card.Title>

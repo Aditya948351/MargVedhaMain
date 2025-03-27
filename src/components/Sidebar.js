@@ -1,13 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import {
-  FaTachometerAlt,
-  FaMapMarkerAlt,
-  FaCamera,
-  FaBell,
-  FaChartBar,
-  FaCog,
-} from "react-icons/fa";
+import { FaTachometerAlt, FaMapMarkerAlt, FaCamera, FaBell, FaChartBar, FaCog } from "react-icons/fa";
 import "./Sidebar.css";
 
 const Sidebar = () => {
@@ -16,7 +9,7 @@ const Sidebar = () => {
       <h2 className="sidebar-title">Marg Vedha</h2>
       <ul>
         <li>
-          <Link to="/" className="sidebar-link">
+          <Link to="/dashboard" className="sidebar-link">
             <FaTachometerAlt className="sidebar-icon" /> Dashboard
           </Link>
         </li>

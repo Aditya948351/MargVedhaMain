@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
@@ -18,6 +18,20 @@ import Home from "./pages/Home";
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  // Load authentication state from localStorage on mount
+  useEffect(() => {
+    const storedAuth = localStorage.getItem("isAuthenticated");
+    if (storedAuth === "true") {
+      setIsAuthenticated(true);
+    }
+  }, []);
+
+  // Logout function
+  const handleLogout = () => {
+    setIsAuthenticated(false);
+    localStorage.removeItem("isAuthenticated");
+  };
+
   return (
     <div className="d-flex">
       {/* Show Sidebar only if logged in */}
@@ -27,11 +41,11 @@ function App() {
         <Routes>
           {/* Pass setIsAuthenticated to Home for login handling */}
           <Route path="/" element={<Home setIsAuthenticated={setIsAuthenticated} />} />
-          
+
           {/* Protected routes (only accessible after login) */}
           {isAuthenticated ? (
             <>
-              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard onLogout={handleLogout} />} />
               <Route path="/google-map" element={<MapLocation />} />
               <Route path="/camera-feeds" element={<CameraFeeds />} />
               <Route path="/traffic-alerts" element={<Alerts />} />
