@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-google-maps/api": "^2.20.6",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.2.0",
@@ -10,6 +11,7 @@
     "axios": "^1.8.4",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.8",
+    "firebase": "^11.5.0",
     "leaflet": "^1.9.4",
     "react": "^19.0.0",
     "react-bootstrap": "^2.10.9",
@@ -19,6 +21,7 @@
     "react-leaflet": "^5.0.0",
     "react-router-dom": "^7.4.0",
     "react-scripts": "5.0.1",
+    "recharts": "^2.15.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

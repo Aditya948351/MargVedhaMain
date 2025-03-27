@@ -14,11 +14,6 @@ const Sidebar = () => {
           </Link>
         </li>
         <li>
-          <Link to="/google-map" className="sidebar-link">
-            <FaMapMarkerAlt className="sidebar-icon" /> Signal Location
-          </Link>
-        </li>
-        <li>
           <Link to="/camera-feeds" className="sidebar-link">
             <FaCamera className="sidebar-icon" /> Camera Feeds
           </Link>
