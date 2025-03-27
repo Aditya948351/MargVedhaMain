@@ -1,5 +1,5 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
+import React, { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
@@ -13,26 +13,40 @@ import TrafficCounting from "./pages/TrafficCounting";
 import BusRouteOptimization from "./pages/BusRouteOptimization";
 import BlockChainTicketing from "./pages/BlockChainTicketing";
 import AutoFareAdjustments from "./pages/AutoFareAdjustments";
-
+import Home from "./pages/Home";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
   return (
     <div className="d-flex">
-      <Sidebar />
-      <div className="content-area">
+      {/* Show Sidebar only if logged in */}
+      {isAuthenticated && <Sidebar />}
+
+      <div className="content-area w-100">
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/google-map" element={<MapLocation />} />
-          <Route path="/camera-feeds" element={<CameraFeeds />} />
-          <Route path="/traffic-alerts" element={<Alerts />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
-          <Route path="/live-Feed" element={<LiveFeed />} />
-          <Route path="/EmergencyAlerts" element={<EmergencyAlerts/>} />
-          <Route path="/TrafficCounting" element={<TrafficCounting/>} />
-          <Route path="/BusRouteOptimization" element={<BusRouteOptimization/>} />
-          <Route path="/BlockChainTicketing" element={<BlockChainTicketing/>} />
-          <Route path="/AutoFareAdjustments" element={<AutoFareAdjustments/>} />
+          {/* Pass setIsAuthenticated to Home for login handling */}
+          <Route path="/" element={<Home setIsAuthenticated={setIsAuthenticated} />} />
+          
+          {/* Protected routes (only accessible after login) */}
+          {isAuthenticated ? (
+            <>
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/google-map" element={<MapLocation />} />
+              <Route path="/camera-feeds" element={<CameraFeeds />} />
+              <Route path="/traffic-alerts" element={<Alerts />} />
+              <Route path="/reports" element={<Reports />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/live-feed" element={<LiveFeed />} />
+              <Route path="/EmergencyAlerts" element={<EmergencyAlerts />} />
+              <Route path="/TrafficCounting" element={<TrafficCounting />} />
+              <Route path="/BusRouteOptimization" element={<BusRouteOptimization />} />
+              <Route path="/BlockChainTicketing" element={<BlockChainTicketing />} />
+              <Route path="/AutoFareAdjustments" element={<AutoFareAdjustments />} />
+            </>
+          ) : (
+            <Route path="*" element={<Navigate to="/" />} />
+          )}
         </Routes>
       </div>
     </div>
