@@ -7,10 +7,10 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from "chart.js";
 
-// Register Chart.js components
+
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
-// Fix Leaflet marker issue
+
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -26,11 +26,11 @@ const Alerts = ({ isAdmin = true }) => {
   const [issue, setIssue] = useState("");
   const [reportedBy, setReportedBy] = useState("");
 
-  // List of predefined issues
+  
   const issueOptions = ["Accident", "Roadwork", "Traffic Jam", "Weather Issue"];
   const adminOptions = ["Admin (ID=01)", "Admin (ID=02)", "Admin (ID=03)"];
 
-  // Fetch coordinates from OpenStreetMap
+  
   const handleLocationChange = async (e) => {
     const loc = e.target.value;
     setLocation(loc);
@@ -47,7 +47,7 @@ const Alerts = ({ isAdmin = true }) => {
     }
   };
 
-  // Handle submitting a new incident
+  
   const handleReportIncident = (e) => {
     e.preventDefault();
     if (isAdmin) {
@@ -61,7 +61,7 @@ const Alerts = ({ isAdmin = true }) => {
     }
   };
 
-  // Chart Data
+  
   const chartData = {
     labels: ["Accidents", "Roadworks", "Traffic Jams", "Weather Issues"],
     datasets: [
@@ -81,7 +81,7 @@ const Alerts = ({ isAdmin = true }) => {
   return (
     <Container fluid className="mt-4">
       <Col md={10} className="mx-auto">
-        {/* Page Header */}
+        
         <Row className="text-center mb-4">
           <Col>
             <h1 className="fw-bold text-warning">
@@ -91,7 +91,7 @@ const Alerts = ({ isAdmin = true }) => {
           </Col>
         </Row>
 
-        {/* Always Visible Map */}
+        
         <Row className="justify-content-center">
           <Col md={8}>
             <Card className="shadow-sm border-0">
@@ -110,7 +110,7 @@ const Alerts = ({ isAdmin = true }) => {
           </Col>
         </Row>
 
-        {/* Report Incident Section */}
+        
         <Row className="justify-content-center my-4">
           <Col md={6} className="text-center">
             <Card className="shadow-sm border-0 p-3">
@@ -127,7 +127,7 @@ const Alerts = ({ isAdmin = true }) => {
           </Col>
         </Row>
 
-                {/* Incident Table */}
+                
                 {incidents.length > 0 && (
           <Row className="justify-content-center mt-4">
             <Col md={8}>
@@ -160,7 +160,7 @@ const Alerts = ({ isAdmin = true }) => {
           </Row>
         )}
 
-        {/* Traffic Reports Graph (Always Visible) */}
+        
         <Row className="justify-content-center mt-4">
           <Col md={8}>
             <Card className="shadow-sm border-0">
@@ -176,7 +176,7 @@ const Alerts = ({ isAdmin = true }) => {
 
 
 
-        {/* Modal for Reporting Incidents */}
+        
         <Modal show={showModal} onHide={() => setShowModal(false)} centered>
           <Modal.Header closeButton>
             <Modal.Title>Report an Incident</Modal.Title>
