@@ -1,4 +1,9 @@
-
+```mermaid
+graph TD
+    A[YOLOv8 Perception Layer: Detects vehicles, roadblocks, VIP movement] --> B[Agentic AI Core: Real-time traffic control and routing]
+    B --> C[Supervisory AI: Validates actions and prevents misbehavior]
+    C --> D[User & Authority Interface: App for location input and Admin Dashboard]
+```
 connecting repo to vs code
 
 # Getting Started with Create React App
