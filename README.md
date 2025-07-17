@@ -1,4 +1,4 @@
-# 🚦 Real-Time Public Transportation Optimization System
+# 🚦 Real-Time Public Transport Optimization System
 
 > A multi-layered AI-powered solution to optimize public transport using real-time traffic perception, dynamic routing, and agentic decision-making.
 
