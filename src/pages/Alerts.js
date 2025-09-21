@@ -85,8 +85,9 @@ const Alerts = ({ isAdmin = true }) => {
         <Row className="text-center mb-4">
           <Col>
             <h1 className="fw-bold text-warning">
-              <FaTrafficLight className="me-2" /> Live Traffic Alerts & Reports
+              <FaTrafficLight className="me-2" /> Live Traffic Alerts & Reports 
             </h1>
+            <h2 color="#ffffff">In Development </h2>
             <p className="text-muted">Stay updated with real-time traffic incidents and roadwork reports.</p>
           </Col>
         </Row>

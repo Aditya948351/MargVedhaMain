@@ -1,0 +1,169 @@
+/* Dashboard.css
+   Light, eye-catching palette. Scoped with .dashboard-* prefixes to avoid Bootstrap conflicts.
+   Author: Assistant (for Aditya / Marg Vedha dashboard)
+*/
+
+/* Theme variables */
+:root {
+  --dashboard-bg: #fbfdff;
+  --card-shadow-lg: 0 8px 24px rgba(20, 40, 80, 0.06);
+  --card-shadow-md: 0 6px 18px rgba(18, 38, 63, 0.06);
+  --accent-blue: #2b7cff;
+  --accent-orange: #ffa31a;
+  --accent-green: #96e6a1;
+  --accent-yellow: #f9d976;
+  --radius: 12px;
+  --muted: #6c757d;
+  --container-padding: 1.5rem;
+}
+
+/* Page container — leave space for persistent side navbar */
+.dashboard-container {
+  margin-left: 100px;              /* Reserve sidebar width */
+  background: var(--dashboard-bg);
+  min-height: 100vh;
+  padding: var(--container-padding);
+  box-sizing: border-box;
+}
+
+/* Responsive: collapse left margin on small screens (mobile/tablet) */
+@media (max-width: 991.98px) {
+  .dashboard-container {
+    margin-left: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Header row spacing */
+.dashboard-header {
+  margin-bottom: 0.5rem;
+}
+
+/* Large cards used in primary grid */
+.dashboard-large-card {
+  min-height: 320px;
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Medium / secondary cards */
+.dashboard-medium-card {
+  min-height: 220px;
+  border-radius: 10px;
+  box-shadow: var(--card-shadow-md);
+  overflow: hidden;
+}
+
+/* Consistent inner padding (works alongside bootstrap p-3) */
+.dashboard-card-pad {
+  padding: 1rem !important;
+}
+
+/* Badge (small) used near feature titles */
+.dashboard-badge {
+  font-size: 12px;
+  padding: 0.45em 0.6em;
+  border-radius: 999px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Upload thumbnail styling */
+.dashboard-upload-thumb {
+  width: 96px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+}
+
+/* Graph area wrapper for consistent heights */
+.dashboard-graph-area {
+  height: 240px;
+  width: 100%;
+  min-height: 180px;
+}
+
+/* Smaller graph area (e.g., area chart inside KPI card) */
+.dashboard-graph-small {
+  height: 160px;
+  width: 100%;
+}
+
+/* New features strip (if you re-enable horizontal/scrollable features) */
+.dashboard-feature-strip {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  padding: 0.75rem 0;
+  align-items: stretch;
+}
+
+/* Card background helpers — subtle gradients for eye-appeal */
+.dashboard-bg-ice {
+  background: linear-gradient(135deg,#fdfcfb,#e2f7ff);
+}
+.dashboard-bg-warm {
+  background: linear-gradient(135deg,#fff7f0,#f9fff4);
+}
+.dashboard-bg-fresh {
+  background: linear-gradient(135deg,#f2f8ff,#e6fff7);
+}
+
+/* Quick-actions grid spacing override (keeps two-button layout neat) */
+.dashboard-quick-actions .btn {
+  width: 100%;
+}
+
+/* Modal iframe preview for 3D simulation */
+.dashboard-sim-iframe {
+  width: 100%;
+  height: 520px;
+  border: none;
+  border-radius: 8px;
+}
+
+/* Small helper text */
+.dashboard-muted {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* Status badges alignment container (used in card footers) */
+.dashboard-status-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Thumbnail container text wrap */
+.dashboard-thumb-label {
+  width: 96px;
+  text-align: center;
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Utility: two-cards-per-row enforcement (you already use Col md={6}, but this helps if needed) */
+.dashboard-two-col-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+
+/* Preserve accessibility contrast for interactive elements */
+.dashboard-btn-contrast {
+  border-radius: 8px;
+}
+
+/* Misc small polish */
+.dashboard-rounded {
+  border-radius: 8px;
+}
