@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import React from "react";
+import { Routes, Route } from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
@@ -16,51 +16,35 @@ import AutoFareAdjustments from "./pages/AutoFareAdjustments";
 import Home from "./pages/Home";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const isAuthenticated = true; // <--- Bypass login by hardcoding to true
 
-  // Load authentication state from localStorage on mount
-  useEffect(() => {
-    const storedAuth = localStorage.getItem("isAuthenticated");
-    if (storedAuth === "true") {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  // Logout function
   const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("isAuthenticated");
+    // Optional: No real logout now, since we always authenticate
+    console.log("Logout disabled in bypass mode.");
   };
 
   return (
     <div className="d-flex">
-      {/* Show Sidebar only if logged in */}
       {isAuthenticated && <Sidebar />}
 
       <div className="content-area w-100">
         <Routes>
-          {/* Pass setIsAuthenticated to Home for login handling */}
-          <Route path="/" element={<Home setIsAuthenticated={setIsAuthenticated} />} />
+          {/* Redirect root (/) to /dashboard */}
+          <Route path="/" element={<Dashboard onLogout={handleLogout} />} />
 
-          {/* Protected routes (only accessible after login) */}
-          {isAuthenticated ? (
-            <>
-              <Route path="/dashboard" element={<Dashboard onLogout={handleLogout} />} />
-              <Route path="/google-map" element={<MapLocation />} />
-              <Route path="/camera-feeds" element={<CameraFeeds />} />
-              <Route path="/traffic-alerts" element={<Alerts />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/live-feed" element={<LiveFeed />} />
-              <Route path="/EmergencyAlerts" element={<EmergencyAlerts />} />
-              <Route path="/TrafficCounting" element={<TrafficCounting />} />
-              <Route path="/BusRouteOptimization" element={<BusRouteOptimization />} />
-              <Route path="/BlockChainTicketing" element={<BlockChainTicketing />} />
-              <Route path="/AutoFareAdjustments" element={<AutoFareAdjustments />} />
-            </>
-          ) : (
-            <Route path="*" element={<Navigate to="/" />} />
-          )}
+          {/* All other routes are accessible since we are always "logged in" */}
+          <Route path="/dashboard" element={<Dashboard onLogout={handleLogout} />} />
+          <Route path="/google-map" element={<MapLocation />} />
+          <Route path="/camera-feeds" element={<CameraFeeds />} />
+          <Route path="/traffic-alerts" element={<Alerts />} />
+          <Route path="/reports" element={<Reports />} />
+          <Route path="/settings" element={<Settings />} />
+          <Route path="/live-feed" element={<LiveFeed />} />
+          <Route path="/EmergencyAlerts" element={<EmergencyAlerts />} />
+          <Route path="/TrafficCounting" element={<TrafficCounting />} />
+          <Route path="/BusRouteOptimization" element={<BusRouteOptimization />} />
+          <Route path="/BlockChainTicketing" element={<BlockChainTicketing />} />
+          <Route path="/AutoFareAdjustments" element={<AutoFareAdjustments />} />
         </Routes>
       </div>
     </div>
