@@ -16,21 +16,7 @@ import AutoFareAdjustments from "./pages/AutoFareAdjustments";
 import Home from "./pages/Home";
 
 function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Load authentication state from localStorage on mount
-  useEffect(() => {
-    const storedAuth = localStorage.getItem("isAuthenticated");
-    if (storedAuth === "true") {
-      setIsAuthenticated(true);
-    }
-  }, []);
-
-  // Logout function
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    localStorage.removeItem("isAuthenticated");
-  };
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
 
   return (
     <div className="d-flex">
