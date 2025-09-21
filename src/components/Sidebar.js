@@ -2,11 +2,14 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { FaTachometerAlt, FaMapMarkerAlt, FaCamera, FaBell, FaChartBar, FaCog } from "react-icons/fa";
 import "./Sidebar.css";
+import { color } from "chart.js/helpers";
 
 const Sidebar = () => {
   return (
     <div className="sidebar">
-      <h2 className="sidebar-title">Marg Vedha</h2>
+      <div className="sidebar-header">
+        <img src="../logo.svg" alt="Marg Vedha Logo" className="sidebar-logo" />
+      </div>
       <ul>
         <li>
           <Link to="/dashboard" className="sidebar-link">
@@ -34,6 +37,9 @@ const Sidebar = () => {
           </Link>
         </li>
       </ul>
+      <div>
+        <h1 className="contact-detail"><a href="https://github.com/Aditya948351/MargVedhaMain" target="_blank">Github</a></h1>
+      </div>
     </div>
   );
 };

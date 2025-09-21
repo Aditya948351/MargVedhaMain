@@ -639,7 +639,6 @@ const Dashboard = ({ onLogout }) => {
         </Modal.Body>
         <Modal.Footer><Button variant="secondary" onClick={() => setAiModalOpen(false)}>Close</Button></Modal.Footer>
       </Modal>
-
     </Container>
   );
 };
