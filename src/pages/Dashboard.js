@@ -192,9 +192,7 @@ const Dashboard = ({ onLogout }) => {
     distribution: { veryHigh: 1, high: 2, medium: 1, low: 1 },
   };
 
-  /* embedded CSS so user does not need to import external file */
   const embeddedCSS = `
-  /* --- Dashboard inline CSS (scoped classes) --- */
   :root {
     --dashboard-bg: #fbfdff;
     --card-shadow-lg: 0 8px 24px rgba(20, 40, 80, 0.06);
