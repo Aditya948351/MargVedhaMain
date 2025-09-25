@@ -1,109 +1,122 @@
-# 🚦 MargVedhaMain: Smart Urban Traffic Management System
+# 🚦 Marg Vedha 3.0 – Real-Time Traffic Optimization System for Urban Congestion  
 
-A multi-layered, AI-powered solution aimed at optimizing public transportation through real-time traffic perception, dynamic routing, and agentic decision-making.
-
----
-
-## 🔍 Overview
-
-Urban public transport often suffers from:
-- Long wait times
-- Overcrowding
-- Inefficiency
-- Poor commuter experiences
-
-MargVedhaMain introduces a **4-Layer AI Stack** to create a Smart, Real-Time Adaptive Transit Ecosystem.
+### 🏆 Smart India Hackathon 2025 (Problem Statement ID: **SIH25050**)  
+**Team ID:** 52806 | **Team Name:** Marg Vedha 3.0  
 
 ---
 
-## 🧠 System Architecture
+## 📌 Problem Statement  
+Urban cities in India face **severe traffic congestion**, leading to:  
+- Long commute times ⏳  
+- Increased CO₂ emissions 🌍  
+- Delayed emergency services 🚑  
+- Reduced logistics and workforce productivity 📦  
 
-```mermaid
-graph TD
-    A[YOLOv8 Perception Layer: Detects vehicles, roadblocks, VIP movement] --> B[Agentic AI Core: Real-time traffic control and routing]
-    B --> C[Supervisory AI: Validates actions and prevents misbehavior]
-    C --> D[User & Authority Interface: App for location input and Admin Dashboard]
-```
-
-**Layers:**
-- **YOLOv8 Perception**: Computer vision for traffic object and anomaly detection.
-- **Agentic AI Core**: Autonomous traffic decision-making (signals, buses, taxis).
-- **Supervisory AI**: Monitors and validates Agentic AI actions.
-- **Interface Layer**: Web app for authorities, Android app for commuters.
+A **smart, AI-driven traffic management solution** is required to optimize urban mobility, reduce congestion, and enable faster emergency response.  
 
 ---
 
-## 💼 Business Model
+## 💡 Proposed Solution  
+We built an **AI-powered modular platform** for **real-time traffic optimization**, integrating **computer vision, reinforcement learning, and citizen participation**.  
 
-```mermaid
-graph TD
-    S["City/Smart Government Partnership"] --> A["Data Integration & Deployment: Sensors, CCTVs"]
-    A --> B["Traffic & Transit Optimization Engine"]
-    B --> C["Reduction in Travel Time, Emissions, and Congestion"]
-    C --> D["Increased Public Transport Adoption"]
-    D --> E["Revenue from Platform License, Data API, Dynamic Fare Model"]
-```
-
-**Revenue Streams:**
-- City-level Platform Licensing (SaaS)
-- Real-time Traffic Data APIs for urban planners
-- Commissions from AI-powered Dynamic Fare System
+### 🔑 Key Features  
+- **🚗 Lane-wise Vehicle Counting & Incident Detection** using **YOLOv11 + BoT-SORT**  
+- **🧠 Agentic AI** dynamically adjusting signal timings in real-time  
+- **⏱ 1-Hour Traffic Forecasting** using Reinforcement Learning (Q-Learning + RL models)  
+- **🌐 3D Simulation Preview** for planners with **three.js**  
+- **📊 Live Dashboard (SUMO)** – Graphs, alerts, and predictive analytics  
+- **🚌 Bus Route Optimization** – Adaptive routing based on passenger demand  
+- **🚨 Emergency Green Corridors** – Automatic signal clearance for ambulances/fire trucks  
+- **📱 Citizen Reports + Targeted Alerts** via mobile/web apps  
 
 ---
 
-## 🔑 Key Features
+## 🛠️ Tech Stack  
 
-- 🚌 Demand-based Bus & Taxi Routing (via App Check-ins)
-- 🚦 Real-Time Signal Control (Reinforcement + Fuzzy Logic)
-- 🧾 AI-Based Fare Estimation (Auto-Rickshaw, Taxi)
-- 🛑 Accident Detection & Emergency Lane Clearance
-- 👮 E-Challan Generation (Number Plate OCR)
-- 📡 Admin Dashboard, Live Heatmaps, Congestion Zones
+**Core AI/ML:**  
+- **YOLOv11** – Object Detection  
+- **BoT-SORT** – Multi-object tracking  
+- **Reinforcement Learning (RL + Q-Learning)** – Adaptive signal optimization  
+- **TensorFlow / PyTorch** – Model training  
 
----
+**Simulation & Visualization:**  
+- **SUMO** – Traffic simulation & performance testing  
+- **Three.js** – 3D visualization of traffic flow  
 
-## 🌐 Live Preview
+**Backend & Infrastructure:**  
+- **Python** – AI/ML pipeline  
+- **Kotlin (Android)** – Mobile app for citizens/authorities  
+- **Bhuvan API (ISRO)** – Geospatial data integration  
+- **Cloud + Local DB** – For storage & offline resilience  
 
-🔐 **Authentication Required (Testing Phase)**  
-- **URL:** [https://marg-vedha.vercel.app/dashboard](https://marg-vedha.vercel.app/dashboard)
-- **Email:** margvedha01@gmail.com  
-- **Password:** DR@123
-
-> The frontend prototype is live for demonstration. Backend and full AI integration are under development.
-
----
-
-## 🛠️ Tech Stack
-
-- **Frontend:** React, Vercel
-- **Backend:** Node.js, Python (planned for AI integration)
-- **AI/ML:** YOLOv8, Reinforcement Learning, Fuzzy Logic
-- **Deployment:** Vercel, Cloud APIs
-- **Mobile:** Android (user app, in progress)
+**Additional Tools:**  
+- Hugging Face (AI hosting)  
+- GitHub (collaboration & version control)  
+- Gradio (ML model interface for testing)  
 
 ---
 
-## 📩 Contact
+## 📐 System Architecture  
 
-Interested in collaboration or want to know more?
-- 📧 Email: margvedha01@gmail.com
-
----
-
-## 📜 License
-
-MIT License — Open for research, collaboration, and smart city innovation.
+1. **Data Collection** – CCTV feeds, GPS, Bhuvan API, open government data  
+2. **AI Pipeline** – YOLOv11 + BoT-SORT for vehicle detection & violation monitoring  
+3. **Reinforcement Learning Layer** – Signal timing optimization & traffic forecasting  
+4. **Supervisory AI Layer** – Error control + emergency prioritization  
+5. **Visualization** – 3D simulations, live dashboards, citizen mobile alerts  
 
 ---
 
-## 🤝 Contributing
+## 🚀 Impact & Benefits  
 
-We welcome contributions! Please open issues or pull requests for any suggestions or improvements. For major changes, please discuss via email first.
+### 👥 Social  
+- Reduced commute stress & frustration  
+- Faster emergency response 🚑  
+- Transparent dashboards → Higher public trust  
+
+### 💰 Economic  
+- Lower logistics & fuel costs  
+- Productivity boost (reduced travel delays)  
+- ROI for municipalities through smart tolling & efficient bus routes  
+
+### 🌱 Environmental  
+- Reduced idle time → Lower CO₂ emissions  
+- Greener mobility with priority public transport  
 
 ---
 
-## ⭐ Acknowledgements
+## 📊 Results  
+- **~74% efficiency improvement** in simulations  
+- **Emergency response time reduction** via Green Corridors  
+- **Scalable, modular design** → Can be deployed city-wide with existing infrastructure  
 
-- OpenCV & YOLOv8 for computer vision
-- React, Node.js, Python communities
-- Smart city and urban mobility researchers
+---
+
+## 📚 References & Research  
+- [YOLOv11 Performance in ITS](https://arxiv.org/html/2410.22898v1)  
+- [Deep RL for Traffic Signal Control](https://www.ijfmr.com/papers/2024/1/11650.pdf)  
+- [Transportation Research Part C: Emerging Technologies](https://www.sciencedirect.com/science/article/pii/S2352146525000687)  
+- [Bhuvan API (ISRO)](https://bhuvan-app1.nrsc.gov.in/api/)  
+- [Government of India Open Data](https://www.data.gov.in/apis)  
+
+---
+
+## 🌐 Live Links  
+- **Website:** [Marg Vedha Portal](https://nocopymarg-vedha.vercel.app/)  
+- **Simulation Repo:** [3D Traffic Simulation](https://github.com/Aditya948351/3D-Traffic-Simulation)  
+- **Main Repo:** [Marg Vedha GitHub](https://github.com/Aditya948351/MargVedhaMain)  
+- **Demo Drive Videos:** [Google Drive](https://drive.google.com/drive/folders/1U1yZOBJTfGuDqCg1dIaAl9V2nXLSeUF4?usp=sharing)  
+- **Hugging Face Space:** [Marg Vedha AI](https://huggingface.co/spaces/starkbyte45896/Marg-Vedha)  
+
+---
+
+## 👩‍💻 Team – Marg Vedha 3.0  
+- **Aditya** – ML & Android Development  
+- **Team Members** – ML, Web Development, Java Programming  
+
+---
+
+## 📌 Future Scope  
+- Integration with **5G IoT sensors** for faster response  
+- AI-powered **accident prediction** & early warnings  
+- **Blockchain-secured ticketing & payments** for public transport  
+- Expansion to **multi-city smart grid traffic management**  
