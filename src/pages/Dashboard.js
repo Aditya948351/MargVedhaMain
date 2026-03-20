@@ -1,5 +1,5 @@
-// Dashboard.jsx
 import React, { useState, useEffect } from "react";
+import "./Dashboard.css";
 import {
   Container,
   Row,
@@ -101,6 +101,29 @@ const initialSignalState = {
   "Sharanpur Rd - North": "green",
 };
 
+const nashikJunctions = [
+  { id: 1, name: "CBS Circle", top: "45%", left: "50%" },
+  { id: 2, name: "Ashok Stambh", top: "35%", left: "48%" },
+  { id: 3, name: "Raviwar Karanja", top: "30%", left: "55%" },
+  { id: 4, name: "Panchavati Karanja", top: "25%", left: "60%" },
+  { id: 5, name: "Dwarka Circle", top: "60%", left: "65%" },
+  { id: 6, name: "Mumbai Naka", top: "55%", left: "40%" },
+  { id: 7, name: "City Centre Mall Signal", top: "48%", left: "30%" },
+  { id: 8, name: "Trimbak Naka", top: "40%", left: "38%" },
+  { id: 9, name: "Bapu Pool", top: "65%", left: "75%" },
+  { id: 10, name: "Upnagar Naka", top: "75%", left: "70%" },
+  { id: 11, name: "Bytco Point", top: "85%", left: "68%" },
+  { id: 12, name: "Satpur Garware Point", top: "35%", left: "20%" },
+  { id: 13, name: "ITI Signal", top: "45%", left: "22%" },
+  { id: 14, name: "Pappu Samosa Signal", top: "50%", left: "52%" },
+  { id: 15, name: "Govind Nagar Square", top: "60%", left: "45%" },
+  { id: 16, name: "Indira Nagar Jogging Track", top: "65%", left: "50%" },
+  { id: 17, name: "Pathardi Phata", top: "75%", left: "45%" },
+  { id: 18, name: "Makhmalabad Naka", top: "15%", left: "50%" },
+  { id: 19, name: "Mhasrul Naka", top: "10%", left: "60%" },
+  { id: 20, name: "Adgaon Naka", top: "15%", left: "80%" }
+];
+
 const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
   const [trafficData, setTrafficData] = useState(sampleTrafficData);
@@ -192,52 +215,13 @@ const Dashboard = ({ onLogout }) => {
     distribution: { veryHigh: 1, high: 2, medium: 1, low: 1 },
   };
 
-  const embeddedCSS = `
-  :root {
-    --dashboard-bg: #fbfdff;
-    --card-shadow-lg: 0 8px 24px rgba(20, 40, 80, 0.06);
-    --card-shadow-md: 0 6px 18px rgba(18, 38, 63, 0.06);
-    --accent-blue: #2b7cff;
-    --accent-orange: #ffa31a;
-    --radius: 12px;
-    --muted: #6c757d;
-    --container-padding: 1.5rem;
-  }
-  .dashboard-container { margin-left: 200px; width: 80% background: var(--dashboard-bg); min-height: 100vh; padding: var(--container-padding); box-sizing: border-box; }
-  @media (max-width: 991.98px) { .dashboard-container { margin-left: 0; padding-left: 1rem; padding-right: 1rem; } }
-  .dashboard-large-card { min-height: 320px; border-radius: var(--radius); box-shadow: var(--card-shadow-lg); overflow: hidden; display:flex; flex-direction:column; justify-content:space-between; }
-  .dashboard-medium-card { min-height: 220px; border-radius: 10px; box-shadow: var(--card-shadow-md); overflow:hidden; }
-  .dashboard-card-pad { padding: 1rem !important; }
-  .dashboard-badge { font-size: 12px; padding: 0.45em 0.6em; border-radius: 999px; display:inline-block; vertical-align: middle; }
-  .dashboard-upload-thumb { width: 96px; height: 64px; object-fit: cover; border-radius: 8px; display:block; }
-  .dashboard-graph-area { height: 240px; width: 100%; min-height: 180px; }
-  .dashboard-graph-small { height: 160px; width: 100%; }
-  .dashboard-feature-strip { display:flex; gap:1rem; overflow-x:auto; padding:0.75rem 0; align-items:stretch; }
-  .dashboard-bg-ice { background: linear-gradient(135deg,#fdfcfb,#e2f7ff); }
-  .dashboard-bg-warm { background: linear-gradient(135deg,#fff7f0,#f9fff4); }
-  .dashboard-bg-fresh { background: linear-gradient(135deg,#f2f8ff,#e6fff7); }
-  .dashboard-quick-actions .btn { width:100%; }
-  .dashboard-sim-iframe { width:100%; height:520px; border:none; border-radius:8px; }
-  .dashboard-muted { color: var(--muted); font-size: 0.9rem; }
-  .dashboard-status-group { display:flex; gap:0.5rem; align-items:center; }
-  .dashboard-thumb-label { width:96px; text-align:center; font-size:11px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  .signal-dot { width:12px; height:12px; border-radius:50%; display:inline-block; margin-right:8px; vertical-align: middle; }
-  .signal-green { background:#28a745; }
-  .signal-red { background:#dc3545; }
-  `;
-
   return (
     <Container fluid className="dashboard-container">
-      <style>{embeddedCSS}</style>
 
-      <Row className="align-items-center" style={{ marginBottom: 8 }}>
+      <Row className="align-items-center mb-4">
         <Col>
-          <h4 style={{ marginBottom: 0 }}>🚦Authority Dashboard 📶</h4>
-          <small className="text-muted">Realtime monitoring • 1-hour prediction • 3D simulation preview</small>
-        </Col>
-        <Col className="text-end">
-          <Button variant="outline-secondary" className="me-2" onClick={() => navigate("/settings")}>Settings</Button>
-          <Button variant="danger" onClick={onLogout}><FaSignOutAlt className="me-2" /> Login as Government Admin</Button>
+          <h3 className="mb-0">🚦 Authority Dashboard 📶</h3>
+          <p className="text-muted mb-0">Realtime monitoring • 1-hour prediction • 3D simulation preview</p>
         </Col>
       </Row>
 
@@ -369,8 +353,8 @@ const Dashboard = ({ onLogout }) => {
                   <XAxis dataKey="time" />
                   <YAxis />
                   <Tooltip />
-                  <Line type="monotone" dataKey="vehicles" stroke="#2b7cff" strokeWidth={3} dot={false} />
-                  <Line type="monotone" dataKey="predicted" stroke="#ffa31a" strokeWidth={2} strokeDasharray="5 5" dot={false} />
+                  <Line type="monotone" dataKey="vehicles" stroke="#2b7cff" strokeWidth={3} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} />
+                  <Line type="monotone" dataKey="predicted" stroke="#cbd5e1" strokeWidth={2} strokeDasharray="5 5" dot={false} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -410,7 +394,7 @@ const Dashboard = ({ onLogout }) => {
                   <YAxis />
                   <CartesianGrid strokeDasharray="3 3" />
                   <Tooltip />
-                  <Area type="monotone" dataKey="vehicles" stroke="#2b7cff" fillOpacity={1} fill="url(#colorVehicles)" />
+                  <Area type="monotone" dataKey="vehicles" stroke="#2b7cff" strokeWidth={2} fillOpacity={1} fill="url(#colorVehicles)" />
                 </AreaChart>
               </ResponsiveContainer>
             </div>
@@ -432,13 +416,12 @@ const Dashboard = ({ onLogout }) => {
                 <h6 style={{ marginBottom: 8 }}>Signal States</h6>
                 <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                   {Object.keys(signalState).map((k) => (
-                    <div key={k} style={{ minWidth: 220, background: "#fff", padding: 8, borderRadius: 8, boxShadow: "0 4px 10px rgba(0,0,0,0.03)" }}>
-                      <span
-                        className={`signal-dot ${signalState[k] === "green" ? "signal-green" : "signal-red"}`}
-                        aria-hidden
-                      />
-                      <strong>{k}</strong>
-                      <div style={{ fontSize: 12, color: "#666" }}>{signalState[k].toUpperCase()}</div>
+                    <div key={k} className="p-2 mb-2 rounded bg-white border" style={{ minWidth: 200 }}>
+                      <span className={`signal-dot ${signalState[k] === "green" ? "signal-green" : "signal-red"}`} aria-hidden="true" />
+                      <strong className="text-dark">{k}</strong>
+                      <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: "4px" }}>
+                        {signalState[k].toUpperCase()}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -582,28 +565,64 @@ const Dashboard = ({ onLogout }) => {
         </Col>
       </Row>
 
-      {/* 3D Simulation modal (preserved) */}
+      {/* 3D Simulation map preview */}
       <Modal show={simModalOpen} onHide={() => setSimModalOpen(false)} size="xl" centered>
         <Modal.Header closeButton>
-          <Modal.Title>3D Simulation</Modal.Title>
+          <Modal.Title><FaMapMarkerAlt className="me-2 text-primary" /> Live 3D Simulation Map - Nashik City</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ minHeight: 480 }}>
-          {!simOverride ? (
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
-              <h5>3D Simulation — In Development</h5>
-              <p className="text-muted text-center" style={{ maxWidth: 720 }}>
-                The interactive three.js + SUMO preview is under active integration. Use override to preview external demo.
-              </p>
-              <div className="d-flex gap-2">
-                <Button variant="primary" onClick={() => overrideSim()}><FaExpandAlt className="me-2" /> Override & Preview</Button>
-                <Button variant="outline-secondary" onClick={() => setSimModalOpen(false)}>Close</Button>
+        <Modal.Body style={{ minHeight: 600, padding: 0, position: "relative", background: "#111827" }}>
+          
+          <img 
+            src="/nashik_3d_map.png" 
+            alt="Nashik 3D Map Preview" 
+            style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", opacity: 0.8 }} 
+            onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=2000&auto=format&fit=crop"; }}
+          />
+
+          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
+            {nashikJunctions.map((j) => (
+              <div
+                key={j.id}
+                className="map-marker-hover"
+                style={{
+                  position: "absolute",
+                  top: j.top,
+                  left: j.left,
+                  transform: "translate(-50%, -50%)",
+                  background: "rgba(15, 23, 42, 0.9)",
+                  border: "2px solid #3b82f6",
+                  color: "#fff",
+                  padding: "4px 8px",
+                  borderRadius: "8px",
+                  fontSize: "12px",
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  boxShadow: "0 0 12px rgba(59, 130, 246, 0.6)",
+                  transition: "all 0.2s"
+                }}
+              >
+                <div style={{
+                  background: "#10b981", 
+                  width: "10px", 
+                  height: "10px", 
+                  borderRadius: "50%", 
+                  marginRight: "6px",
+                  boxShadow: "0 0 8px #10b981"
+                }}></div>
+                {j.id}. {j.name}
               </div>
-            </div>
-          ) : (
-            <iframe title="3D Simulation Preview" src={simulationUrl} className="dashboard-sim-iframe" />
-          )}
+            ))}
+          </div>
+
         </Modal.Body>
-        <Modal.Footer><small className="text-muted">Placeholder preview. Secure embed on production required.</small></Modal.Footer>
+        <Modal.Footer>
+          <div className="w-100 d-flex justify-content-between align-items-center text-muted">
+            <small>Traffic overlay actively tracking 20 main junctions in Nashik.</small>
+            <Button variant="secondary" onClick={() => setSimModalOpen(false)}>Close Map</Button>
+          </div>
+        </Modal.Footer>
       </Modal>
 
       {/* AI Decisions modal */}

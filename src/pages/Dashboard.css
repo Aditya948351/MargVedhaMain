@@ -1,169 +1,116 @@
-/* Dashboard.css
-   Light, eye-catching palette. Scoped with .dashboard-* prefixes to avoid Bootstrap conflicts.
-   Author: Assistant (for Aditya / Marg Vedha dashboard)
-*/
+/* Dashboard.css */
 
-/* Theme variables */
-:root {
-  --dashboard-bg: #fbfdff;
-  --card-shadow-lg: 0 8px 24px rgba(20, 40, 80, 0.06);
-  --card-shadow-md: 0 6px 18px rgba(18, 38, 63, 0.06);
-  --accent-blue: #2b7cff;
-  --accent-orange: #ffa31a;
-  --accent-green: #96e6a1;
-  --accent-yellow: #f9d976;
-  --radius: 12px;
-  --muted: #6c757d;
-  --container-padding: 1.5rem;
-}
-
-/* Page container — leave space for persistent side navbar */
 .dashboard-container {
-  margin-left: 100px;              /* Reserve sidebar width */
-  background: var(--dashboard-bg);
-  min-height: 100vh;
-  padding: var(--container-padding);
+  width: 100%;
+  background: var(--bg-color);
+  min-height: calc(100vh - 70px);
+  padding: 3vh 3vw;
   box-sizing: border-box;
 }
 
-/* Responsive: collapse left margin on small screens (mobile/tablet) */
 @media (max-width: 991.98px) {
   .dashboard-container {
     margin-left: 0;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    width: 100vw;
+    padding: 2vh 4vw;
   }
 }
 
-/* Header row spacing */
-.dashboard-header {
-  margin-bottom: 0.5rem;
-}
-
-/* Large cards used in primary grid */
 .dashboard-large-card {
-  min-height: 320px;
-  border-radius: var(--radius);
-  box-shadow: var(--card-shadow-lg);
-  overflow: hidden;
+  min-height: 380px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  background: var(--card-bg);
+  border: 1px solid rgba(0,0,0,0.05);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Medium / secondary cards */
 .dashboard-medium-card {
-  min-height: 220px;
-  border-radius: 10px;
-  box-shadow: var(--card-shadow-md);
-  overflow: hidden;
+  min-height: 240px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  background: var(--card-bg);
+  border: 1px solid rgba(0,0,0,0.05);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Consistent inner padding (works alongside bootstrap p-3) */
+.dashboard-large-card:hover, .dashboard-medium-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
 .dashboard-card-pad {
-  padding: 1rem !important;
+  padding: 1.5rem !important;
 }
 
-/* Badge (small) used near feature titles */
-.dashboard-badge {
-  font-size: 12px;
-  padding: 0.45em 0.6em;
-  border-radius: 999px;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-/* Upload thumbnail styling */
-.dashboard-upload-thumb {
-  width: 96px;
-  height: 64px;
-  object-fit: cover;
-  border-radius: 8px;
-  display: block;
-}
-
-/* Graph area wrapper for consistent heights */
-.dashboard-graph-area {
-  height: 240px;
-  width: 100%;
-  min-height: 180px;
-}
-
-/* Smaller graph area (e.g., area chart inside KPI card) */
-.dashboard-graph-small {
-  height: 160px;
-  width: 100%;
-}
-
-/* New features strip (if you re-enable horizontal/scrollable features) */
-.dashboard-feature-strip {
-  display: flex;
-  gap: 1rem;
-  overflow-x: auto;
-  padding: 0.75rem 0;
-  align-items: stretch;
-}
-
-/* Card background helpers — subtle gradients for eye-appeal */
-.dashboard-bg-ice {
-  background: linear-gradient(135deg,#fdfcfb,#e2f7ff);
-}
-.dashboard-bg-warm {
-  background: linear-gradient(135deg,#fff7f0,#f9fff4);
-}
-.dashboard-bg-fresh {
-  background: linear-gradient(135deg,#f2f8ff,#e6fff7);
-}
-
-/* Quick-actions grid spacing override (keeps two-button layout neat) */
-.dashboard-quick-actions .btn {
-  width: 100%;
-}
-
-/* Modal iframe preview for 3D simulation */
-.dashboard-sim-iframe {
-  width: 100%;
-  height: 520px;
-  border: none;
-  border-radius: 8px;
-}
-
-/* Small helper text */
 .dashboard-muted {
-  color: var(--muted);
-  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 400;
 }
 
-/* Status badges alignment container (used in card footers) */
-.dashboard-status-group {
-  display: flex;
-  gap: 0.5rem;
-  align-items: center;
+.dashboard-graph-area {
+  height: 260px;
+  width: 100%;
+  margin-top: 1rem;
 }
 
-/* Thumbnail container text wrap */
+.signal-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 8px;
+  vertical-align: middle;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.signal-green {
+  background: var(--success);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.signal-red {
+  background: var(--danger);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+}
+
+/* Subtle accent backgrounds for top KPI cards */
+.dashboard-bg-ice {
+  background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+}
+
+.dashboard-bg-warm {
+  background: linear-gradient(145deg, #ffffff 0%, #fff7ed 100%);
+}
+
+.dashboard-upload-thumb {
+  width: 100px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  display: block;
+  box-shadow: var(--shadow-sm);
+}
+
 .dashboard-thumb-label {
-  width: 96px;
+  width: 100px;
   text-align: center;
-  font-size: 11px;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  margin-top: 4px;
 }
 
-/* Utility: two-cards-per-row enforcement (you already use Col md={6}, but this helps if needed) */
-.dashboard-two-col-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.2rem;
-}
-
-/* Preserve accessibility contrast for interactive elements */
-.dashboard-btn-contrast {
-  border-radius: 8px;
-}
-
-/* Misc small polish */
-.dashboard-rounded {
-  border-radius: 8px;
+.dashboard-sim-iframe {
+  width: 100%;
+  height: 600px;
+  border: none;
+  border-radius: var(--radius-md);
+  background: #f8fafc;
 }

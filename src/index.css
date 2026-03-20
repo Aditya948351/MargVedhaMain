@@ -1,45 +1,44 @@
-body {
-  font-family: "Arial", sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f4f6f9;
-}
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-.p-4 {
-  margin-left: 210px;
-}
-
-h1{
-  color: #333;
-  font-weight: bold;
-}
-
-h2 {
-  color: #333;
-  font-weight: bold;
-}
-
-h3{
-  color: #333;
-  font-weight: bold;
-  margin-left: 260px;
-
-}
-.card {
-  transition: transform 0.4s ease-in-out;
+:root {
+  --bg-color: #f4f7f6;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --sidebar-bg: #0f172a;
+  --sidebar-text: #cbd5e1;
+  --sidebar-text-hover: #ffffff;
+  --sidebar-active: #1e293b;
+  --sidebar-active-border: #3b82f6;
+  
+  --primary: #2b7cff;
+  --primary-hover: #1e60ef;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --card-bg: #ffffff;
+  
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  
+  box-shadow: var(--shadow-md);
+  transition: box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: scale(1.05);
+  box-shadow: var(--shadow-lg);
 }
 
 button {
-  font-weight: bold;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
 }
 
+a {
+  text-decoration: none;
+}
 
-
-
-
-
-
+.content-area {
+  padding-top: 70px; /* Account for the fixed 70px top-navbar */
+  min-height: 100vh;
+}

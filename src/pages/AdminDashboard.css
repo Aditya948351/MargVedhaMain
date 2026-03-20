@@ -1,0 +1,64 @@
+.admin-dashboard-container {
+  padding: 20px;
+}
+
+.bg-dark-card {
+  background-color: #1e293b !important;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.metric-card {
+  background-color: #1e293b;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+}
+
+.metric-card:hover {
+  transform: translateY(-5px);
+}
+
+.border-left-primary {
+  border-left: 4px solid #3b82f6 !important;
+}
+
+.border-left-success {
+  border-left: 4px solid #10b981 !important;
+}
+
+.border-left-danger {
+  border-left: 4px solid #ef4444 !important;
+}
+
+.icon-circle {
+  border-radius: 50%;
+  padding: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-primary-soft { background-color: rgba(59, 130, 246, 0.15); }
+.bg-success-soft { background-color: rgba(16, 185, 129, 0.15); }
+.bg-danger-soft { background-color: rgba(239, 68, 68, 0.15); }
+
+table {
+  color: #fff !important;
+}
+
+thead th {
+  border-bottom: 2px solid #334155 !important;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+tbody tr {
+  border-bottom: 1px solid #334155;
+}
+
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
