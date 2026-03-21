@@ -572,11 +572,10 @@ const Dashboard = ({ onLogout }) => {
         </Modal.Header>
         <Modal.Body style={{ minHeight: 600, padding: 0, position: "relative", background: "#111827" }}>
           
-          <img 
-            src="/nashik_3d_map.png" 
-            alt="Nashik 3D Map Preview" 
+          <video 
+            src="https://res.cloudinary.com/dsj0vaews/video/upload/v1774117387/eeololastomdbamjbs9a.mp4" 
+            autoPlay loop muted playsInline
             style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", opacity: 0.8 }} 
-            onError={(e) => { e.target.onerror = null; e.target.src = "https://images.unsplash.com/photo-1519501025264-65ba15a82390?q=80&w=2000&auto=format&fit=crop"; }}
           />
 
           <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>

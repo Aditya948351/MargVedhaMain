@@ -66,104 +66,128 @@ const Profile = () => {
   }
 
   return (
-    <Container className="profile-container mt-4">
-      <Row className="justify-content-center">
-        <Col md={8} lg={6}>
-          <Card className="profile-card border-0 text-white shadow-lg">
-            <Card.Body className="p-5 text-center">
-              <div className="profile-avatar mb-4">
-                <FaUserCircle size={100} className="text-primary" />
-              </div>
-              <h2 className="fw-bold mb-1">{profileData?.officerName || "Unknown Officer"}</h2>
-              <p className="text-muted mb-4 fs-5">{profileData?.email}</p>
-              
-              <hr className="border-secondary opacity-25" />
+    <Container fluid className="profile-container mt-2">
+      <Row className="justify-content-center w-100 m-0">
+        <Col lg={10} xl={9}>
+          <div className="d-flex justify-content-between align-items-center mb-4">
+            <h3 className="mb-0 text-dark fw-bold">Officer Profile</h3>
+          </div>
+          <Card className="dashboard-large-card border-0 shadow-lg" style={{ background: 'var(--card-bg)', color: 'var(--text-primary)' }}>
+            <Card.Body className="p-4 p-md-5">
+              <Row className="align-items-center border-bottom pb-4 mb-4 text-center text-md-start">
+                <Col md={3} className="mb-3 mb-md-0 d-flex justify-content-center">
+                   <div className="profile-avatar">
+                     <FaUserCircle size={90} className="text-primary" />
+                   </div>
+                </Col>
+                <Col md={9}>
+                   <h2 className="fw-bold mb-1">{profileData?.officerName || "Unknown Officer"}</h2>
+                   <p className="text-muted fs-5 mb-0">{profileData?.email}</p>
+                   {profileData?.status === "Super Admin" && <Badge bg="primary" className="mt-3 text-uppercase px-3 py-2 rounded-pill shadow-sm">City Administrator</Badge>}
+                </Col>
+              </Row>
 
-              <Row className="mt-4 text-start g-3">
-                <Col xs={12}>
-                  <div className="info-box d-flex align-items-center p-3 bg-dark-soft rounded shadow-sm">
-                    <div className="icon-wrapper bg-danger-soft text-danger me-3"><FaMapMarkerAlt size={24} /></div>
-                    <div>
-                      <small className="text-muted text-uppercase fw-bold" style={{ fontSize: '0.75rem' }}>Assigned Junction</small>
-                      <div className="fs-5 fw-semibold text-white">{profileData?.junctionName || "N/A"}</div>
+              <Row className="g-4 mb-5">
+                <Col md={4}>
+                  <div className="info-box d-flex flex-column p-4 rounded bg-white shadow-sm border border-light h-100">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="icon-wrapper border border-danger border-opacity-25 bg-danger text-white me-3 bg-opacity-75 shadow-sm">
+                        <FaMapMarkerAlt size={20} />
+                      </div>
+                      <small className="text-muted text-uppercase fw-bold" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Assigned Junction</small>
                     </div>
+                    <div className="fs-5 fw-semibold mt-auto" style={{ color: 'var(--text-primary)' }}>{profileData?.junctionName || "N/A"}</div>
                   </div>
                 </Col>
                 
-                <Col xs={12}>
-                  <div className="info-box d-flex align-items-center p-3 bg-dark-soft rounded shadow-sm">
-                    <div className="icon-wrapper bg-info-soft text-info me-3"><FaCarSide size={24} /></div>
-                    <div>
-                      <small className="text-muted text-uppercase fw-bold" style={{ fontSize: '0.75rem' }}>Live Traffic</small>
-                      <div className="fs-5 fw-bold text-white mb-0">{profileData?.liveVehicleCount || 0} <span className="text-muted fs-6 fw-normal">vehicles</span></div>
+                <Col md={4}>
+                  <div className="info-box d-flex flex-column p-4 rounded bg-white shadow-sm border border-light h-100">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="icon-wrapper border border-info border-opacity-25 bg-info text-white me-3 bg-opacity-75 shadow-sm">
+                        <FaCarSide size={20} />
+                      </div>
+                      <small className="text-muted text-uppercase fw-bold" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Live Traffic Density</small>
+                    </div>
+                    <div className="fs-4 fw-bold mt-auto" style={{ color: 'var(--text-primary)' }}>
+                      {profileData?.liveVehicleCount || 0} <span className="text-muted fs-6 fw-normal">vehicles</span>
                     </div>
                   </div>
                 </Col>
 
-                <Col xs={12}>
-                  <div className="info-box d-flex align-items-center p-3 bg-dark-soft rounded shadow-sm">
-                    <div className="icon-wrapper bg-success-soft text-success me-3"><FaTrafficLight size={24} /></div>
-                    <div>
-                      <small className="text-muted text-uppercase fw-bold" style={{ fontSize: '0.75rem' }}>Current Status</small>
-                      <div className="fs-5 fw-bold text-white mb-0">
-                        {profileData?.status || "Active"}
+                <Col md={4}>
+                  <div className="info-box d-flex flex-column p-4 rounded bg-white shadow-sm border border-light h-100">
+                    <div className="d-flex align-items-center mb-3">
+                      <div className="icon-wrapper border border-success border-opacity-25 bg-success text-white me-3 bg-opacity-75 shadow-sm">
+                        <FaTrafficLight size={20} />
                       </div>
+                      <small className="text-muted text-uppercase fw-bold" style={{ fontSize: '0.75rem', letterSpacing: '0.5px' }}>Current Status</small>
+                    </div>
+                    <div className="fs-4 fw-bold mt-auto" style={{ color: 'var(--text-primary)' }}>
+                      {profileData?.status === "Congested" && <span className="text-danger">Congested</span>}
+                      {profileData?.status === "Clear" && <span className="text-success">Clear</span>}
+                      {(profileData?.status !== "Congested" && profileData?.status !== "Clear") && <span>{profileData?.status || "Active"}</span>}
                     </div>
                   </div>
                 </Col>
               </Row>
 
               {/* Performance & Rewards Section */}
-              <div className="mt-5 text-start">
-                <div className="d-flex align-items-center justify-content-between mb-3">
-                  <h5 className="fw-bold mb-0 text-white"><FaAward className="text-warning me-2" /> Performance & Rewards</h5>
-                  <Badge bg="warning" text="dark" className="px-3 py-2 fs-6 rounded-pill shadow-sm">
+              <div className="mt-4 pt-2">
+                <div className="d-flex flex-column flex-md-row align-items-md-center justify-content-between mb-4 border-bottom pb-3">
+                  <h4 className="fw-bold mb-3 mb-md-0 text-dark"><FaAward className="text-warning me-2" /> Performance & Rewards</h4>
+                  <Badge bg="warning" text="dark" className="px-4 py-2 fs-6 rounded-pill shadow-sm border border-warning">
                     <FaStar className="mb-1 me-1" /> Gold Member
                   </Badge>
                 </div>
                 
-                <Card className="bg-dark-soft border-0 shadow-sm rounded-4 mb-4">
+                <Card className="border-0 shadow-sm rounded-4 overflow-hidden mt-3" style={{ background: 'linear-gradient(145deg, #ffffff 0%, #f8fafc 100%)', border: '1px solid rgba(0,0,0,0.08) !important' }}>
                   <Card.Body className="p-4">
-                    <Row className="g-3 mb-4">
+                    <Row className="g-4 mb-4">
                       
-                      <Col xs={12} className="border-bottom border-secondary border-opacity-25 pb-3">
-                        <div className="d-flex align-items-center justify-content-between">
-                          <div className="d-flex align-items-center">
-                            <div className="icon-wrapper bg-warning bg-opacity-10 text-warning me-3" style={{width: '40px', height: '40px', borderRadius: '10px'}}><FaStar size={20} /></div>
-                            <small className="text-muted text-uppercase fw-bold" style={{fontSize: '0.75rem', letterSpacing: '0.5px'}}>Reward Points</small>
+                      <Col xs={12} md={4}>
+                        <div className="d-flex align-items-center p-3 rounded" style={{ background: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0,0,0,0.03)' }}>
+                          <div className="icon-wrapper bg-warning bg-opacity-25 text-warning me-3 shadow-sm" style={{width: '50px', height: '50px', borderRadius: '14px', border: '1px solid rgba(245, 158, 11, 0.3)'}}>
+                            <FaStar size={24} />
                           </div>
-                          <h4 className="fw-bold text-white mb-0">1,250</h4>
+                          <div>
+                            <small className="text-muted text-uppercase fw-bold d-block mb-1" style={{fontSize: '0.75rem', letterSpacing: '0.5px'}}>Reward Points</small>
+                            <h4 className="fw-bold text-dark mb-0 fs-3">1,250</h4>
+                          </div>
                         </div>
                       </Col>
                       
-                      <Col xs={12} className="border-bottom border-secondary border-opacity-25 pb-3">
-                        <div className="d-flex align-items-center justify-content-between">
-                          <div className="d-flex align-items-center">
-                            <div className="icon-wrapper bg-primary bg-opacity-10 text-primary me-3" style={{width: '40px', height: '40px', borderRadius: '10px'}}><FaBusAlt size={20} /></div>
-                            <small className="text-muted text-uppercase fw-bold" style={{fontSize: '0.75rem', letterSpacing: '0.5px'}}>Buses Prioritized</small>
+                      <Col xs={12} md={4}>
+                        <div className="d-flex align-items-center p-3 rounded" style={{ background: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0,0,0,0.03)' }}>
+                          <div className="icon-wrapper bg-primary bg-opacity-25 text-primary me-3 shadow-sm" style={{width: '50px', height: '50px', borderRadius: '14px', border: '1px solid rgba(59, 130, 246, 0.3)'}}>
+                            <FaBusAlt size={22} />
                           </div>
-                          <h4 className="fw-bold text-white mb-0">42</h4>
+                          <div>
+                            <small className="text-muted text-uppercase fw-bold d-block mb-1" style={{fontSize: '0.75rem', letterSpacing: '0.5px'}}>Buses Prioritized</small>
+                            <h4 className="fw-bold text-dark mb-0 fs-3">42</h4>
+                          </div>
                         </div>
                       </Col>
                       
-                      <Col xs={12}>
-                        <div className="d-flex align-items-center justify-content-between">
-                          <div className="d-flex align-items-center">
-                            <div className="icon-wrapper bg-success bg-opacity-10 text-success me-3" style={{width: '40px', height: '40px', borderRadius: '10px'}}><FaClock size={20} /></div>
-                            <small className="text-muted text-uppercase fw-bold" style={{fontSize: '0.75rem', letterSpacing: '0.5px'}}>Shift Logged</small>
+                      <Col xs={12} md={4}>
+                        <div className="d-flex align-items-center p-3 rounded" style={{ background: 'rgba(255, 255, 255, 0.8)', border: '1px solid rgba(0,0,0,0.03)' }}>
+                          <div className="icon-wrapper bg-success bg-opacity-25 text-success me-3 shadow-sm" style={{width: '50px', height: '50px', borderRadius: '14px', border: '1px solid rgba(16, 185, 129, 0.3)'}}>
+                            <FaClock size={22} />
                           </div>
-                          <h4 className="fw-bold text-white mb-0">18h</h4>
+                          <div>
+                            <small className="text-muted text-uppercase fw-bold d-block mb-1" style={{fontSize: '0.75rem', letterSpacing: '0.5px'}}>Shift Logged</small>
+                            <h4 className="fw-bold text-dark mb-0 fs-3">18h</h4>
+                          </div>
                         </div>
                       </Col>
                       
                     </Row>
                     
-                    <div className="px-2 mt-2">
+                    <div className="px-3 pt-2 mt-3">
                        <div className="d-flex justify-content-between align-items-end mb-2">
                           <span className="text-muted fw-semibold" style={{ fontSize: '0.85rem' }}>Next Tier: Platinum</span>
-                          <span className="text-white fw-bold">1,250 / 2,000 pts</span>
+                          <span className="text-dark fw-bold">1,250 <span className="text-muted fw-normal">/ 2,000 pts</span></span>
                        </div>
-                       <ProgressBar variant="warning" now={62.5} style={{ height: '8px' }} />
+                       <ProgressBar variant="warning" now={62.5} style={{ height: '12px', backgroundColor: 'rgba(0,0,0,0.08)' }} className="shadow-sm" />
                     </div>
                   </Card.Body>
                 </Card>
