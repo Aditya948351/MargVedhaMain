@@ -1,8 +1,5 @@
 # 🚦 Marg Vedha 3.0 – Real-Time Traffic Optimization System for Urban Congestion  
 
-### 🏆 Smart India Hackathon 2025 (Problem Statement ID: **SIH25050**)  
-**Team ID:** 52806 | **Team Name:** Marg Vedha 3.0  
-
 ---
 
 ## 📌 Problem Statement  
