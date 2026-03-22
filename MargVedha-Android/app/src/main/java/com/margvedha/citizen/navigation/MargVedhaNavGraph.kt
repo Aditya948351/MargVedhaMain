@@ -1,6 +1,7 @@
 package com.margvedha.citizen.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,30 +14,22 @@ import com.margvedha.citizen.ui.screens.profile.ProfileScreen
 import com.margvedha.citizen.ui.screens.report.ReportScreen
 import com.margvedha.citizen.ui.screens.transport.PublicTransportScreen
 
-sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object LiveMap : Screen("live_map")
-    object Report : Screen("report")
-    object Alerts : Screen("alerts")
-    object Profile : Screen("profile")
-    object Parking : Screen("parking")
-    object PublicTransport : Screen("public_transport")
-}
-
 @Composable
 fun MargVedhaNavGraph(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController = rememberNavController(),
+    modifier: Modifier = Modifier
 ) {
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route
+        startDestination = "home",
+        modifier = modifier
     ) {
-        composable(Screen.Home.route)             { HomeScreen(navController) }
-        composable(Screen.LiveMap.route)          { LiveMapScreen(navController) }
-        composable(Screen.Report.route)           { ReportScreen(navController) }
-        composable(Screen.Alerts.route)           { AlertsScreen(navController) }
-        composable(Screen.Profile.route)          { ProfileScreen(navController) }
-        composable(Screen.Parking.route)          { ParkingScreen(navController) }
-        composable(Screen.PublicTransport.route)  { PublicTransportScreen(navController) }
+        composable("home")             { HomeScreen(navController) }
+        composable("live_map")         { LiveMapScreen(navController) }
+        composable("report")           { ReportScreen(navController) }
+        composable("alerts")           { AlertsScreen(navController) }
+        composable("profile")          { ProfileScreen(navController) }
+        composable("parking")          { ParkingScreen(navController) }
+        composable("public_transport") { PublicTransportScreen(navController) }
     }
 }
