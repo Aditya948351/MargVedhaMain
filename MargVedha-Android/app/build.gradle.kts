@@ -49,10 +49,8 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
-    // Maps
-    implementation("com.google.maps.android:maps-compose:4.3.3")
-    implementation("com.google.android.gms:play-services-maps:18.2.0")
-    implementation("com.google.android.gms:play-services-location:21.2.0")
+    // Maps - OSMdroid (OpenStreetMap, completely FREE, no API key)
+    implementation("org.osmdroid:osmdroid-android:6.1.20")
 
     // Coil (Image Loading)
     implementation("io.coil-kt:coil-compose:2.6.0")

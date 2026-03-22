@@ -65,13 +65,9 @@ In `RetrofitClient.kt`:
 private const val BASE_URL = "http://YOUR_FLASK_BACKEND_URL/api/"
 ```
 
-### 4. Add Google Maps API Key
-In `AndroidManifest.xml`:
-```xml
-<meta-data
-    android:name="com.google.android.geo.API_KEY"
-    android:value="YOUR_GOOGLE_MAPS_API_KEY" />
-```
+### 4. Maps (No API Key Required! ✅)
+This app uses **OSMdroid (OpenStreetMap)** which is completely free.
+No setup needed — the map works out of the box.
 
 ### 5. Add Firebase Config
 - Download `google-services.json` from Firebase Console
@@ -91,7 +87,7 @@ Sync Project → Build → Run on Emulator/Device
 | UI Framework | Jetpack Compose (Material 3) |
 | Language | Kotlin |
 | Navigation | Navigation Compose |
-| Maps | Google Maps Compose SDK |
+| Maps | **OSMdroid (OpenStreetMap)** — Free, no API key |
 | Networking | Retrofit 2 + OkHttp |
 | Authentication | Firebase Auth |
 | Database | Firebase Firestore |
