@@ -233,7 +233,7 @@ fun HomeAlertRow(alert: Alert, navController: NavController) {
     }
     val icon = when (alert.type) {
         "accident" -> Icons.Default.CarCrash
-        "signal" -> Icons.Default.TrafficOutlined
+        "signal" -> Icons.Default.Traffic
         "closure" -> Icons.Default.Block
         "weather" -> Icons.Default.Thunderstorm
         "vip" -> Icons.Default.Shield

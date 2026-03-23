@@ -31,7 +31,7 @@ fun ReportScreen(navController: NavController) {
     val issueTypes = listOf(
         Triple("Pothole", Icons.Default.Construction, Color(0xFFF59E0B)),
         Triple("Traffic Jam", Icons.Default.Traffic, Color(0xFFEF4444)),
-        Triple("Signal Issue", Icons.Default.TrafficOutlined, Color(0xFFF97316)),
+        Triple("Signal Issue", Icons.Default.Traffic, Color(0xFFF97316)),
         Triple("Accident", Icons.Default.CarCrash, Color(0xFFDC2626)),
         Triple("Road Block", Icons.Default.Block, Color(0xFF7C3AED)),
         Triple("Flooding", Icons.Default.Water, Color(0xFF0EA5E9)),
