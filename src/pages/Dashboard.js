@@ -18,6 +18,7 @@ import {
   FaExpandAlt,
 } from "react-icons/fa";
 import { Modal, Button } from "react-bootstrap";
+import MapComponent from "../components/MapComponent";
 import {
   LineChart,
   Line,
@@ -695,50 +696,7 @@ const Dashboard = ({ onLogout }) => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ minHeight: 600, padding: 0, position: "relative", background: "#111827" }}>
-          
-          <video 
-            src="https://res.cloudinary.com/dsj0vaews/video/upload/v1774117387/eeololastomdbamjbs9a.mp4" 
-            autoPlay loop muted playsInline
-            style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", opacity: 0.8 }} 
-          />
-
-          <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}>
-            {nashikJunctions.map((j) => (
-              <div
-                key={j.id}
-                className="map-marker-hover"
-                style={{
-                  position: "absolute",
-                  top: j.top,
-                  left: j.left,
-                  transform: "translate(-50%, -50%)",
-                  background: "rgba(15, 23, 42, 0.9)",
-                  border: "2px solid #3b82f6",
-                  color: "#fff",
-                  padding: "4px 8px",
-                  borderRadius: "8px",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  boxShadow: "0 0 12px rgba(59, 130, 246, 0.6)",
-                  transition: "all 0.2s"
-                }}
-              >
-                <div style={{
-                  background: "#10b981", 
-                  width: "10px", 
-                  height: "10px", 
-                  borderRadius: "50%", 
-                  marginRight: "6px",
-                  boxShadow: "0 0 8px #10b981"
-                }}></div>
-                {j.id}. {j.name}
-              </div>
-            ))}
-          </div>
-
+          <MapComponent height="600px" />
         </Modal.Body>
         <Modal.Footer className="bg-slate-50 border-t border-slate-200 p-6 rounded-b-3xl">
           <div className="w-full flex justify-between items-center text-slate-500">

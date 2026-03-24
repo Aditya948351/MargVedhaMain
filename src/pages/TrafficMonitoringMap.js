@@ -34,10 +34,20 @@ const TrafficMonitoringMap = () => {
      
       {intersections.map((point, index) => (
         <Marker key={index} position={[point.lat, point.lon]} icon={cameraIcon}>
-          <Popup>
-            <strong>{point.name}</strong>
-            <br />
-            📷 Camera Monitoring Active
+          <Popup className="premium-popup" maxWidth={300}>
+            <div style={{ borderRadius: '12px', overflow: 'hidden' }}>
+              <video 
+                src="https://res.cloudinary.com/dsj0vaews/video/upload/v1774117387/eeololastomdbamjbs9a.mp4" 
+                autoPlay loop muted playsInline
+                style={{ width: '100%', height: '150px', objectFit: 'cover' }}
+              />
+              <div style={{ padding: '12px' }}>
+                <strong style={{ fontSize: '14px', color: '#1e293b' }}>{point.name}</strong>
+                <p style={{ margin: '4px 0 0', fontSize: '11px', color: '#64748b' }}>
+                  <span style={{ color: '#ef4444', fontWeight: 'bold' }}>● LIVE</span> 3D Simulation Feed
+                </p>
+              </div>
+            </div>
           </Popup>
         </Marker>
       ))}

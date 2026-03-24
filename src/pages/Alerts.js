@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Container, Row, Col, Card, Table, Modal, Button, Form } from "react-bootstrap";
 import { FaTrafficLight, FaExclamationTriangle, FaRoad, FaChartBar, FaMapMarkerAlt } from "react-icons/fa";
 import { Bar } from "react-chartjs-2";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, Marker, Popup } from "react-leaflet";
+import MapComponent from "../components/MapComponent";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from "chart.js";
@@ -100,12 +101,7 @@ const Alerts = ({ isAdmin = true }) => {
                 <h4 className="text-info fw-bold">
                   <FaMapMarkerAlt className="me-2" /> Live Map View
                 </h4>
-                <MapContainer center={coordinates} zoom={13} style={{ height: "350px", width: "100%" }}>
-                  <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-                  <Marker position={coordinates}>
-                    <Popup>{location || "Current Map View"}</Popup>
-                  </Marker>
-                </MapContainer>
+                <MapComponent height="350px" />
               </Card.Body>
             </Card>
           </Col>

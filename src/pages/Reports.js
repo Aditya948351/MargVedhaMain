@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { Row, Col, Button, Card } from "react-bootstrap";
-import { GoogleMap, LoadScript, Marker } from "@react-google-maps/api";
+import MapComponent from "../components/MapComponent";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
-const mapContainerStyle = { width: "100%", height: "400px" };
-const center = { lat: 37.7749, lng: -122.4194 }; // Default center (San Francisco)
 
 const Reports = () => {
   const [activeTab, setActiveTab] = useState("incident");
@@ -173,15 +171,12 @@ const Reports = () => {
 
      
       {activeTab === "incident" && subTab === "incidentMap" && (
-        <div>
-          <h3>Incident Map</h3>
-          <LoadScript googleMapsApiKey="YOUR_GOOGLE_MAPS_API_KEY">
-            <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={12}>
-              {activeIncidents.map((incident) => (
-                <Marker key={incident.id} position={{ lat: incident.lat, lng: incident.lng }} />
-              ))}
-            </GoogleMap>
-          </LoadScript>
+        <div className="bg-white rounded-3xl p-6 shadow-xl border border-slate-100">
+          <h3 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
+             <span className="p-1.5 bg-blue-50 text-blue-600 rounded-lg">🗺️</span>
+             Interactive Incident Map
+          </h3>
+          <MapComponent height="500px" />
         </div>
       )}
 
