@@ -1,24 +1,6 @@
-import React, { useState, useEffect } from "react";
-import "./Dashboard.css";
-import { useNavigate } from "react-router-dom";
-import {
-  FaTrafficLight,
-  FaBus,
-  FaLock,
-  FaExclamationTriangle,
-  FaMoneyBill,
-  FaCar,
-  FaChartLine,
-  FaUsers,
-  FaAmbulance,
-  FaUpload,
-  FaMapMarkerAlt,
-  FaRobot,
-  FaExternalLinkAlt,
-  FaExpandAlt,
-} from "react-icons/fa";
-import { Modal, Button } from "react-bootstrap";
-import MapComponent from "../components/MapComponent";
+import { db } from "../firebase";
+import { collection, query, where, onSnapshot, orderBy, limit } from "firebase/firestore";
+import { junctionCoords } from "../utils/junctionCoords";
 import {
   LineChart,
   Line,
@@ -57,37 +39,16 @@ const sampleTrafficData = [
   { time: "10:00", vehicles: 210, predicted: 215 },
 ];
 
-const intersectionsList = [
-  {
-    id: "gangapur",
-    label: "Gangapur Road",
-    cams: [{ id: "CAM101", vehicles: 240, congestion: "High" }],
-  },
-  {
-    id: "college",
-    label: "College Road",
-    cams: [{ id: "CAM102", vehicles: 179, congestion: "Medium" }],
-  },
-  {
-    id: "nashik",
-    label: "Nashik Road",
-    cams: [{ id: "CAM103", vehicles: 310, congestion: "Very High" }],
-  },
-  {
-    id: "sharanpur",
-    label: "Sharanpur Road",
-    cams: [{ id: "CAM104", vehicles: 128, congestion: "Low" }],
-  },
-];
+const intersectionsList = Object.entries(junctionCoords).map(([id, data]) => ({
+  id: id,
+  label: data.name,
+  cams: [{ id: `CAM${100 + parseInt(id)}`, vehicles: 0, congestion: "Low" }],
+}));
 
-const initialSignalState = {
-  "Gangapur Rd - North": "green",
-  "Gangapur Rd - South": "red",
-  "College Rd - East": "green",
-  "College Rd - West": "red",
-  "Nashik Rd - East": "red",
-  "Sharanpur Rd - North": "green",
-};
+const initialSignalState = Object.entries(junctionCoords).reduce((acc, [id, data]) => {
+  acc[`${data.name} - North`] = "green";
+  return acc;
+}, {});
 
 const nashikJunctions = [
   { id: 1, name: "CBS Circle", top: "45%", left: "50%" },
@@ -114,7 +75,7 @@ const nashikJunctions = [
 
 const Dashboard = ({ onLogout }) => {
   const navigate = useNavigate();
-  const [trafficData, setTrafficData] = useState(sampleTrafficData);
+  const [trafficData, setTrafficData] = useState([]);
   const [simModalOpen, setSimModalOpen] = useState(false);
   const [simOverride, setSimOverride] = useState(false);
   const [uploadedImages, setUploadedImages] = useState([]);
@@ -122,30 +83,82 @@ const Dashboard = ({ onLogout }) => {
   const [aiModalOpen, setAiModalOpen] = useState(false);
   const [aiDecisions, setAiDecisions] = useState(null);
   const [signalState, setSignalState] = useState(initialSignalState);
+  const [latestStats, setLatestStats] = useState({
+      car_count: 0,
+      motorcycle_count: 0,
+      bus_count: 0,
+      truck_count: 0,
+      total_vehicles: 0,
+  });
 
   const simulationUrl = "https://traffic-optimization-system.vercel.app/";
 
-  /* Demo live update: keep charts lively; replace with real feed in production */
+  const [liveKpi, setLiveKpi] = useState({ vehicles: 0, inflow: 0, outflow: 0, density: 0 });
+
+  /* Real-time traffic data subscription */
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTrafficData((prev) => {
-        const last = prev[prev.length - 1];
-        const nextVehicles = Math.max(
-          50,
-          Math.round(last.vehicles + (Math.random() - 0.45) * 40)
-        );
-        const nextPred = Math.round(nextVehicles + (Math.random() - 0.3) * 20);
-        const time = new Date();
-        const minutes = time.getMinutes();
-        const hh = time.getHours();
-        const fmt = `${String(hh).padStart(2, "0")}:${String(
-          minutes - (minutes % 10)
-        ).padStart(2, "0")}`;
-        const next = [...prev.slice(-6), { time: fmt, vehicles: nextVehicles, predicted: nextPred }];
-        return next;
-      });
-    }, 5000);
-    return () => clearInterval(interval);
+    const activeJunctionName = junctionCoords[selectedIntersection]?.name || "CBS Circle";
+    const trafficRef = collection(db, "traffic_data");
+    const q = query(
+      trafficRef, 
+      where("location", "==", activeJunctionName),
+      orderBy("timestamp", "desc"), 
+      limit(10)
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        const docs = snapshot.docs.map(doc => doc.data()).reverse();
+        const latest = docs[docs.length - 1];
+        
+        // Update Chart Data
+        const formattedData = docs.map(d => ({
+          time: new Date(d.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          vehicles: d.total_vehicles || (d.car_count + d.motorcycle_count + d.bus_count + d.truck_count),
+          predicted: (d.total_vehicles || 0) + Math.round(Math.random() * 20)
+        }));
+        setTrafficData(formattedData);
+
+        // Update KPIs
+        setLatestStats(latest);
+        setLiveKpi({
+          vehicles: latest.total_vehicles || (latest.car_count + latest.motorcycle_count + latest.bus_count + latest.truck_count),
+          inflow: latest.car_count + latest.bus_count,
+          outflow: latest.motorcycle_count + latest.truck_count,
+          density: Math.min(100, Math.round(((latest.total_vehicles || 0) / 200) * 100))
+        });
+      } else {
+        // Fallback or clear if no data found
+        console.warn(`No data found for junction: ${activeJunctionName}`);
+        setTrafficData([]);
+        setLatestStats({
+          car_count: 0,
+          motorcycle_count: 0,
+          bus_count: 0,
+          truck_count: 0,
+          total_vehicles: 0,
+        });
+        setLiveKpi({ vehicles: 0, inflow: 0, outflow: 0, density: 0 });
+      }
+    }, (error) => {
+      console.error("Firestore error:", error);
+    });
+
+    return () => unsubscribe();
+  }, [selectedIntersection]);
+
+  const [cityWideStats, setCityWideStats] = useState([]);
+
+  /* City-wide traffic summary for bottom table */
+  useEffect(() => {
+    const unsub = onSnapshot(collection(db, "traffic_police"), (snapshot) => {
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCityWideStats(data.slice(0, 5)); // Show top 5 or some subset
+    });
+    return () => unsub();
   }, []);
 
   /* Mock AI decisions (replace with real API call) */
@@ -192,15 +205,14 @@ const Dashboard = ({ onLogout }) => {
 
   const overrideSim = () => setSimOverride(true);
 
-  const getCurrentIntersectionData = () =>
+  const activeIntersection = 
     intersectionsList.find((it) => it.id === selectedIntersection) || intersectionsList[0];
 
-  /* KPI static (demo) — you can replace these with computed values from real APIs */
   const kpi = {
-    liveDensity: "70%",
-    totalVehicles: 1064,
-    congestion: "Very High",
-    distribution: { veryHigh: 1, high: 2, medium: 1, low: 1 },
+    liveDensity: `${liveKpi.density}%`,
+    totalVehicles: liveKpi.vehicles,
+    congestion: liveKpi.density > 70 ? "Very High" : (liveKpi.density > 40 ? "High" : "Moderate"),
+    distribution: { veryHigh: 1, high: 2, medium: 1, low: 1 }, // This could be calculated from city-wide data
   };
 
   return (
@@ -313,7 +325,7 @@ const Dashboard = ({ onLogout }) => {
                 <select 
                   value={selectedIntersection} 
                   onChange={(e) => setSelectedIntersection(e.target.value)}
-                  className="pl-4 pr-10 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-800 shadow-inner focus:ring-4 focus:ring-orange-500/5 transition-all outline-none appearance-none cursor-pointer min-w-[180px]"
+                  className="pl-4 pr-10 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-800 shadow-inner focus:ring-4 focus:ring-orange-500/5 transition-all outline-none appearance-none cursor-pointer min-w-[220px]"
                 >
                   {intersectionsList.map((it) => (
                     <option key={it.id} value={it.id}>{it.label}</option>
@@ -328,21 +340,31 @@ const Dashboard = ({ onLogout }) => {
             <div className="flex-grow">
               <div className="overflow-hidden rounded-3xl border border-slate-100 mb-8 shadow-sm">
                 <table className="w-full text-left">
-                  <thead>
-                    <tr className="bg-slate-50 border-b border-slate-100">
-                      <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none">Camera ID</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none text-center">Volume</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-slate-500 uppercase tracking-widest leading-none text-right">Status</th>
+                  <thead className="bg-slate-50/50 border-b border-slate-100">
+                    <tr>
+                      <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">vehicle type</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">count</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-100 bg-white">
-                    {getCurrentIntersectionData().cams.map((cam) => (
-                      <tr key={cam.id} className="hover:bg-orange-50/30 transition-colors">
-                        <td className="px-6 py-4 font-bold text-slate-800 text-sm tracking-tight">{cam.id}</td>
-                        <td className="px-6 py-4 font-black text-slate-900 text-md text-center tabular-nums">{cam.vehicles}</td>
+                  <tbody className="divide-y divide-slate-50">
+                    {[
+                      { type: "Car", count: latestStats.car_count, icon: "🚗" },
+                      { type: "Motorcycle", count: latestStats.motorcycle_count, icon: "🏍️" },
+                      { type: "Bus", count: latestStats.bus_count, icon: "🚌" },
+                      { type: "Truck", count: latestStats.truck_count, icon: "🚛" },
+                    ].map((row, idx) => (
+                      <tr key={idx} className="hover:bg-slate-50/30 transition-colors group/row">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <span className="text-xl">{row.icon}</span>
+                            <span className="text-sm font-bold text-slate-700">{row.type}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 font-black text-slate-900 text-md text-center tabular-nums">{row.count}</td>
                         <td className="px-6 py-4 text-right">
-                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm border ${cam.congestion === 'High' ? 'bg-rose-500 text-white border-rose-400' : 'bg-emerald-500 text-white border-emerald-400'}`}>
-                            {cam.congestion}
+                          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm border ${row.count > 20 ? 'bg-rose-500 text-white border-rose-400' : 'bg-emerald-500 text-white border-emerald-400'}`}>
+                            {row.count > 20 ? "High" : "Normal"}
                           </span>
                         </td>
                       </tr>
@@ -354,14 +376,14 @@ const Dashboard = ({ onLogout }) => {
               <div className="grid grid-cols-3 gap-6 bg-slate-50/50 p-4 rounded-3xl border border-slate-100">
                 <div className="space-y-1">
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Density</p>
-                  <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{Math.round((getCurrentIntersectionData().cams.reduce((s, c) => s + c.vehicles, 0) / 3) || 70)}%</p>
+                  <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{liveKpi.density}%</p>
                 </div>
                 <div className="space-y-1 border-x border-slate-200 px-4">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Sensors</p>
-                  <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{getCurrentIntersectionData().cams.length}</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Cams</p>
+                  <p className="text-xl font-black text-slate-900 leading-none tracking-tight">1</p>
                 </div>
                 <div className="space-y-1 px-4">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Peak Time</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Signal Status</p>
                   <p className="text-xl font-black text-slate-900 leading-none tracking-tight">Active</p>
                 </div>
               </div>
@@ -630,29 +652,26 @@ const Dashboard = ({ onLogout }) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {[
-                    { id: 'CAM101', loc: 'Gangapur Road', val: 240, status: 'High' },
-                    { id: 'CAM102', loc: 'College Road', val: 179, status: 'Medium' },
-                    { id: 'CAM103', loc: 'Nashik Road', val: 310, status: 'Very High' },
-                    { id: 'CAM104', loc: 'Sharanpur Road', val: 128, status: 'Low' },
-                    { id: 'CAM105', loc: 'Trimbak Road', val: 207, status: 'High' },
-                  ].map((row) => (
+                  {cityWideStats.length > 0 ? cityWideStats.map((row) => (
                     <tr key={row.id} className="hover:bg-blue-50/20 transition-colors">
-                      <td className="px-8 py-5 font-bold text-slate-800 text-sm">{row.id}</td>
-                      <td className="px-8 py-5 text-slate-600 font-medium text-sm">{row.loc}</td>
-                      <td className="px-8 py-5 tabular-nums font-black text-slate-900">{row.val}</td>
+                      <td className="px-8 py-5 font-bold text-slate-800 text-sm">{row.junctionId || 'SYS'+row.id.slice(-3)}</td>
+                      <td className="px-8 py-5 text-slate-600 font-medium text-sm">{row.junctionName}</td>
+                      <td className="px-8 py-5 tabular-nums font-black text-slate-900">{row.liveVehicleCount}</td>
                       <td className="px-8 py-5 text-right">
                         <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm ${
-                          row.status === 'Very High' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
-                          row.status === 'High' ? 'bg-orange-50 text-orange-700 border border-orange-200' :
-                          row.status === 'Medium' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                          row.liveVehicleCount > 100 ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                          row.liveVehicleCount > 50 ? 'bg-orange-50 text-orange-700 border border-orange-200' :
                           'bg-emerald-50 text-emerald-700 border border-emerald-200'
                         }`}>
-                          {row.status}
+                          {row.status || (row.liveVehicleCount > 100 ? 'Very High' : row.liveVehicleCount > 50 ? 'High' : 'Low')}
                         </span>
                       </td>
                     </tr>
-                  ))}
+                  )) : (
+                    <tr>
+                      <td colSpan="4" className="px-8 py-5 text-center text-slate-400 italic font-medium">Connecting to city-wide sensors...</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>

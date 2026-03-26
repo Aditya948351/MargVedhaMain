@@ -79,11 +79,36 @@ fun ProfileScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 StatItem("24", "Reports\nSubmitted")
-                StatItem("120", "Points\nEarned")
-                StatItem("8", "Alerts\nReceived")
+                StatItem("450", "Reward\nPoints")
+                StatItem("18", "Community\nPosts")
             }
 
-            Divider(modifier = Modifier.padding(horizontal = 16.dp))
+            // Reward Progress Card
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.2f)),
+                elevation = CardDefaults.cardElevation(0.dp)
+            ) {
+                Row(Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Icon(Icons.Default.Stars, contentDescription = null, tint = Color(0xFFF59E0B), modifier = Modifier.size(32.dp))
+                    Spacer(Modifier.width(12.dp))
+                    Column(Modifier.weight(1f)) {
+                        Text("Silver Contributor", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text("50 points until Gold badge", fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                        Spacer(Modifier.height(8.dp))
+                        LinearProgressIndicator(
+                            progress = { 0.8f },
+                            modifier = Modifier.fillMaxWidth().height(6.dp).clip(CircleShape),
+                            color = Color(0xFFF59E0B)
+                        )
+                    }
+                }
+            }
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
             Spacer(modifier = Modifier.height(8.dp))
 
             Text("Account", fontWeight = FontWeight.Bold, fontSize = 14.sp,
@@ -96,7 +121,7 @@ fun ProfileScreen(navController: NavController) {
             ProfileOption(Icons.Default.Language, "Language", "English (Default)")
 
             Spacer(modifier = Modifier.height(8.dp))
-            Divider(modifier = Modifier.padding(horizontal = 16.dp))
+            HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
             Spacer(modifier = Modifier.height(8.dp))
 
             Text("Support", fontWeight = FontWeight.Bold, fontSize = 14.sp,

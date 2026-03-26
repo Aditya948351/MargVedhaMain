@@ -1,46 +1,71 @@
 import React, { useState, useEffect } from "react";
-import { Card, Button, Table, Spinner } from "react-bootstrap";
+import { Card, Button, Table, Spinner, Form } from "react-bootstrap";
 import { FaCar, FaSyncAlt, FaHistory } from "react-icons/fa";
-import { collection, getDocs, onSnapshot, query, orderBy, limit } from "firebase/firestore";
+import { collection, getDocs, onSnapshot, query, orderBy, limit, where } from "firebase/firestore";
 import { db } from "../firebase"; 
+import { junctionCoords } from "../utils/junctionCoords";
 
 const TrafficCounting = () => {
   const [latestTraffic, setLatestTraffic] = useState(null);
   const [trafficHistory, setTrafficHistory] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [lastSync, setLastSync] = useState(null);
+  const [selectedJunction, setSelectedJunction] = useState("1"); // Default to CBS Circle
 
   useEffect(() => {
+    const activeJunctionName = junctionCoords[selectedJunction]?.name || "CBS Circle";
     const trafficRef = collection(db, "traffic_data");
-
     
-    const q = query(trafficRef, orderBy("timestamp", "desc"), limit(1));
+    // Live update for the selected junction
+    const q = query(
+      trafficRef, 
+      where("location", "==", activeJunctionName),
+      orderBy("timestamp", "desc"), 
+      limit(1)
+    );
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (!snapshot.empty) {
         setLatestTraffic(snapshot.docs[0].data());
+        setLastSync(new Date());
+      } else {
+        setLatestTraffic(null);
       }
     });
 
-    
+    // Historical data for the selected junction
     const fetchHistoricalData = async () => {
-      const querySnapshot = await getDocs(query(trafficRef, orderBy("timestamp", "desc")));
+      const histQuery = query(
+        trafficRef, 
+        where("location", "==", activeJunctionName),
+        orderBy("timestamp", "desc"),
+        limit(50)
+      );
+      const querySnapshot = await getDocs(histQuery);
       const historyData = querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setTrafficHistory(historyData);
     };
 
     fetchHistoricalData();
     return () => unsubscribe(); 
-  }, []);
+  }, [selectedJunction]);
 
   const fetchTrafficData = async () => {
     setLoading(true);
-    setTimeout(async () => {
+    try {
       const querySnapshot = await getDocs(query(collection(db, "traffic_data"), orderBy("timestamp", "desc"), limit(1)));
       if (!querySnapshot.empty) {
         setLatestTraffic(querySnapshot.docs[0].data()); 
+        setLastSync(new Date());
+      } else {
+        console.warn("No traffic data found in collection 'traffic_data'");
       }
+    } catch (error) {
+      console.error("Error fetching traffic data:", error);
+      alert("Failed to fetch live traffic data. Please check your connection.");
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   
@@ -57,11 +82,27 @@ const TrafficCounting = () => {
   return (
     <div className="p-4">
       <h2 className="text-primary"><FaCar /> Live Traffic Data</h2>
-      <p> Real-time vehicle count based on AI-powered YOLOv8 detection.</p>
+      <p> Real-time vehicle count based on AI-powered YOLO detection.</p>
+
+      <div className="mb-4" style={{ maxWidth: "300px" }}>
+        <label className="form-label font-bold text-slate-700">Select Junction:</label>
+        <select 
+          className="form-select shadow-sm"
+          value={selectedJunction}
+          onChange={(e) => setSelectedJunction(e.target.value)}
+        >
+          {Object.entries(junctionCoords).map(([id, data]) => (
+            <option key={id} value={id}>{data.name}</option>
+          ))}
+        </select>
+      </div>
 
       <Card className="shadow-lg border-0 mb-4">
         <Card.Body>
-          <Card.Title> Latest Vehicle Detection</Card.Title>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <Card.Title className="mb-0">Latest Vehicle Detection</Card.Title>
+            {lastSync && <small className="text-muted">Last Sync: {lastSync.toLocaleTimeString()}</small>}
+          </div>
           {loading ? (
             <Spinner animation="border" variant="primary" />
           ) : latestTraffic ? (

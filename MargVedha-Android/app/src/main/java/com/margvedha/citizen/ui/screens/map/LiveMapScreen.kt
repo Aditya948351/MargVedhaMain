@@ -1,15 +1,21 @@
 package com.margvedha.citizen.ui.screens.map
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Layers
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Mic
 import androidx.compose.material.icons.filled.MyLocation
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -75,6 +81,10 @@ fun LiveMapScreen(navController: NavController) {
                             marker.title = title
                             marker.snippet = snippet
                             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+                            marker.setOnMarkerClickListener { m, _ ->
+                                m.showInfoWindow()
+                                true
+                            }
                             overlays.add(marker)
                         }
                         invalidate()
@@ -83,11 +93,39 @@ fun LiveMapScreen(navController: NavController) {
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Layer Filter Chips
+            // Search Bar at Top
+            Card(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                shape = RoundedCornerShape(12.dp),
+                elevation = CardDefaults.cardElevation(6.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(Icons.Default.Search, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.width(12.dp))
+                    Text(
+                        "Search for a destination...",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                        fontSize = 14.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = { }) {
+                        Icon(Icons.Default.Mic, contentDescription = "Voice Search", tint = MaterialTheme.colorScheme.primary)
+                    }
+                }
+            }
+
+            // Layer Filter Chips (Moved down slightly to avoid overlap with search)
             Row(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 8.dp),
+                    .padding(top = 80.dp),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 layers.forEach { layer ->
@@ -95,7 +133,11 @@ fun LiveMapScreen(navController: NavController) {
                         selected = selectedLayer == layer,
                         onClick = { selectedLayer = layer },
                         label = { Text(layer) },
-                        shape = RoundedCornerShape(50)
+                        shape = RoundedCornerShape(50),
+                        colors = FilterChipDefaults.filterChipColors(
+                            selectedContainerColor = MaterialTheme.colorScheme.primary,
+                            selectedLabelColor = MaterialTheme.colorScheme.onPrimary
+                        )
                     )
                 }
             }
@@ -106,48 +148,57 @@ fun LiveMapScreen(navController: NavController) {
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .padding(16.dp),
-                shape = RoundedCornerShape(20.dp),
-                elevation = CardDefaults.cardElevation(8.dp)
+                shape = RoundedCornerShape(24.dp),
+                elevation = CardDefaults.cardElevation(12.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
             ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Plan Your Route", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                    Spacer(modifier = Modifier.height(8.dp))
+                Column(modifier = Modifier.padding(20.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(Modifier.size(8.dp).clip(RoundedCornerShape(50)).background(MaterialTheme.colorScheme.primary))
+                        Spacer(Modifier.width(12.dp))
+                        Text("Plan Your Route", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp)
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
                     OutlinedTextField(
-                        value = "",
+                        value = "Your Location",
                         onValueChange = {},
                         label = { Text("From") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        singleLine = true
+                        shape = RoundedCornerShape(16.dp),
+                        singleLine = true,
+                        leadingIcon = { Icon(Icons.Default.MyLocation, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp)) }
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
                     OutlinedTextField(
                         value = "",
                         onValueChange = {},
                         label = { Text("To") },
+                        placeholder = { Text("Enter destination") },
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        singleLine = true
+                        shape = RoundedCornerShape(16.dp),
+                        singleLine = true,
+                        leadingIcon = { Icon(Icons.Default.LocationOn, null, tint = Color.Red, modifier = Modifier.size(20.dp)) }
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     Button(
                         onClick = {},
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(vertical = 14.dp)
                     ) {
-                        Text("Find Best Route", fontWeight = FontWeight.Bold)
+                        Text("Find Best Route", fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
                 }
             }
 
-            // My Location FAB
+            // My Location FAB (Floating above the card)
             FloatingActionButton(
                 onClick = {},
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(end = 16.dp, bottom = 240.dp),
-                containerColor = MaterialTheme.colorScheme.primary
+                    .padding(end = 16.dp, bottom = 280.dp),
+                containerColor = MaterialTheme.colorScheme.primary,
+                shape = RoundedCornerShape(16.dp)
             ) {
                 Icon(Icons.Default.MyLocation, contentDescription = "My Location")
             }

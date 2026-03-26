@@ -3,7 +3,7 @@
     {
       "id": "cam1_north",
       "name": "Camera 1 - North",
-      "source": "E:\\SIH\\Development\\Authority-Dashboard\\MargVedhaMain\\Backend-YOLOv11\\data\\cam1.mp4",
+      "source": "data/cam1.mp4",
       "weights": "weights/yolov11m.pt",
       "split_line": [0, 360, 1280, 360],
       "frame_scale": 1.0,
@@ -12,7 +12,7 @@
     {
       "id": "cam2_south",
       "name": "Camera 2 - South",
-      "source": "E:\\SIH\\Development\\Authority-Dashboard\\MargVedhaMain\\Backend-YOLOv11\\data\\cam2.mp4",
+      "source": "data/cam2.mp4",
       "weights": "weights/yolov11m.pt",
       "split_line": [0, 360, 1280, 360],
       "frame_scale": 1.0,
@@ -21,7 +21,7 @@
     {
       "id": "cam3_east",
       "name": "Camera 3 - East",
-      "source": "E:\\SIH\\Development\\Authority-Dashboard\\MargVedhaMain\\Backend-YOLOv11\\data\\cam3.mp4",
+      "source": "data/cam3.mp4",
       "weights": "weights/yolov11m.pt",
       "split_line": [0, 360, 1280, 360],
       "frame_scale": 1.0,
@@ -30,7 +30,7 @@
     {
       "id": "cam4_west",
       "name": "Camera 4 - West",
-      "source": "E:\\SIH\\Development\\Authority-Dashboard\\MargVedhaMain\\Backend-YOLOv11\\data\\cam4.mp4",
+      "source": "data/cam4.mp4",
       "weights": "weights/yolov11m.pt",
       "split_line": [0, 360, 1280, 360],
       "frame_scale": 1.0,

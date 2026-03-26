@@ -5,9 +5,9 @@ numpy>=1.24
 pandas>=2.0
 tqdm>=4.65
 
-# BoT-SORT (install via git)
-#git+https://github.com/NirAharon/BoT-SORT.git@main
+# Backend
+flask
+firebase-admin
 
-# PyTorch - choose appropriate wheel for your CUDA or CPU
-# For CUDA 11.7 (example): pip install torch==2.2.0+cu117 torchvision==0.16.0 --extra-index-url https://download.pytorch.org/whl/cu117
-# If you are on CPU-only environment, install CPU wheel or use: pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+# PyTorch
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu

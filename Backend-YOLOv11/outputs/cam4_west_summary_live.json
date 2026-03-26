@@ -1,0 +1,15 @@
+{
+  "camera_id": "cam4_west",
+  "camera_name": "Camera 4 - West",
+  "counts": {
+    "incoming": {
+      "car": 83
+    },
+    "outgoing": {
+      "car": 54,
+      "truck": 9
+    }
+  },
+  "last_event_time": "2026-03-26 17:01:40.382",
+  "events_logged": 146
+}

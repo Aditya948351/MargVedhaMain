@@ -1,0 +1,15 @@
+{
+  "camera_id": "cam3_east",
+  "camera_name": "Camera 3 - East",
+  "counts": {
+    "incoming": {
+      "car": 61
+    },
+    "outgoing": {
+      "car": 41,
+      "truck": 6
+    }
+  },
+  "last_event_time": "2026-03-26 17:02:24.837",
+  "events_logged": 108
+}

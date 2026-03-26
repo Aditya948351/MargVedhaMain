@@ -1,0 +1,390 @@
+#!/usr/bin/env python3
+"""
+SIH25050: Real time Traffic Optimization System for Urban Congestion.
+Author: Team Marg Vedha 3.0
+"""
+
+import argparse
+import json
+import math
+import os
+import time
+import threading
+from collections import defaultdict
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, Tuple
+
+import cv2
+import numpy as np
+import pandas as pd
+from ultralytics import YOLO
+from tqdm import tqdm
+
+# ---------- Utilities ----------
+def now_epoch():
+    return float(time.time())
+
+def epoch_to_hms(ts):
+    return datetime.fromtimestamp(ts).strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+
+def point_side_of_line(pt: Tuple[float, float], a: Tuple[float, float], b: Tuple[float, float]) -> float:
+    (x, y) = pt
+    (x1, y1), (x2, y2) = a, b
+    return (x2 - x1) * (y - y1) - (y2 - y1) * (x - x1)
+
+def centroid_from_xyxy(xyxy):
+    x1, y1, x2, y2 = xyxy
+    return ((x1 + x2) / 2.0, (y1 + y2) / 2.0)
+
+# ---------- Firebase Integration ----------
+try:
+    import firebase_admin
+    from firebase_admin import credentials, firestore
+    HAS_FIREBASE = True
+except ImportError:
+    HAS_FIREBASE = False
+
+class FirebaseManager:
+    _instance = None
+    def __new__(cls, cert_path=None):
+        if not cls._instance:
+            cls._instance = super(FirebaseManager, cls).__new__(cls)
+            cls._instance.db = None
+            if cert_path and HAS_FIREBASE:
+                try:
+                    cred = credentials.Certificate(cert_path)
+                    firebase_admin.initialize_app(cred)
+                    cls._instance.db = firestore.client()
+                    print("[Firebase] Initialized successfully.")
+                except Exception as e:
+                    print(f"[Firebase] Initialization failed: {e}")
+        return cls._instance
+
+    def update_counts(self, camera_id, counts):
+        if self.db:
+            try:
+                doc_ref = self.db.collection("traffic_data").document("latest_counts")
+                # Also store historical snapshots
+                # doc_ref_hist = self.db.collection("traffic_data").document()
+                
+                data = {
+                    "camera_id": camera_id,
+                    "timestamp": int(time.time() * 1000), # Milliseconds for dashboard compatibility
+                    "car_count": counts.get("incoming", {}).get("car", 0) + counts.get("outgoing", {}).get("car", 0),
+                    "bus_count": counts.get("incoming", {}).get("bus", 0) + counts.get("outgoing", {}).get("bus", 0),
+                    "truck_count": counts.get("incoming", {}).get("truck", 0) + counts.get("outgoing", {}).get("truck", 0),
+                    "motorcycle_count": counts.get("incoming", {}).get("motorcycle", 0) + counts.get("outgoing", {}).get("motorcycle", 0),
+                }
+                data["total_vehicles"] = data["car_count"] + data["bus_count"] + data["truck_count"] + data["motorcycle_count"]
+                
+                doc_ref.set(data, merge=True)
+                # For historical tracking as seen in TrafficCounting.js
+                self.db.collection("traffic_data").add(data)
+            except Exception as e:
+                print(f"[Firebase] Update failed: {e}")
+
+# ---------- Camera Processor ----------
+class CameraProcessor:
+    def __init__(self, cam_cfg: Dict, output_dir: str, firebase_mgr=None):
+        self.id = cam_cfg.get("id", f"cam_{int(time.time()*1000)%10000}")
+        self.name = cam_cfg.get("name", self.id)
+        self.source = cam_cfg["source"]
+        self.weights = cam_cfg.get("weights", "yolov11m.pt")
+        self.split_line = tuple(cam_cfg.get("split_line", [640, 0, 640, 720]))
+        self.frame_scale = float(cam_cfg.get("frame_scale", 1.0))
+        self.out_video = os.path.join(output_dir, cam_cfg.get("out_video", f"{self.id}_out.mp4"))
+        self.model = YOLO(self.weights)
+        self.firebase_mgr = firebase_mgr
+
+        # data
+        self.track_last_side = {}
+        self.counts = {'incoming': defaultdict(int), 'outgoing': defaultdict(int)}
+        self.events = []  
+        self.target_names = ['car', 'bus', 'truck', 'motorcycle', 'person']
+        self.class_map = {}
+        self.writer = None
+        self.output_dir = output_dir
+        self.last_frame = None
+
+        # files
+        self.events_ndjson = os.path.join(output_dir, f"{self.id}_events.ndjson")
+        self.summary_json = os.path.join(output_dir, f"{self.id}_summary_live.json")
+        self.summary_csv = os.path.join(output_dir, f"{self.id}_events.csv")
+
+        Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    def map_class_names(self, result):
+        try:
+            self.class_map = self.model.names if hasattr(self.model, 'names') else result.model.names
+        except Exception:
+            self.class_map = {0: 'person', 1: 'bicycle', 2: 'car', 3: 'motorcycle', 5: 'bus', 7: 'truck'}
+
+    def side_label_from_signed(self, signed_value):
+        return 'A' if signed_value > 0 else 'B'
+
+    def side_to_direction(self, prev_side, new_side):
+        if prev_side is None:
+            return None
+        if prev_side == 'A' and new_side == 'B':
+            return 'outgoing'
+        if prev_side == 'B' and new_side == 'A':
+            return 'incoming'
+        return None
+
+    def initialize_writer(self, frame_shape, fps=20):
+        h, w = frame_shape[:2]
+        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        self.writer = cv2.VideoWriter(self.out_video, fourcc, fps, (w, h))
+
+    def persist_event_live(self, event: Dict):
+        """Append event as single-line NDJSON and update live summary JSON."""
+        # append to ndjson
+        with open(self.events_ndjson, 'a') as f:
+            f.write(json.dumps(event) + "\n")
+        # update in-memory and write summary JSON
+        self.events.append(event)
+        
+        # update Firebase if manager available
+        if self.firebase_mgr:
+            self.firebase_mgr.update_counts(self.id, self.counts)
+
+        # write summary JSON (overwrite)
+        summary = {
+            'camera_id': self.id,
+            'camera_name': self.name,
+            'counts': {
+                'incoming': dict(self.counts['incoming']),
+                'outgoing': dict(self.counts['outgoing'])
+            },
+            'last_event_time': epoch_to_hms(event['timestamp']),
+            'events_logged': len(self.events)
+        }
+        with open(self.summary_json, 'w') as f:
+            json.dump(summary, f, indent=2)
+
+    def finalize(self):
+        # release writer, dump csv
+        if self.writer:
+            self.writer.release()
+        # dump final CSV of events
+        if len(self.events) > 0:
+            df = pd.DataFrame(self.events)
+            df.to_csv(self.summary_csv, index=False)
+        # final summary JSON
+        final = {
+            'camera_id': self.id,
+            'camera_name': self.name,
+            'counts': {
+                'incoming': dict(self.counts['incoming']),
+                'outgoing': dict(self.counts['outgoing'])
+            },
+            'events': self.events
+        }
+        with open(os.path.join(self.output_dir, f"{self.id}_final_summary.json"), 'w') as f:
+            json.dump(final, f, indent=2)
+
+    def process(self, max_frames: int = None, verbose: bool = True, on_frame=None, loop: bool = False):
+
+        if verbose:
+            print(f"[{self.id}] Starting. source={self.source} weights={self.weights} loop={loop}")
+
+        first_frame = True
+        frame_count = 0
+        fps = 20
+        a = (self.split_line[0], self.split_line[1])
+        b = (self.split_line[2], self.split_line[3])
+
+        try:
+            while True:
+                stream = self.model.track(source=self.source, tracker='botsort.yaml', persist=True, stream=True, show=False)
+                for result in stream:
+                    frame = None
+                    if hasattr(result, 'orig_img') and result.orig_img is not None:
+                        frame = result.orig_img.copy() # copy to avoid modification issues
+                    elif hasattr(result, 'orig_frame') and result.orig_frame is not None:
+                        frame = result.orig_frame.copy()
+                    else:
+                        continue
+
+                    if frame is None:
+                        continue
+
+                    frame_count += 1
+                    if first_frame:
+                        self.map_class_names(result)
+                        try:
+                            cap = cv2.VideoCapture(self.source)
+                            if cap.isOpened():
+                                fps_try = cap.get(cv2.CAP_PROP_FPS)
+                                if fps_try and fps_try > 1:
+                                    fps = int(fps_try)
+                                cap.release()
+                        except Exception:
+                            pass
+                        self.initialize_writer(frame.shape, fps=fps)
+                        first_frame = False
+
+                    # draw split line
+                    cv2.line(frame, (int(a[0]), int(a[1])), (int(b[0]), int(b[1])), (0,255,255), 2)
+
+                    # parse boxes
+                    boxes = []
+                    ids = []
+                    classes = []
+                    scores = []
+                    try:
+                        for box in result.boxes:
+                            try:
+                                xyxy = box.xyxy.squeeze().tolist() if hasattr(box.xyxy, 'squeeze') else box.xyxy.tolist()
+                            except Exception:
+                                xyxy = box.xyxy.tolist() if hasattr(box, 'xyxy') else None
+                            conf = float(getattr(box, 'conf', getattr(box, 'confidence', 0.0)))
+                            cls = int(getattr(box, 'cls', getattr(box, 'cls_id', -1)))
+                            tid = int(getattr(box, 'id', getattr(box, 'track_id', -1)))
+                            if xyxy is None:
+                                continue
+                            boxes.append(xyxy)
+                            ids.append(tid)
+                            classes.append(cls)
+                            scores.append(conf)
+                    except Exception:
+                        try:
+                            arr_xyxy = result.boxes.xyxy.cpu().numpy()
+                            arr_cls = result.boxes.cls.cpu().numpy().astype(int)
+                            arr_id = result.boxes.id.cpu().numpy().astype(int)
+                            arr_conf = result.boxes.conf.cpu().numpy()
+                            for xyxy, cls_, tid_, conf_ in zip(arr_xyxy, arr_cls, arr_id, arr_conf):
+                                boxes.append(xyxy.tolist())
+                                ids.append(int(tid_))
+                                classes.append(int(cls_))
+                                scores.append(float(conf_))
+                        except Exception:
+                            boxes, ids, classes, scores = [], [], [], []
+
+                    for xyxy, tid, cls_idx, conf in zip(boxes, ids, classes, scores):
+                        cls_name = self.class_map.get(cls_idx, str(cls_idx))
+                        if cls_name not in self.target_names:
+                            continue
+                        centroid = centroid_from_xyxy(xyxy)
+                        signed = point_side_of_line(centroid, a, b)
+                        new_side = self.side_label_from_signed(signed)
+                        prev_side = self.track_last_side.get(tid, None)
+                        self.track_last_side[tid] = new_side
+
+                        if prev_side is not None and prev_side != new_side:
+                            direction = self.side_to_direction(prev_side, new_side)
+                            if direction is not None:
+                                self.counts[direction][cls_name] += 1
+                                event = {
+                                    'frame': frame_count,
+                                    'timestamp': now_epoch(),
+                                    'timestamp_human': epoch_to_hms(now_epoch()),
+                                    'track_id': int(tid),
+                                    'class': cls_name,
+                                    'direction': direction,
+                                    'centroid': [float(centroid[0]), float(centroid[1])],
+                                    'confidence': float(conf),
+                                    'camera_id': self.id,
+                                    'camera_name': self.name
+                                }
+                                self.persist_event_live(event)
+
+                    for xyxy, tid, cls_idx, conf in zip(boxes, ids, classes, scores):
+                        cls_name = self.class_map.get(cls_idx, str(cls_idx))
+                        if cls_name not in self.target_names:
+                            continue
+                        x1,y1,x2,y2 = map(int, xyxy)
+                        cv2.rectangle(frame, (x1,y1), (x2,y2), (0,255,0), 2)
+                        label = f"{cls_name}:{tid}"
+                        cv2.putText(frame, label, (x1, y1 - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 1)
+
+                    left = 10
+                    top = 20
+                    for direction in ['incoming','outgoing']:
+                        text = f"{direction.upper()} - car:{self.counts[direction].get('car',0)} bus:{self.counts[direction].get('bus',0)} truck:{self.counts[direction].get('truck',0)}"
+                        cv2.putText(frame, text, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,0), 3)
+                        cv2.putText(frame, text, (left, top), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255,255,255), 1)
+                        top += 30
+
+                    if self.writer:
+                        self.writer.write(frame)
+                    
+                    if self.firebase_mgr and frame_count % 30 == 0: # Update every ~1.5s at 20fps
+                        self.firebase_mgr.update_counts(self.id, self.counts)
+
+                    self.last_frame = frame
+                    if on_frame:
+                        on_frame(self.id, frame)
+
+                    if max_frames and frame_count >= max_frames:
+                        return {
+                            'camera_id': self.id,
+                            'counts': {k: dict(v) for k,v in self.counts.items()}
+                        }
+                
+                if not loop and frame_count > 0 and result is stream[-1] if isinstance(stream, list) else False:
+                    # This is tricky with stream=True, but usually the for loop just ends.
+                    pass
+                
+                # If we reach here and the for loop ends, it will either loop or exit.
+            
+            # End of while True loop
+            if not loop:
+                # This should not normally be reached if max_frames is set or stream ends
+                pass
+
+        except KeyboardInterrupt:
+            print(f"[{self.id}] Interrupted by user.")
+        except Exception as e:
+            print(f"[{self.id}] Error during processing: {e}")
+            import traceback
+            traceback.print_exc()
+        finally:
+            self.finalize()
+            return {
+                'camera_id': self.id,
+                'counts': {k: dict(v) for k,v in self.counts.items()}
+            }
+
+# ---------- Orchestration ----------
+def load_config(path):
+    with open(path, 'r') as f:
+        return json.load(f)
+
+def main(config_path, output_dir, firebase_cert=None, max_frames: int = None):
+    firebase_mgr = None
+    if firebase_cert:
+        firebase_mgr = FirebaseManager(firebase_cert)
+        
+    cfg = load_config(config_path)
+    cameras = cfg.get('cameras', [])
+    threads = []
+    
+    def run_proc(cam_cfg):
+        proc = CameraProcessor(cam_cfg, output_dir=output_dir, firebase_mgr=firebase_mgr)
+        proc.process(max_frames=max_frames, verbose=True, loop=True)
+
+    for cam in cameras:
+        t = threading.Thread(target=run_proc, args=(cam,), daemon=True)
+        t.start()
+        threads.append(t)
+        time.sleep(1) # Small delay to avoid overlapping init logs too much
+
+    print(f"Started {len(threads)} camera processing threads. Processing live...")
+    
+    try:
+        while True:
+            time.sleep(10)
+    except KeyboardInterrupt:
+        print("Stopping all threads...")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="YOLOv11 + BoT-SORT traffic counting (live JSON)")
+    parser.add_argument('--config', required=True, help='Path to cameras_config.json')
+    parser.add_argument('--out', default='outputs', help='Output directory for videos and logs')
+    parser.add_argument('--firebase-cert', default=None, help='Path to firebase-adminsdk.json')
+    parser.add_argument('--max-frames', type=int, default=None, help='For dev: stop after N frames per camera')
+    args = parser.parse_args()
+    main(args.config, args.out, firebase_cert=args.firebase_cert, max_frames=args.max_frames)
+

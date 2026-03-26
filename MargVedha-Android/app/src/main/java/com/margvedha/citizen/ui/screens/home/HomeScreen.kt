@@ -132,8 +132,8 @@ fun HomeScreen(navController: NavController) {
                         QuickAction("Navigate", Icons.Default.Directions, Color(0xFF2563EB), Modifier.weight(1f)) {
                             navController.navigate("live_map")
                         }
-                        QuickAction("Report", Icons.Default.ReportProblem, Color(0xFFEF4444), Modifier.weight(1f)) {
-                            navController.navigate("report")
+                        QuickAction("Social", Icons.Default.Groups, Color(0xFFF97316), Modifier.weight(1f)) {
+                            navController.navigate("social")
                         }
                         QuickAction("Bus ETA", Icons.Default.DirectionsBus, Color(0xFF10B981), Modifier.weight(1f)) {
                             navController.navigate("public_transport")
@@ -147,7 +147,7 @@ fun HomeScreen(navController: NavController) {
 
             // ── Stats Row ────────────────────────────────────────────────────
             item {
-                Divider(modifier = Modifier.padding(horizontal = 16.dp))
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
                 Row(
                     Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -160,7 +160,7 @@ fun HomeScreen(navController: NavController) {
                     VertDivider()
                     MiniStat("94%", "AI\nAccuracy", Color(0xFF7C3AED))
                 }
-                Divider(modifier = Modifier.padding(horizontal = 16.dp))
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
             }
 
             // ── Nearby Incidents ─────────────────────────────────────────────
@@ -219,7 +219,7 @@ fun MiniStat(value: String, label: String, color: Color) {
 
 @Composable
 fun VertDivider() {
-    Divider(modifier = Modifier.height(40.dp).width(1.dp),
+    VerticalDivider(modifier = Modifier.height(40.dp).width(1.dp),
         color = MaterialTheme.colorScheme.outlineVariant)
 }
 

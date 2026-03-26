@@ -4,9 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.*
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -24,9 +26,9 @@ data class BottomNavItem(
 val bottomNavItems = listOf(
     BottomNavItem("Home",    "home",      Icons.Filled.Home,         Icons.Outlined.Home),
     BottomNavItem("Map",     "live_map",  Icons.Filled.Map,          Icons.Outlined.Map),
-    BottomNavItem("Report",  "report",    Icons.Filled.AddCircle,    Icons.Outlined.AddCircle),
+    BottomNavItem("Social",  "social",    Icons.Filled.Groups,       Icons.Outlined.Groups),
+    BottomNavItem("Report",  "report",    Icons.Filled.Assignment,   Icons.Outlined.Assignment),
     BottomNavItem("Alerts",  "alerts",    Icons.Filled.Notifications,Icons.Outlined.Notifications),
-    BottomNavItem("Profile", "profile",   Icons.Filled.Person,       Icons.Outlined.Person),
 )
 
 @Composable
@@ -38,38 +40,50 @@ fun MargVedhaBottomBar(navController: NavController) {
     val showBar = bottomNavItems.any { it.route == currentRoute }
     if (!showBar) return
 
-    NavigationBar(
-        tonalElevation = 0.dp,
-        containerColor = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.height(64.dp)
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(72.dp),
+        shape = RoundedCornerShape(24.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
     ) {
-        bottomNavItems.forEach { item ->
-            val selected = currentRoute == item.route
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    if (!selected) {
-                        navController.navigate(item.route) {
-                            popUpTo("home") { saveState = true }
-                            launchSingleTop = true
-                            restoreState = true
+        NavigationBar(
+            tonalElevation = 0.dp,
+            containerColor = Color.Transparent,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            bottomNavItems.forEach { item ->
+                val selected = currentRoute == item.route
+                NavigationBarItem(
+                    selected = selected,
+                    onClick = {
+                        if (!selected) {
+                            navController.navigate(item.route) {
+                                popUpTo("home") { saveState = true }
+                                launchSingleTop = true
+                                restoreState = true
+                            }
                         }
-                    }
-                },
-                icon = {
-                    Icon(
-                        imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
-                        contentDescription = item.label
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
+                            contentDescription = item.label,
+                            tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        )
+                    },
+                    label = {
+                        Text(item.label, fontSize = 10.sp, 
+                            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
+                            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                    },
+                    alwaysShowLabel = true,
+                    colors = NavigationBarItemDefaults.colors(
+                        indicatorColor = Color.Transparent
                     )
-                },
-                label = {
-                    Text(item.label, fontSize = 11.sp, fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal)
-                },
-                alwaysShowLabel = true,
-                colors = NavigationBarItemDefaults.colors(
-                    indicatorColor = MaterialTheme.colorScheme.primaryContainer
                 )
-            )
+            }
         }
     }
 }

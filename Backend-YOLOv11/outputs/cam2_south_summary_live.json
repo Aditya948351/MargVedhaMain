@@ -1,0 +1,15 @@
+{
+  "camera_id": "cam2_south",
+  "camera_name": "Camera 2 - South",
+  "counts": {
+    "incoming": {
+      "car": 64
+    },
+    "outgoing": {
+      "car": 42,
+      "truck": 7
+    }
+  },
+  "last_event_time": "2026-03-26 17:01:59.503",
+  "events_logged": 113
+}
