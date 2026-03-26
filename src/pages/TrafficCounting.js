@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Card, Table, Form, Row, Col, Badge, ListGroup, OverlayTrigger, Tooltip, Container } from "react-bootstrap";
-import { FaCar, FaBus, FaTruck, FaMotorcycle, FaExclamationTriangle, FaIdCard, FaSyncAlt, FaRoad, FaArrowUp, FaArrowDown, FaClock, FaMapMarkerAlt, FaBrain } from "react-icons/fa";
+import { Card, Table, Form, Row, Col, Badge, ListGroup, OverlayTrigger, Tooltip, Container, Button } from "react-bootstrap";
+import { FaCar, FaBus, FaTruck, FaMotorcycle, FaExclamationTriangle, FaIdCard, FaSyncAlt, FaRoad, FaArrowUp, FaArrowDown, FaClock, FaMapMarkerAlt, FaBrain, FaShieldAlt } from "react-icons/fa";
 import { collection, onSnapshot, query, orderBy, limit, where, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase"; 
 import { junctionCoords } from "../utils/junctionCoords";
@@ -229,9 +229,21 @@ const TrafficCounting = () => {
     );
   };
 
+  const [vipMode, setVipMode] = useState(false);
+
   const calculateRecommendation = () => {
     // Simulated Q-Learning Policy for Signal Optimization
     const directions = ['North', 'South', 'East', 'West'];
+    
+    if (vipMode) {
+      // Force Green for North (Simulating VIP Path)
+      return directions.map(d => ({
+        dir: d,
+        seconds: d === 'North' ? 90 : 10,
+        reward: d === 'North' ? "1.00 (PRIORITY)" : "0.00"
+      }));
+    }
+
     const counts = directions.map(d => ({
       dir: d,
       count: (intersectionData[d]?.total_vehicles || 0) + jitter[d]
@@ -254,16 +266,25 @@ const TrafficCounting = () => {
       <Container fluid>
         <Row className="mb-4 align-items-center g-4">
           <Col lg={7}>
-            <div className="d-flex align-items-center">
-              <div className="bg-blue-600 p-4 rounded-3xl shadow-2xl shadow-blue-500/20 me-4">
-                 <FaMapMarkerAlt size={32} />
+            <div className="d-flex align-items-center justify-content-between w-100">
+              <div className="d-flex align-items-center">
+                <div className="bg-blue-600 p-4 rounded-3xl shadow-2xl shadow-blue-500/20 me-4">
+                  <FaMapMarkerAlt size={32} />
+                </div>
+                <div>
+                  <h1 className="h2 fw-bold mb-1 tracking-tight">Nashik Traffic Operational Cockpit</h1>
+                  <p className="text-slate-400 mb-0 d-flex align-items-center gap-2">
+                    <span className="text-emerald-500">●</span> ENGINE: Q-LEARNING REINFORCEMENT LEARNING • A* ROUTING
+                  </p>
+                </div>
               </div>
-              <div>
-                <h1 className="h2 fw-bold mb-1 tracking-tight">Nashik Traffic Operational Cockpit</h1>
-                <p className="text-slate-400 mb-0 d-flex align-items-center gap-2">
-                  <span className="text-emerald-500">●</span> ENGINE: Q-LEARNING REINFORCEMENT LEARNING • A* ROUTING
-                </p>
-              </div>
+              <Button 
+                variant={vipMode ? "danger" : "outline-primary"} 
+                className={`ms-4 px-4 py-3 rounded-2xl fw-bold d-flex align-items-center gap-2 border-2 ${vipMode ? 'animate-pulse shadow-lg shadow-danger/50 bg-danger text-white border-danger' : 'border-blue-500/30 text-blue-400 hover:bg-blue-500/10'}`}
+                onClick={() => setVipMode(!vipMode)}
+              >
+                <FaShieldAlt /> {vipMode ? "VIP PREEMPTION ACTIVE" : "TRIGGER VIP WAVE"}
+              </Button>
             </div>
           </Col>
           <Col lg={5}><div className="d-flex gap-2">
