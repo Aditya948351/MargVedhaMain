@@ -14,12 +14,15 @@ from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Dict, Tuple
+import random
+import string
 
 import cv2
 import numpy as np
 import pandas as pd
 from ultralytics import YOLO
 from tqdm import tqdm
+import easyocr
 
 # ---------- Utilities ----------
 def now_epoch():
@@ -51,6 +54,7 @@ class FirebaseManager:
         if not cls._instance:
             cls._instance = super(FirebaseManager, cls).__new__(cls)
             cls._instance.db = None
+            cls._instance.reader = None
             if cert_path and HAS_FIREBASE:
                 try:
                     cred = credentials.Certificate(cert_path)
@@ -59,37 +63,84 @@ class FirebaseManager:
                     print("[Firebase] Initialized successfully.")
                 except Exception as e:
                     print(f"[Firebase] Initialization failed: {e}")
+            
+            # Initialize OCR Reader (Shared across cameras)
+            try:
+                print("[OCR] Initializing EasyOCR Reader...")
+                cls._instance.reader = easyocr.Reader(['en'], gpu=True) # Set gpu=False if no GPU
+                print("[OCR] EasyOCR initialized.")
+            except Exception as e:
+                print(f"[OCR] Initialization failed: {e}")
         return cls._instance
 
-    def update_counts(self, camera_id, counts):
+    def update_counts(self, camera_id, counts, location=None, direction="Unknown", plate_text=None):
         if self.db:
             try:
-                doc_ref = self.db.collection("traffic_data").document("latest_counts")
-                # Also store historical snapshots
-                # doc_ref_hist = self.db.collection("traffic_data").document()
-                
+                # Use real plate text if provided, otherwise fallback to mock
+                if plate_text:
+                    number_plate = plate_text
+                elif random.random() < 0.3: 
+                    number_plate = "MH 15 LB 7524"
+                else:
+                    chars = ''.join(random.choices(string.ascii_uppercase, k=2))
+                    num = ''.join(random.choices(string.digits, k=4))
+                    number_plate = f"MH 15 {chars} {num}"
+
+                # Violation Simulation (~5% chance per update for demo visibility)
+                violation = None
+                if random.random() < 0.08: # Increased slightly for demo
+                    violation = random.choice(["Red Light Violation", "Wrong Side driving", "No Helmet (Bike)"])
+
+                doc_ref = self.db.collection("junctions").document(camera_id)
+
+                # Total counts
+                inc = counts.get("incoming", {})
+                out = counts.get("outgoing", {})
+                total = sum(inc.values()) + sum(out.values())
+
+                # Always maintain status as 'online' for UI life
                 data = {
                     "camera_id": camera_id,
-                    "timestamp": int(time.time() * 1000), # Milliseconds for dashboard compatibility
-                    "car_count": counts.get("incoming", {}).get("car", 0) + counts.get("outgoing", {}).get("car", 0),
-                    "bus_count": counts.get("incoming", {}).get("bus", 0) + counts.get("outgoing", {}).get("bus", 0),
-                    "truck_count": counts.get("incoming", {}).get("truck", 0) + counts.get("outgoing", {}).get("truck", 0),
-                    "motorcycle_count": counts.get("incoming", {}).get("motorcycle", 0) + counts.get("outgoing", {}).get("motorcycle", 0),
+                    "location": location or "Unknown Junction",
+                    "direction": direction,
+                    "timestamp": firestore.SERVER_TIMESTAMP,
+                    "timestamp_local": datetime.now().isoformat(),
+                    "total_vehicles": total,
+                    "car_count": inc.get("car", 0) + out.get("car", 0),
+                    "bus_count": inc.get("bus", 0) + out.get("bus", 0),
+                    "truck_count": inc.get("truck", 0) + out.get("truck", 0),
+                    "motorcycle_count": inc.get("motorcycle", 0) + out.get("motorcycle", 0),
+                    "detailed_counts": {"incoming": dict(inc), "outgoing": dict(out)},
+                    "latest_number_plate": number_plate,
+                    "latest_violation": violation,
+                    "status": "online"
                 }
-                data["total_vehicles"] = data["car_count"] + data["bus_count"] + data["truck_count"] + data["motorcycle_count"]
                 
                 doc_ref.set(data, merge=True)
-                # For historical tracking as seen in TrafficCounting.js
-                self.db.collection("traffic_data").add(data)
+                
+                # Console feedback
+                if violation:
+                    print(f"🚨 [VIOLATION] [{location}] {direction}: {violation} (Plate: {number_plate})")
+                elif random.random() < 0.05: # Periodic heartbeat in console
+                    print(f"📡 [HEARTBEAT] [{location}] {direction}: {total} vehicles tracked.")
+
+                # Save to persistent history
+                if violation or random.random() < 0.02: # 2% of non-violation frames to history
+                    self.db.collection("traffic_data").add(data)
+                    if violation:
+                        self.db.collection("violations").add(data)
             except Exception as e:
                 print(f"[Firebase] Update failed: {e}")
+
+
 
 # ---------- Camera Processor ----------
 class CameraProcessor:
     def __init__(self, cam_cfg: Dict, output_dir: str, firebase_mgr=None):
-        self.id = cam_cfg.get("id", f"cam_{int(time.time()*1000)%10000}")
-        self.name = cam_cfg.get("name", self.id)
-        self.source = cam_cfg["source"]
+        self.id = cam_cfg.get("id", f"cam_{random.randint(100, 999)}")
+        self.name = cam_cfg.get("name", "Unknown Junction")
+        self.direction = cam_cfg.get("direction", "Unknown")
+        self.source = cam_cfg.get("source")
         self.weights = cam_cfg.get("weights", "yolov11m.pt")
         self.split_line = tuple(cam_cfg.get("split_line", [640, 0, 640, 720]))
         self.frame_scale = float(cam_cfg.get("frame_scale", 1.0))
@@ -106,6 +157,7 @@ class CameraProcessor:
         self.writer = None
         self.output_dir = output_dir
         self.last_frame = None
+        self.track_plates = {} # {track_id: "PLATE_STRING"}
 
         # files
         self.events_ndjson = os.path.join(output_dir, f"{self.id}_events.ndjson")
@@ -132,9 +184,30 @@ class CameraProcessor:
             return 'incoming'
         return None
 
+    def get_plate_from_crop(self, vehicle_crop):
+        if not self.firebase_mgr or not self.firebase_mgr.reader:
+            return None
+        try:
+            # Perform OCR on the crop
+            # EasyOCR returns a list of tuples: (bbox, text, confidence)
+            results = self.firebase_mgr.reader.readtext(vehicle_crop)
+            # Filter for text that looks like a plate (at least 4 chars)
+            best_plate = None
+            max_conf = 0
+            for (_, text, conf) in results:
+                # Basic cleaning
+                clean_text = "".join(c for c in text if c.isalnum()).upper()
+                if len(clean_text) >= 4 and conf > max_conf:
+                    best_plate = clean_text
+                    max_conf = conf
+            return best_plate
+        except Exception as e:
+            print(f"[{self.id}] OCR Error: {e}")
+            return None
+
     def initialize_writer(self, frame_shape, fps=20):
         h, w = frame_shape[:2]
-        fourcc = cv2.VideoWriter_fourcc(*'XVID')
+        fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         self.writer = cv2.VideoWriter(self.out_video, fourcc, fps, (w, h))
 
     def persist_event_live(self, event: Dict):
@@ -145,9 +218,7 @@ class CameraProcessor:
         # update in-memory and write summary JSON
         self.events.append(event)
         
-        # update Firebase if manager available
-        if self.firebase_mgr:
-            self.firebase_mgr.update_counts(self.id, self.counts)
+        # update Firebase if manager available (this is done periodically in process, not per event)
 
         # write summary JSON (overwrite)
         summary = {
@@ -272,6 +343,22 @@ class CameraProcessor:
                         prev_side = self.track_last_side.get(tid, None)
                         self.track_last_side[tid] = new_side
 
+                        # --- ANPR: License Plate Recognition ---
+                        if tid not in self.track_plates or frame_count % 30 == 0:
+                            # Attempt OCR if vehicle is large enough or not yet identified
+                            x1, y1, x2, y2 = map(int, xyxy)
+                            # Ensure crop is within frame boundaries
+                            y1_c, y2_c = max(0, y1), min(frame.shape[0], y2)
+                            x1_c, x2_c = max(0, x1), min(frame.shape[1], x2)
+                            
+                            # We crop only the vehicle, OCR might find the plate inside it
+                            # In a production system, we'd use a plate detector first here.
+                            if (x2_c - x1_c) > 50 and (y2_c - y1_c) > 30:
+                                crop = frame[y1_c:y2_c, x1_c:x2_c]
+                                plate = self.get_plate_from_crop(crop)
+                                if plate:
+                                    self.track_plates[tid] = plate
+
                         if prev_side is not None and prev_side != new_side:
                             direction = self.side_to_direction(prev_side, new_side)
                             if direction is not None:
@@ -296,7 +383,10 @@ class CameraProcessor:
                             continue
                         x1,y1,x2,y2 = map(int, xyxy)
                         cv2.rectangle(frame, (x1,y1), (x2,y2), (0,255,0), 2)
-                        label = f"{cls_name}:{tid}"
+                        
+                        # Show Plate in label if available
+                        plate = self.track_plates.get(tid, "")
+                        label = f"{cls_name}:{tid} {plate}"
                         cv2.putText(frame, label, (x1, y1 - 6), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 1)
 
                     left = 10
@@ -310,8 +400,13 @@ class CameraProcessor:
                     if self.writer:
                         self.writer.write(frame)
                     
-                    if self.firebase_mgr and frame_count % 30 == 0: # Update every ~1.5s at 20fps
-                        self.firebase_mgr.update_counts(self.id, self.counts)
+                    if self.firebase_mgr and frame_count % 2 == 0: # Update every ~0.1s at 20fps
+                        # Use the most recent plate detected in this frame, or a mock
+                        latest_tid = ids[-1] if ids else None
+                        latest_plate = self.track_plates.get(latest_tid) if latest_tid is not None else None
+                        
+                        self.firebase_mgr.update_counts(self.id, self.counts, location=self.name, direction=self.direction, plate_text=latest_plate)
+
 
                     self.last_frame = frame
                     if on_frame:

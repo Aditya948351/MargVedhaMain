@@ -10,7 +10,7 @@ const MapLocation = () => {
           Real-time Signal Locations
         </h1>
         <p className="text-lg text-slate-500 font-medium mt-2">
-          Monitor live traffic density and 3D simulation feeds across Nashik City.
+          Monitor live traffic density and 3D simulation feeds across Nashik City via <strong>A* Search Algorithm</strong>.
         </p>
       </header>
 
@@ -25,9 +25,9 @@ const MapLocation = () => {
          <div className="p-6 bg-emerald-50 rounded-3xl border border-emerald-100 italic text-emerald-700 text-sm font-medium">
             "Markers are color-coded: Green (Clear), Amber (Moderate), Red (Congested)."
          </div>
-         <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 italic text-slate-700 text-sm font-medium">
-            "Active monitoring of 20 high-priority sensors in the metropolitan area."
-         </div>
+          <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 italic text-slate-700 text-sm font-medium">
+            "A* Pathfinding optimized: Routing is dynamically calculated based on junction weights."
+          </div>
       </div>
     </div>
   );

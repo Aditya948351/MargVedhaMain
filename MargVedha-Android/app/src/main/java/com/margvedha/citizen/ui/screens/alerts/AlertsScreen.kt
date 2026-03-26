@@ -11,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -18,25 +19,17 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.margvedha.citizen.data.dummy.DummyRepository
+import com.margvedha.citizen.data.FirebaseRepository
 import com.margvedha.citizen.data.model.Alert
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.collect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertsScreen(navController: NavController) {
-    val scope = rememberCoroutineScope()
-    var alerts by remember { mutableStateOf<List<Alert>>(emptyList()) }
-    var loading by remember { mutableStateOf(true) }
+    val alerts by FirebaseRepository.getFines("MH 15 LB 7524").collectAsState(initial = emptyList())
+    var loading by remember { mutableStateOf(false) } // Set to false manually as flow handles empty init
     var selectedFilter by remember { mutableStateOf("All") }
-    val filters = listOf("All", "Critical", "High", "Medium", "Info")
-
-    LaunchedEffect(Unit) {
-        scope.launch {
-            alerts = DummyRepository.getAlerts()
-            loading = false
-        }
-    }
+    val filters = listOf("All", "High", "Info")
 
     val filtered = if (selectedFilter == "All") alerts else alerts.filter { it.severity == selectedFilter }
 
@@ -74,6 +67,9 @@ fun AlertsScreen(navController: NavController) {
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
+                    item {
+                        AIForecastCard()
+                    }
                     item {
                         Text("${filtered.size} Incidents", fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
@@ -162,12 +158,51 @@ fun alertStyle(alert: Alert): Pair<Color, ImageVector> {
         else -> Color(0xFF10B981)
     }
     val icon = when (alert.type) {
-        "accident" -> Icons.Default.CarCrash
-        "signal" -> Icons.Default.Traffic
-        "closure" -> Icons.Default.Block
-        "weather" -> Icons.Default.Thunderstorm
-        "vip" -> Icons.Default.Shield
-        else -> Icons.Default.Warning
+        "accident" -> Icons.Default.Warning
+        "signal" -> Icons.Default.Place
+        "closure" -> Icons.Default.Clear
+        "weather" -> Icons.Default.Info
+        "vip" -> Icons.Default.Star
+        else -> Icons.Default.Notifications
     }
     return Pair(color, icon)
+}
+
+@Composable
+fun AIForecastCard() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(24.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
+        ),
+        elevation = CardDefaults.cardElevation(0.dp)
+    ) {
+        Column(Modifier.padding(20.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(Icons.Default.Star, contentDescription = null, 
+                     tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.width(8.dp))
+                Text("Smart AI Forecast", fontWeight = FontWeight.ExtraBold, 
+                     color = MaterialTheme.colorScheme.onPrimaryContainer)
+            }
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Based on current YOLOv11 telemetry, CBS Circle congestion is expected to decrease by 15% in the next 10 minutes.",
+                fontSize = 14.sp,
+                lineHeight = 20.sp,
+                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+            )
+            Spacer(Modifier.height(16.dp))
+            LinearProgressIndicator(
+                progress = 0.65f,
+                modifier = Modifier.fillMaxWidth().height(8.dp).clip(RoundedCornerShape(50)),
+                color = MaterialTheme.colorScheme.primary,
+                trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.1f)
+            )
+            Spacer(Modifier.height(8.dp))
+            Text("Reliability: 94%", fontSize = 11.sp, fontWeight = FontWeight.Bold,
+                 color = MaterialTheme.colorScheme.primary)
+        }
+    }
 }

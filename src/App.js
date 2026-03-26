@@ -19,6 +19,10 @@ import BlockChainTicketing from "./pages/BlockChainTicketing";
 import AutoFareAdjustments from "./pages/AutoFareAdjustments";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import CitizenSuggestions from "./pages/CitizenSuggestions";
+import EnvironmentalImpact from "./pages/EnvironmentalImpact";
+import MLAnalytics from "./pages/MLAnalytics";
+import AdminProfile from "./pages/AdminProfile";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -76,6 +80,10 @@ function App() {
           <Route path="/BusRouteOptimization" element={user ? <BusRouteOptimization /> : <Navigate to="/login" />} />
           <Route path="/BlockChainTicketing" element={user ? <BlockChainTicketing /> : <Navigate to="/login" />} />
           <Route path="/AutoFareAdjustments" element={user ? <AutoFareAdjustments /> : <Navigate to="/login" />} />
+          <Route path="/CitizenSuggestions" element={user && user.email === 'admin@nashikcity.gov.in' ? <CitizenSuggestions /> : <Navigate to="/login" />} />
+          <Route path="/EcoImpact" element={user && user.email === 'admin@nashikcity.gov.in' ? <EnvironmentalImpact /> : <Navigate to="/login" />} />
+          <Route path="/MLAnalytics" element={user && user.email === 'admin@nashikcity.gov.in' ? <MLAnalytics /> : <Navigate to="/login" />} />
+          <Route path="/profile/admin" element={user && user.email === 'admin@nashikcity.gov.in' ? <AdminProfile /> : <Navigate to="/login" />} />
         </Routes>
       </div>
     </div>

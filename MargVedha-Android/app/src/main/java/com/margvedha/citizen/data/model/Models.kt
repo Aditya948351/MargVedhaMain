@@ -63,3 +63,12 @@ data class ReportRequest(
     val userId: String,
     val imageUrl: String? = null
 )
+
+data class BusRoute(
+    val routeId: String,
+    val routeName: String,
+    val stops: List<String>,
+    val etaMinutes: Int,
+    val congestion: String
+)
+

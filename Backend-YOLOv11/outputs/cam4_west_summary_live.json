@@ -1,15 +1,15 @@
 {
   "camera_id": "cam4_west",
-  "camera_name": "Camera 4 - West",
+  "camera_name": "Panchavati Karanja",
   "counts": {
     "incoming": {
-      "car": 88
+      "car": 17
     },
     "outgoing": {
-      "car": 57,
-      "truck": 10
+      "car": 11,
+      "truck": 2
     }
   },
-  "last_event_time": "2026-03-26 17:08:30.976",
-  "events_logged": 155
+  "last_event_time": "2026-03-26 22:29:30.238",
+  "events_logged": 30
 }

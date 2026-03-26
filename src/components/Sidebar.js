@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaTachometerAlt, FaCamera, FaBell, FaChartBar, FaCog, FaGithub, FaSignOutAlt, FaUserCircle } from "react-icons/fa";
+import { FaTachometerAlt, FaCamera, FaBell, FaChartBar, FaCog, FaGithub, FaSignOutAlt, FaUserCircle, FaBrain, FaLeaf, FaChartLine, FaFileExport } from "react-icons/fa";
 import { Button } from "react-bootstrap";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
@@ -53,7 +53,21 @@ const Sidebar = () => {
         <NavLink to="/reports" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
           <FaChartBar className="icon" /> Reports
         </NavLink>
+        {isAdmin && (
+          <>
+            <NavLink to="/CitizenSuggestions" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaBrain className="icon" /> Suggestions
+            </NavLink>
+            <NavLink to="/EcoImpact" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaLeaf className="icon" /> Eco-Impact
+            </NavLink>
+            <NavLink to="/MLAnalytics" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaFileExport className="icon" /> ML Data
+            </NavLink>
+          </>
+        )}
       </div>
+
       <div className="nav-actions">
         <Button variant="outline-light" size="sm" onClick={() => window.open('https://github.com/Aditya948351/MargVedhaMain', '_blank')}>
           <FaGithub className="me-2" /> GitHub

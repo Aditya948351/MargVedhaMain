@@ -1,15 +1,15 @@
 {
   "camera_id": "cam3_east",
-  "camera_name": "Camera 3 - East",
+  "camera_name": "Raviwar Karanja",
   "counts": {
     "incoming": {
-      "car": 66
+      "car": 14
     },
     "outgoing": {
-      "car": 43,
-      "truck": 8
+      "car": 9,
+      "truck": 1
     }
   },
-  "last_event_time": "2026-03-26 17:09:15.186",
-  "events_logged": 117
+  "last_event_time": "2026-03-26 22:29:22.176",
+  "events_logged": 24
 }

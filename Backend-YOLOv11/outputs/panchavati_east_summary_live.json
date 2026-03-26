@@ -1,0 +1,14 @@
+{
+  "camera_id": "panchavati_east",
+  "camera_name": "Panchavati Karanja",
+  "counts": {
+    "incoming": {
+      "car": 4
+    },
+    "outgoing": {
+      "car": 3
+    }
+  },
+  "last_event_time": "2026-03-26 23:01:30.911",
+  "events_logged": 7
+}

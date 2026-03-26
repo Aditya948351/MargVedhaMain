@@ -1,15 +1,14 @@
 {
   "camera_id": "cam2_south",
-  "camera_name": "Camera 2 - South",
+  "camera_name": "Ashok Stambh",
   "counts": {
     "incoming": {
-      "car": 68
+      "car": 4
     },
     "outgoing": {
-      "car": 44,
-      "truck": 8
+      "car": 3
     }
   },
-  "last_event_time": "2026-03-26 17:07:42.756",
-  "events_logged": 120
+  "last_event_time": "2026-03-26 22:17:03.486",
+  "events_logged": 7
 }

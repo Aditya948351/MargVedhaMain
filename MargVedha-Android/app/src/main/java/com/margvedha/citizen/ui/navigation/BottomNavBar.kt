@@ -43,15 +43,17 @@ fun MargVedhaBottomBar(navController: NavController) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(72.dp),
+            .wrapContentHeight(),
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f))
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.97f))
     ) {
         NavigationBar(
             tonalElevation = 0.dp,
             containerColor = Color.Transparent,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
         ) {
             bottomNavItems.forEach { item ->
                 val selected = currentRoute == item.route
@@ -70,13 +72,18 @@ fun MargVedhaBottomBar(navController: NavController) {
                         Icon(
                             imageVector = if (selected) item.selectedIcon else item.unselectedIcon,
                             contentDescription = item.label,
+                            modifier = Modifier.size(24.dp),
                             tint = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
                         )
                     },
                     label = {
-                        Text(item.label, fontSize = 10.sp, 
+                        Text(
+                            item.label,
+                            fontSize = 10.sp,
                             fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-                            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                            color = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                            maxLines = 1
+                        )
                     },
                     alwaysShowLabel = true,
                     colors = NavigationBarItemDefaults.colors(

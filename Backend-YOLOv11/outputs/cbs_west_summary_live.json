@@ -1,0 +1,14 @@
+{
+  "camera_id": "cbs_west",
+  "camera_name": "CBS Circle",
+  "counts": {
+    "incoming": {
+      "car": 4
+    },
+    "outgoing": {
+      "car": 3
+    }
+  },
+  "last_event_time": "2026-03-26 23:01:30.086",
+  "events_logged": 7
+}

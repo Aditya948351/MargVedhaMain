@@ -96,7 +96,8 @@ def process_video(source_path, model_path, output_path, line_coords, firebase_ce
                     counts[direction][cls_name] += 1
                     
                     if firebase_mgr:
-                        firebase_mgr.update_counts("cam1_standalone", counts)
+                        firebase_mgr.update_counts("cam1_standalone", counts, location="Camera 1 - North")
+
                 
                 # Draw box and ID
                 x1, y1, x2, y2 = map(int, box)
@@ -118,7 +119,8 @@ def process_video(source_path, model_path, output_path, line_coords, firebase_ce
             
         # Periodic update
         if firebase_mgr and i % 30 == 0:
-            firebase_mgr.update_counts("cam1_standalone", counts)
+            firebase_mgr.update_counts("cam1_standalone", counts, location="Camera 1 - North")
+
 
         # Write frame
         out.write(frame)

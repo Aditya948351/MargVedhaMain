@@ -21,9 +21,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+import com.margvedha.citizen.data.FirebaseRepository
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(navController: NavController) {
+    val points by FirebaseRepository.getRewardPoints("MH 15 LB 7524").collectAsState(initial = 450)
+    
     Scaffold(
         topBar = {
             TopAppBar(
@@ -79,7 +85,7 @@ fun ProfileScreen(navController: NavController) {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 StatItem("24", "Reports\nSubmitted")
-                StatItem("450", "Reward\nPoints")
+                StatItem(points.toString(), "Reward\nPoints")
                 StatItem("18", "Community\nPosts")
             }
 
