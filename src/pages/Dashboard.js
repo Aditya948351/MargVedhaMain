@@ -1,3 +1,24 @@
+import React, { useState, useEffect } from "react";
+import "./Dashboard.css";
+import { useNavigate } from "react-router-dom";
+import {
+  FaTrafficLight,
+  FaBus,
+  FaLock,
+  FaExclamationTriangle,
+  FaMoneyBill,
+  FaCar,
+  FaChartLine,
+  FaUsers,
+  FaAmbulance,
+  FaUpload,
+  FaMapMarkerAlt,
+  FaRobot,
+  FaExternalLinkAlt,
+  FaExpandAlt,
+} from "react-icons/fa";
+import { Modal, Button } from "react-bootstrap";
+import MapComponent from "../components/MapComponent";
 import { db } from "../firebase";
 import { collection, query, where, onSnapshot, orderBy, limit } from "firebase/firestore";
 import { junctionCoords } from "../utils/junctionCoords";

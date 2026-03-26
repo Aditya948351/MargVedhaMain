@@ -3,13 +3,13 @@
   "camera_name": "Camera 2 - South",
   "counts": {
     "incoming": {
-      "car": 64
+      "car": 68
     },
     "outgoing": {
-      "car": 42,
-      "truck": 7
+      "car": 44,
+      "truck": 8
     }
   },
-  "last_event_time": "2026-03-26 17:01:59.503",
-  "events_logged": 113
+  "last_event_time": "2026-03-26 17:07:42.756",
+  "events_logged": 120
 }

@@ -3,13 +3,13 @@
   "camera_name": "Camera 3 - East",
   "counts": {
     "incoming": {
-      "car": 61
+      "car": 66
     },
     "outgoing": {
-      "car": 41,
-      "truck": 6
+      "car": 43,
+      "truck": 8
     }
   },
-  "last_event_time": "2026-03-26 17:02:24.837",
-  "events_logged": 108
+  "last_event_time": "2026-03-26 17:09:15.186",
+  "events_logged": 117
 }

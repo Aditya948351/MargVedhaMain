@@ -3,13 +3,13 @@
   "camera_name": "Camera 1 - North",
   "counts": {
     "incoming": {
-      "car": 63
+      "car": 68
     },
     "outgoing": {
-      "car": 41,
-      "truck": 6
+      "car": 44,
+      "truck": 8
     }
   },
-  "last_event_time": "2026-03-26 17:02:10.126",
-  "events_logged": 110
+  "last_event_time": "2026-03-26 17:08:50.085",
+  "events_logged": 120
 }
