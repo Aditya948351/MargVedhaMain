@@ -1,0 +1,141 @@
+:root {
+  --primary: #00f2ff;
+  --secondary: #7000ff;
+  --background: #020617;
+  --glass: rgba(15, 23, 42, 0.7);
+  --border: rgba(0, 242, 255, 0.2);
+  --font-heading: 'Orbitron', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--background);
+  color: #fff;
+  font-family: var(--font-body);
+  overflow: hidden;
+}
+
+#canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+#ui-container {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  padding: 16px 24px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 4px;
+  pointer-events: none;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+h1 {
+  font-family: var(--font-heading);
+  letter-spacing: 2px;
+  font-size: 18px;
+  margin: 0 0 4px 0;
+  font-weight: 700;
+}
+
+.accent {
+  color: var(--primary);
+  text-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+}
+
+p {
+  font-size: 12px;
+  opacity: 0.6;
+  margin: 0 0 16px 0;
+  letter-spacing: 0.5px;
+}
+
+.stats {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.label {
+  font-size: 9px;
+  font-family: var(--font-heading);
+  opacity: 0.5;
+  margin-bottom: 2px;
+}
+
+.value {
+  font-size: 14px;
+  font-family: var(--font-heading);
+  color: var(--primary);
+}
+
+/* Loader Styles */
+#loader {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--background);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: opacity 0.5s ease-out;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 3px solid rgba(0, 242, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--primary);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+#loader.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* GUI Overlap fix */
+.lil-gui {
+  --width: 250px;
+  --name-width: 50%;
+  z-index: 20;
+}
+
+/* Scrollbar or other custom styles */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 4px;
+}

@@ -18,10 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
@@ -37,6 +39,7 @@ data class CommunityPost(
     val lang: String = "EN",
     val likes: Int = 0,
     val comments: Int = 0,
+    val imageUrl: String? = null,
     val timestamp: Timestamp? = null
 )
 
@@ -82,6 +85,7 @@ fun SocialScreen(navController: NavController) {
                         lang     = doc.getString("lang") ?: "EN",
                         likes    = doc.getLong("likes")?.toInt() ?: 0,
                         comments = doc.getLong("comments")?.toInt() ?: 0,
+                        imageUrl = doc.getString("imageUrl"),
                         timestamp = doc.getTimestamp("timestamp")
                     )
                 } ?: emptyList()
@@ -306,6 +310,21 @@ fun PostCard(post: CommunityPost, db: FirebaseFirestore) {
                 Text(post.title, fontWeight = FontWeight.ExtraBold, fontSize = 15.sp)
             Spacer(Modifier.height(4.dp))
             Text(post.content, fontSize = 13.sp, lineHeight = 20.sp, color = MaterialTheme.colorScheme.onSurface.copy(0.8f))
+            
+            // Image support
+            if (!post.imageUrl.isNullOrBlank()) {
+                Spacer(Modifier.height(12.dp))
+                AsyncImage(
+                    model = post.imageUrl,
+                    contentDescription = "Post Image",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(200.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentScale = ContentScale.Crop
+                )
+            }
+
             Spacer(Modifier.height(12.dp))
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(0.4f))
 

@@ -27,13 +27,13 @@ const Reports = () => {
   ];
 
   return (
-    <div className="p-4 bg-slate-950 min-vh-100 text-white font-sans">
+    <div className="p-4 bg-[var(--bg-color)] min-vh-100 text-[var(--text-primary)] font-sans">
       <div className="mb-5">
-        <h1 className="fw-black tracking-tight mb-2 d-flex align-items-center gap-3">
+        <h1 className="fw-black tracking-tight mb-2 d-flex align-items-center gap-3 text-[var(--text-primary)]">
           <span className="p-3 bg-blue-600 rounded-2xl shadow-lg border border-white-opacity-10"><FaDatabase /></span>
           NASHIK CITY: OPERATIONAL COCKPIT
         </h1>
-        <p className="text-slate-400 ls-1">Reinforcement Learning (Q-Learning) Analysis & ML Data Insights</p>
+        <p className="text-[var(--text-secondary)] ls-1">Reinforcement Learning (Q-Learning) Analysis & ML Data Insights</p>
       </div>
 
       <Row className="mb-5 g-3">
@@ -57,18 +57,18 @@ const Reports = () => {
       {activeTab === "operational" && (
         <Row className="g-4">
            <Col lg={8}>
-              <Card className="bg-dark border-0 shadow-2xl rounded-3xl overflow-hidden glass-card">
-                 <Card.Header className="bg-transparent border-secondary py-4 px-4 d-flex justify-content-between align-items-center">
-                    <h5 className="mb-0 fw-bold ls-1">HEURISTIC JUNCTION ANALYSIS (24H)</h5>
+              <Card className="bg-[var(--card-bg)] border-0 shadow-2xl rounded-3xl overflow-hidden glass-card">
+                 <Card.Header className="bg-transparent border-[var(--border-color)] py-4 px-4 d-flex justify-content-between align-items-center">
+                    <h5 className="mb-0 fw-bold ls-1 text-[var(--text-primary)]">HEURISTIC JUNCTION ANALYSIS (24H)</h5>
                     <FaChartLine className="text-primary" />
                  </Card.Header>
                  <Card.Body className="p-4" style={{ height: "400px" }}>
                     <ResponsiveContainer width="100%" height="100%">
                        <LineChart data={environmentalTrends}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                          <XAxis dataKey="hour" stroke="#94a3b8" fontSize={12} />
-                          <YAxis stroke="#94a3b8" fontSize={12} />
-                          <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #334155', borderRadius: '12px' }} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
+                          <XAxis dataKey="hour" stroke="var(--text-secondary)" fontSize={12} />
+                          <YAxis stroke="var(--text-secondary)" fontSize={12} />
+                          <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)' }} />
                           <Line type="monotone" dataKey="waitTime" stroke="#3b82f6" strokeWidth={4} dot={{ r: 6 }} name="Avg Wait (s)" />
                        </LineChart>
                     </ResponsiveContainer>
@@ -77,15 +77,15 @@ const Reports = () => {
            </Col>
            <Col lg={4}>
               <div className="d-flex flex-column gap-4 h-100">
-                <Card className="bg-dark border-0 shadow rounded-3xl flex-grow-1 p-4 border-left-info border-4">
+                <Card className="bg-[var(--card-bg)] border-0 shadow rounded-3xl flex-grow-1 p-4 border-left-info border-4">
                     <h6 className="text-info fw-black ls-2 mb-3">Q-LEARNING EFFICIENCY</h6>
-                    <h2 className="text-white fw-black mb-1">12.4% <small className="fs-6 opacity-50 text-success">↑</small></h2>
-                    <p className="text-slate-400 small mb-0">Total vehicle delay saved compared to static signal patterns.</p>
+                    <h2 className="text-[var(--text-primary)] fw-black mb-1">12.4% <small className="fs-6 opacity-50 text-success">↑</small></h2>
+                    <p className="text-[var(--text-secondary)] small mb-0">Total vehicle delay saved compared to static signal patterns.</p>
                 </Card>
-                <Card className="bg-dark border-0 shadow rounded-3xl flex-grow-1 p-4 border-left-warning border-4">
+                <Card className="bg-[var(--card-bg)] border-0 shadow rounded-3xl flex-grow-1 p-4 border-left-warning border-4">
                     <h6 className="text-warning fw-black ls-2 mb-3">SYSTEM RELIABILITY</h6>
-                    <h2 className="text-white fw-black mb-1">99.98%</h2>
-                    <p className="text-slate-400 small mb-0">Anomaly detection uptime across 20 monitored junctions.</p>
+                    <h2 className="text-[var(--text-primary)] fw-black mb-1">99.98%</h2>
+                    <p className="text-[var(--text-secondary)] small mb-0">Anomaly detection uptime across 20 monitored junctions.</p>
                 </Card>
               </div>
            </Col>
@@ -96,27 +96,27 @@ const Reports = () => {
       {activeTab === "datascience" && (
         <Row className="g-4">
            <Col lg={12}>
-              <div className="bg-blue-600 bg-opacity-10 p-4 rounded-3xl border border-blue-500 border-opacity-20 mb-4 d-flex align-items-center justify-content-between">
+              <div className="bg-blue-600 bg-opacity-10 dark:bg-opacity-20 p-4 rounded-3xl border border-blue-500 border-opacity-20 mb-4 d-flex align-items-center justify-content-between">
                 <div>
                    <h5 className="text-blue-400 fw-bold mb-1">DATA SCIENCE DISCOVERY: FRUSTRATION VS DENSITY</h5>
-                   <p className="text-slate-400 small mb-0">Analysis performed on `nashik_traffic_psych_data.csv` (5,000+ entries)</p>
+                   <p className="text-[var(--text-secondary)] small mb-0">Analysis performed on `data/nashik_traffic_psych_data.csv` (5,000+ entries)</p>
                 </div>
                 <div className="text-end">
-                   <div className="text-white fw-bold">R-Squared: 0.892</div>
+                   <div className="text-[var(--text-primary)] fw-bold">R-Squared: 0.892</div>
                    <div className="text-blue-400 small">Strong Correlation</div>
                 </div>
               </div>
            </Col>
            <Col lg={7}>
-              <Card className="bg-dark border-0 shadow-2xl rounded-3xl overflow-hidden glass-card">
+              <Card className="bg-[var(--card-bg)] border-0 shadow-2xl rounded-3xl overflow-hidden glass-card">
                  <Card.Body className="p-4" style={{ height: "450px" }}>
                     <ResponsiveContainer width="100%" height="100%">
                        <ScatterChart>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-                          <XAxis type="number" dataKey="density" name="Density" unit="%" stroke="#94a3b8" />
-                          <YAxis type="number" dataKey="frustration" name="Frustration" unit="/10" stroke="#94a3b8" />
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" />
+                          <XAxis type="number" dataKey="density" name="Density" unit="%" stroke="var(--text-secondary)" />
+                          <YAxis type="number" dataKey="frustration" name="Frustration" unit="/10" stroke="var(--text-secondary)" />
                           <ZAxis type="number" dataKey="pm25" range={[50, 400]} name="PM 2.5" />
-                          <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                          <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: '12px' }} />
                           <Scatter name="Junction Stats" data={mlCsvData} fill="#3b82f6" shape="circle" />
                        </ScatterChart>
                     </ResponsiveContainer>
@@ -124,20 +124,20 @@ const Reports = () => {
               </Card>
            </Col>
            <Col lg={5}>
-              <Card className="bg-dark border-0 shadow-2xl rounded-3xl p-4 glass-card h-100">
-                <h5 className="fw-bold mb-4 d-flex align-items-center gap-2"><FaBrain className="text-info" /> FUTURE ML USE-CASES</h5>
+              <Card className="bg-[var(--card-bg)] border-0 shadow-2xl rounded-3xl p-4 glass-card h-100">
+                <h5 className="fw-bold mb-4 d-flex align-items-center gap-2 text-[var(--text-primary)]"><FaBrain className="text-info" /> FUTURE ML USE-CASES</h5>
                 <div className="d-flex flex-column gap-4">
                    <div className="p-3 bg-white bg-opacity-5 rounded-2xl border border-white border-opacity-5">
-                      <h6 className="text-white fw-bold mb-1">1. Rush Hour Prediction</h6>
-                      <p className="small text-slate-400 mb-0">Identify exact times when Frustration Index peaks *before* actual congestion occurs to trigger early signals.</p>
+                      <h6 className="text-[var(--text-primary)] fw-bold mb-1">1. Rush Hour Prediction</h6>
+                      <p className="small text-[var(--text-secondary)] mb-0">Identify exact times when Frustration Index peaks *before* actual congestion occurs to trigger early signals.</p>
                    </div>
                    <div className="p-3 bg-white bg-opacity-5 rounded-2xl border border-white border-opacity-5">
-                      <h6 className="text-white fw-bold mb-1">2. RL Agent Training</h6>
-                      <p className="small text-slate-400 mb-0">Use the CSV as a offline-pretraining dataset for the Q-Learning engine to reduce exploration time.</p>
+                      <h6 className="text-[var(--text-primary)] fw-bold mb-1">2. RL Agent Training</h6>
+                      <p className="small text-[var(--text-secondary)] mb-0">Use the CSV as a offline-pretraining dataset for the Q-Learning engine to reduce exploration time.</p>
                    </div>
                    <div className="p-3 bg-white bg-opacity-5 rounded-2xl border border-white border-opacity-5">
-                      <h6 className="text-white fw-bold mb-1">3. ESG Compliance Reports</h6>
-                      <p className="small text-slate-400 mb-0">Mathematically prove the reduction in PM 2.5 levels via optimized A* Routing vs Baseline.</p>
+                      <h6 className="text-[var(--text-primary)] fw-bold mb-1">3. ESG Compliance Reports</h6>
+                      <p className="small text-[var(--text-secondary)] mb-0">Mathematically prove the reduction in PM 2.5 levels via optimized A* Routing vs Baseline.</p>
                    </div>
                 </div>
               </Card>
@@ -149,17 +149,17 @@ const Reports = () => {
       {activeTab === "environmental" && (
         <Row className="g-4">
            <Col lg={12}>
-              <Card className="bg-dark border-0 shadow-2xl rounded-3xl overflow-hidden glass-card">
-                 <Card.Header className="bg-transparent border-secondary py-4 px-4">
-                    <h5 className="mb-0 fw-bold ls-1 d-flex align-items-center gap-2"><FaWind className="text-success" /> PM 2.5 EMISSIONS VS TRAFFIC FLOW</h5>
+              <Card className="bg-[var(--card-bg)] border-0 shadow-2xl rounded-3xl overflow-hidden glass-card">
+                 <Card.Header className="bg-transparent border-[var(--border-color)] py-4 px-4">
+                    <h5 className="mb-0 fw-bold ls-1 d-flex align-items-center gap-2 text-[var(--text-primary)]"><FaWind className="text-success" /> PM 2.5 EMISSIONS VS TRAFFIC FLOW</h5>
                  </Card.Header>
                  <Card.Body className="p-4" style={{ height: "400px" }}>
                     <ResponsiveContainer width="100%" height="100%">
                        <BarChart data={mlCsvData}>
-                          <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                          <XAxis dataKey="junction" stroke="#94a3b8" fontSize={10} />
-                          <YAxis stroke="#94a3b8" fontSize={12} />
-                          <Tooltip contentStyle={{ backgroundColor: '#0f172a', border: 'none', borderRadius: '12px' }} />
+                          <CartesianGrid strokeDasharray="3 3" stroke="var(--border-color)" vertical={false} />
+                          <XAxis dataKey="junction" stroke="var(--text-secondary)" fontSize={10} />
+                          <YAxis stroke="var(--text-secondary)" fontSize={12} />
+                          <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid var(--border-color)', borderRadius: '12px', color: 'var(--text-primary)' }} />
                           <Bar dataKey="pm25" fill="#10b981" radius={[4, 4, 0, 0]} name="PM 2.5" />
                           <Bar dataKey="density" fill="#f43f5e" radius={[4, 4, 0, 0]} name="Density %" />
                        </BarChart>

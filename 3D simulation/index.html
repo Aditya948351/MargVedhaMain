@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MargVedha 3D Simulation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="ui-container">
+        <h1>MARGVEDHA <span class="accent">TRAFFIC</span></h1>
+        <p>Interactive 4-Way Intersection Control Simulation</p>
+        <div class="stats">
+            <div class="stat-item">
+                <span class="label">ACTIVE</span>
+                <span class="value" id="active-cars">0</span>
+            </div>
+            <div class="stat-item">
+                <span class="label">THROUGHPUT</span>
+                <span class="value" id="throughput">0/MIN</span>
+            </div>
+            <div class="stat-item">
+                <span class="label">PHASE</span>
+                <span class="value" id="traffic-phase">RED</span>
+            </div>
+        </div>
+    </div>
+    <div id="canvas-container"></div>
+    <div id="loader">
+        <div class="spinner"></div>
+        <p id="loader-text">Initializing World Physics...</p>
+    </div>
+    <script>
+        window.addEventListener('error', function(e) {
+            document.getElementById('loader-text').innerText = 'System Error: ' + e.message;
+            document.querySelector('.spinner').style.borderTopColor = 'red';
+            console.error(e);
+        });
+        window.addEventListener('unhandledrejection', function(e) {
+            document.getElementById('loader-text').innerText = 'Network/Load Error: ' + (e.reason ? e.reason.message : e.reason);
+            document.querySelector('.spinner').style.borderTopColor = 'red';
+            console.error(e);
+        });
+    </script>
+    <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.js"></script>
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.167.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.167.0/examples/jsm/",
+        "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.20.0/+esm",
+        "lil-gui": "https://cdn.jsdelivr.net/npm/lil-gui@0.19.2/+esm"
+      }
+    }
+    </script>
+    <script type="module" src="main.js"></script>
+</body>
+</html>

@@ -23,6 +23,15 @@ import CitizenSuggestions from "./pages/CitizenSuggestions";
 import EnvironmentalImpact from "./pages/EnvironmentalImpact";
 import MLAnalytics from "./pages/MLAnalytics";
 import AdminProfile from "./pages/AdminProfile";
+import PredictiveAnalytics from "./pages/PredictiveAnalytics";
+import CityIntelligence from "./pages/CityIntelligence";
+
+// New Core OS Modules
+import NetworkAnalytics from "./pages/NetworkAnalytics";
+import IncidentHub from "./pages/IncidentHub";
+import PublicTransport from "./pages/PublicTransport";
+import LstmStudio from "./pages/LstmStudio";
+import Enforcement from "./pages/Enforcement";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -67,23 +76,26 @@ function App() {
             user && user.email !== 'admin@nashikcity.gov.in' ? <Dashboard onLogout={handleLogout} /> : <Navigate to={user ? "/admin" : "/login"} />
           } />
 
+          {/* New 8 Module Admin Architecture & Dashboard Architecture */}
+          <Route path="/network-analytics" element={user && user.email === 'admin@nashikcity.gov.in' ? <NetworkAnalytics /> : <Navigate to="/login" />} />
+          <Route path="/incident-hub" element={user && user.email === 'admin@nashikcity.gov.in' ? <IncidentHub /> : <Navigate to="/login" />} />
+          <Route path="/public-transport" element={user && user.email === 'admin@nashikcity.gov.in' ? <PublicTransport /> : <Navigate to="/login" />} />
+          <Route path="/lstm-studio" element={user && user.email === 'admin@nashikcity.gov.in' ? <LstmStudio /> : <Navigate to="/login" />} />
+          <Route path="/enforcement" element={user && user.email === 'admin@nashikcity.gov.in' ? <Enforcement /> : <Navigate to="/login" />} />
+          <Route path="/EcoImpact" element={user && user.email === 'admin@nashikcity.gov.in' ? <EnvironmentalImpact /> : <Navigate to="/login" />} />
+          <Route path="/suggestions" element={user && user.email === 'admin@nashikcity.gov.in' ? <CitizenSuggestions /> : <Navigate to="/login" />} />
+          <Route path="/intelligence" element={user && user.email === 'admin@nashikcity.gov.in' ? <CityIntelligence /> : <Navigate to="/login" />} />
+
+          {/* Legacy / Shared Routes */}
           <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
           <Route path="/profile/:id" element={user ? <Profile /> : <Navigate to="/login" />} />
+          <Route path="/profile/admin" element={user && user.email === 'admin@nashikcity.gov.in' ? <AdminProfile /> : <Navigate to="/login" />} />
           <Route path="/google-map" element={user ? <MapLocation /> : <Navigate to="/login" />} />
           <Route path="/camera-feeds" element={user ? <CameraFeeds /> : <Navigate to="/login" />} />
           <Route path="/traffic-alerts" element={user ? <Alerts /> : <Navigate to="/login" />} />
           <Route path="/reports" element={user ? <Reports /> : <Navigate to="/login" />} />
           <Route path="/settings" element={user ? <Settings /> : <Navigate to="/login" />} />
           <Route path="/live-feed" element={user ? <LiveFeed /> : <Navigate to="/login" />} />
-          <Route path="/EmergencyAlerts" element={user ? <EmergencyAlerts /> : <Navigate to="/login" />} />
-          <Route path="/TrafficCounting" element={user ? <TrafficCounting /> : <Navigate to="/login" />} />
-          <Route path="/BusRouteOptimization" element={user ? <BusRouteOptimization /> : <Navigate to="/login" />} />
-          <Route path="/BlockChainTicketing" element={user ? <BlockChainTicketing /> : <Navigate to="/login" />} />
-          <Route path="/AutoFareAdjustments" element={user ? <AutoFareAdjustments /> : <Navigate to="/login" />} />
-          <Route path="/CitizenSuggestions" element={user && user.email === 'admin@nashikcity.gov.in' ? <CitizenSuggestions /> : <Navigate to="/login" />} />
-          <Route path="/EcoImpact" element={user && user.email === 'admin@nashikcity.gov.in' ? <EnvironmentalImpact /> : <Navigate to="/login" />} />
-          <Route path="/MLAnalytics" element={user && user.email === 'admin@nashikcity.gov.in' ? <MLAnalytics /> : <Navigate to="/login" />} />
-          <Route path="/profile/admin" element={user && user.email === 'admin@nashikcity.gov.in' ? <AdminProfile /> : <Navigate to="/login" />} />
         </Routes>
       </div>
     </div>

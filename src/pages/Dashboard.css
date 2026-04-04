@@ -80,11 +80,12 @@
 
 /* Subtle accent backgrounds for top KPI cards */
 .dashboard-bg-ice {
-  background: linear-gradient(145deg, #ffffff 0%, #f1f5f9 100%);
+  background: var(--bg-secondary);
 }
 
 .dashboard-bg-warm {
-  background: linear-gradient(145deg, #ffffff 0%, #fff7ed 100%);
+  background: var(--bg-secondary);
+  opacity: 0.9;
 }
 
 .dashboard-upload-thumb {
@@ -112,5 +113,5 @@
   height: 600px;
   border: none;
   border-radius: var(--radius-md);
-  background: #f8fafc;
+  background: var(--bg-primary);
 }

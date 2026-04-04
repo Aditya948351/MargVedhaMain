@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FaTachometerAlt, FaCamera, FaBell, FaChartBar, FaCog, FaGithub, FaSignOutAlt, FaUserCircle, FaBrain, FaLeaf, FaChartLine, FaFileExport } from "react-icons/fa";
+import { FaTachometerAlt, FaCamera, FaBell, FaChartBar, FaCog, FaGithub, FaSignOutAlt, FaUserCircle, FaBrain, FaLeaf, FaChartLine, FaFileExport, FaCity } from "react-icons/fa";
 import { Button } from "react-bootstrap";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
@@ -36,35 +36,42 @@ const Sidebar = () => {
 
       <div className="nav-links">
         {isAdmin ? (
-          <NavLink to="/admin" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-            <FaChartBar className="icon" /> City Overview
-          </NavLink>
+          <>
+            <NavLink to="/admin" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaTachometerAlt className="icon" /> Operation Center
+            </NavLink>
+            <NavLink to="/network-analytics" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaChartLine className="icon" /> Network Analytics
+            </NavLink>
+            <NavLink to="/incident-hub" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaBell className="icon" /> Incident Hub
+            </NavLink>
+            <NavLink to="/public-transport" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaCity className="icon" /> Public Transport
+            </NavLink>
+            <NavLink to="/lstm-studio" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaBrain className="icon text-primary" /> AI & ML Studio
+            </NavLink>
+            <NavLink to="/enforcement" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaCamera className="icon" /> Enforcement
+            </NavLink>
+            <NavLink to="/EcoImpact" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaLeaf className="icon text-success" /> Environment
+            </NavLink>
+            <NavLink to="/suggestions" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaBrain className="icon text-primary" /> Advice AI
+            </NavLink>
+            <NavLink to="/intelligence" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaCity className="icon text-info" /> City Intelligence
+            </NavLink>
+            <NavLink to="/reports" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
+              <FaFileExport className="icon" /> Reports
+            </NavLink>
+          </>
         ) : (
           <NavLink to="/dashboard" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
             <FaTachometerAlt className="icon" /> Local Dashboard
           </NavLink>
-        )}
-        <NavLink to="/google-map" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-          <FaCamera className="icon" /> Camera Feeds
-        </NavLink>
-        <NavLink to="/traffic-alerts" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-          <FaBell className="icon" /> Traffic Alerts
-        </NavLink>
-        <NavLink to="/reports" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-          <FaChartBar className="icon" /> Reports
-        </NavLink>
-        {isAdmin && (
-          <>
-            <NavLink to="/CitizenSuggestions" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-              <FaBrain className="icon" /> Suggestions
-            </NavLink>
-            <NavLink to="/EcoImpact" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-              <FaLeaf className="icon" /> Eco-Impact
-            </NavLink>
-            <NavLink to="/MLAnalytics" className={({ isActive }) => `nav-item ${isActive ? "active" : ""}`}>
-              <FaFileExport className="icon" /> ML Data
-            </NavLink>
-          </>
         )}
       </div>
 

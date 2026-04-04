@@ -1,16 +1,24 @@
 #!/usr/bin/env python3
 """
-MargVedha Traffic Simulation API
-================================
-Dynamically updates all 20 Nashik junction traffic counts in Firestore
-every ~30 seconds. The Android app reads these in real-time, updating
-route suggestions and Bus ETA automatically.
+MargVedha Traffic Simulation API v2.0
+=====================================
+Full Smart City simulation engine. Dynamically updates:
+  - 20 junction traffic counts
+  - 5 bus route ETAs
+  - AI route suggestions (Dijkstra)
+  - Live incidents (accidents, construction, VIP)
+  - Enforcement violations (helmet, signal jump, wrong way)
+  - Signal override reading (admin writes from website)
+  - Green corridor support (ambulance detection)
+
+Flask endpoints:
+  GET  /           → status page
+  POST /start      → start the simulation loop (called by website button)
+  GET  /api/status → current simulation state
 
 Usage:
-  pip install firebase-admin
+  pip install firebase-admin flask flask-cors
   python traffic_simulation_api.py
-
-Requires: nsdk.json (Firebase Admin SDK key) in the same folder.
 """
 
 import firebase_admin
@@ -19,38 +27,48 @@ import random
 import time
 import math
 import datetime
+import threading
+import uuid
+from flask import Flask, jsonify, request
+from flask_cors import CORS
 
-# ── Firebase init ──────────────────────────────────────────────────────────────
-cred = credentials.Certificate("nsdk.json")
+# ── Flask App ─────────────────────────────────────────────────────────────────
+app = Flask(__name__)
+CORS(app)
+
+# ── Firebase init ─────────────────────────────────────────────────────────────
+cred = credentials.Certificate("firebase-adminsdk.json")
 firebase_admin.initialize_app(cred)
 db = firestore.client()
 
-# ── 20 Nashik Junctions with road-level connectivity ─────────────────────────
-# Each junction has: name, geographic neighbours (for routing), base_traffic
+# ── Simulation state ──────────────────────────────────────────────────────────
+sim_running = False
+sim_cycle = 0
+
+# ── 20 Nashik Junctions ──────────────────────────────────────────────────────
 JUNCTIONS = [
-    {"id": "cbs_circle",         "name": "CBS Circle",         "neighbours": ["bytco_point","ashok_stambh","lekha_nagar","upnagar"],       "base": 35},
-    {"id": "nashik_road",        "name": "Nashik Road",         "neighbours": ["makhmalabad_naka","dwarka_circle","shalimar"],              "base": 28},
-    {"id": "gangapur_road",      "name": "Gangapur Road",       "neighbours": ["trimbak_naka","indiranagar","untwadi"],                     "base": 22},
-    {"id": "dwarka_circle",      "name": "Dwarka Circle",       "neighbours": ["nashik_road","rajiv_gandhi_bhavan","shalimar"],             "base": 30},
-    {"id": "rajiv_gandhi_bhavan","name": "Rajiv Gandhi Bhavan", "neighbours": ["dwarka_circle","college_road","ashok_stambh"],              "base": 25},
-    {"id": "college_road",       "name": "College Road",        "neighbours": ["rajiv_gandhi_bhavan","upnagar","cbs_circle"],               "base": 20},
-    {"id": "mumbai_naka",        "name": "Mumbai Naka",         "neighbours": ["lekha_nagar","pathardi_phata","bytco_point"],               "base": 45},
-    {"id": "ashok_stambh",       "name": "Ashok Stambh",        "neighbours": ["cbs_circle","rajiv_gandhi_bhavan","bytco_point"],           "base": 32},
-    {"id": "shalimar",           "name": "Shalimar",            "neighbours": ["nashik_road","dwarka_circle","upnagar"],                    "base": 18},
-    {"id": "bytco_point",        "name": "Bytco Point",         "neighbours": ["cbs_circle","ashok_stambh","mumbai_naka"],                  "base": 27},
-    {"id": "pathardi_phata",     "name": "Pathardi Phata",      "neighbours": ["mumbai_naka","ambad_link_road","satpur_midc"],              "base": 40},
-    {"id": "ambad_link_road",    "name": "Ambad Link Road",     "neighbours": ["pathardi_phata","satpur_midc"],                             "base": 22},
-    {"id": "satpur_midc",        "name": "Satpur MIDC",         "neighbours": ["ambad_link_road","makhmalabad_naka","nashik_road"],         "base": 15},
-    {"id": "trimbak_naka",       "name": "Trimbak Naka",        "neighbours": ["gangapur_road","panchavati","indiranagar"],                 "base": 19},
-    {"id": "lekha_nagar",        "name": "Lekha Nagar",         "neighbours": ["cbs_circle","mumbai_naka"],                                 "base": 24},
-    {"id": "upnagar",            "name": "Upnagar",             "neighbours": ["cbs_circle","college_road","shalimar"],                     "base": 21},
-    {"id": "indiranagar",        "name": "Indiranagar",         "neighbours": ["gangapur_road","trimbak_naka","untwadi"],                   "base": 16},
-    {"id": "untwadi",            "name": "Untwadi",             "neighbours": ["gangapur_road","indiranagar","cbs_circle"],                 "base": 14},
-    {"id": "makhmalabad_naka",   "name": "Makhmalabad Naka",    "neighbours": ["nashik_road","satpur_midc","shalimar"],                     "base": 12},
-    {"id": "panchavati",         "name": "Panchavati",          "neighbours": ["trimbak_naka","cbs_circle","upnagar"],                      "base": 29},
+    {"id": "cbs_circle",         "name": "CBS Circle",         "lat": 19.9975, "lng": 73.7898, "neighbours": ["bytco_point","ashok_stambh","lekha_nagar","upnagar"],       "base": 35},
+    {"id": "nashik_road",        "name": "Nashik Road",        "lat": 20.0060, "lng": 73.7720, "neighbours": ["makhmalabad_naka","dwarka_circle","shalimar"],              "base": 28},
+    {"id": "gangapur_road",      "name": "Gangapur Road",      "lat": 19.9850, "lng": 73.7900, "neighbours": ["trimbak_naka","indiranagar","untwadi"],                     "base": 22},
+    {"id": "dwarka_circle",      "name": "Dwarka Circle",      "lat": 20.0010, "lng": 73.7770, "neighbours": ["nashik_road","rajiv_gandhi_bhavan","shalimar"],             "base": 30},
+    {"id": "rajiv_gandhi_bhavan","name": "Rajiv Gandhi Bhavan","lat": 19.9910, "lng": 73.7840, "neighbours": ["dwarka_circle","college_road","ashok_stambh"],              "base": 25},
+    {"id": "college_road",       "name": "College Road",       "lat": 19.9990, "lng": 73.7860, "neighbours": ["rajiv_gandhi_bhavan","upnagar","cbs_circle"],               "base": 20},
+    {"id": "mumbai_naka",        "name": "Mumbai Naka",        "lat": 19.9930, "lng": 73.8020, "neighbours": ["lekha_nagar","pathardi_phata","bytco_point"],               "base": 45},
+    {"id": "ashok_stambh",       "name": "Ashok Stambh",       "lat": 19.9960, "lng": 73.7840, "neighbours": ["cbs_circle","rajiv_gandhi_bhavan","bytco_point"],           "base": 32},
+    {"id": "shalimar",           "name": "Shalimar",           "lat": 20.0040, "lng": 73.7810, "neighbours": ["nashik_road","dwarka_circle","upnagar"],                    "base": 18},
+    {"id": "bytco_point",        "name": "Bytco Point",        "lat": 19.9950, "lng": 73.7870, "neighbours": ["cbs_circle","ashok_stambh","mumbai_naka"],                  "base": 27},
+    {"id": "pathardi_phata",     "name": "Pathardi Phata",     "lat": 20.0120, "lng": 73.7980, "neighbours": ["mumbai_naka","ambad_link_road","satpur_midc"],              "base": 40},
+    {"id": "ambad_link_road",    "name": "Ambad Link Road",    "lat": 20.0090, "lng": 73.7940, "neighbours": ["pathardi_phata","satpur_midc"],                             "base": 22},
+    {"id": "satpur_midc",        "name": "Satpur MIDC",        "lat": 20.0000, "lng": 73.7650, "neighbours": ["ambad_link_road","makhmalabad_naka","nashik_road"],         "base": 15},
+    {"id": "trimbak_naka",       "name": "Trimbak Naka",       "lat": 19.9820, "lng": 73.7780, "neighbours": ["gangapur_road","panchavati","indiranagar"],                 "base": 19},
+    {"id": "lekha_nagar",        "name": "Lekha Nagar",        "lat": 19.9970, "lng": 73.7950, "neighbours": ["cbs_circle","mumbai_naka"],                                 "base": 24},
+    {"id": "upnagar",            "name": "Upnagar",            "lat": 20.0030, "lng": 73.7880, "neighbours": ["cbs_circle","college_road","shalimar"],                     "base": 21},
+    {"id": "indiranagar",        "name": "Indiranagar",        "lat": 19.9900, "lng": 73.7810, "neighbours": ["gangapur_road","trimbak_naka","untwadi"],                   "base": 16},
+    {"id": "untwadi",            "name": "Untwadi",            "lat": 19.9940, "lng": 73.7760, "neighbours": ["gangapur_road","indiranagar","cbs_circle"],                 "base": 14},
+    {"id": "makhmalabad_naka",   "name": "Makhmalabad Naka",   "lat": 20.0080, "lng": 73.7700, "neighbours": ["nashik_road","satpur_midc","shalimar"],                     "base": 12},
+    {"id": "panchavati",         "name": "Panchavati",         "lat": 20.0020, "lng": 73.7920, "neighbours": ["trimbak_naka","cbs_circle","upnagar"],                      "base": 29},
 ]
 
-# ── Bus Routes connecting stops ───────────────────────────────────────────────
 BUS_ROUTES = [
     {"route_id": "N-1",  "name": "CBS ↔ Nashik Road",         "stops": ["cbs_circle","ashok_stambh","shalimar","nashik_road"],           "base_eta_min": 22},
     {"route_id": "N-4",  "name": "Panchavati ↔ Mumbai Naka",  "stops": ["panchavati","cbs_circle","lekha_nagar","mumbai_naka"],          "base_eta_min": 35},
@@ -59,9 +77,18 @@ BUS_ROUTES = [
     {"route_id": "N-17", "name": "Trimbak ↔ College Road",    "stops": ["trimbak_naka","indiranagar","gangapur_road","college_road"],    "base_eta_min": 30},
 ]
 
-def simulate_traffic(base: int, hour: int) -> int:
-    """Realistic time-of-day + random noise traffic simulation."""
-    # Morning peak 8-10, Evening peak 17-19
+INCIDENT_TYPES = [
+    {"type": "accident", "severity": "High", "desc": "Vehicle collision reported"},
+    {"type": "construction", "severity": "Medium", "desc": "Road construction underway"},
+    {"type": "vip_movement", "severity": "Low", "desc": "VIP convoy movement"},
+    {"type": "waterlogging", "severity": "Medium", "desc": "Waterlogging due to heavy rain"},
+    {"type": "road_block", "severity": "High", "desc": "Road blocked by fallen tree"},
+]
+
+VIOLATION_TYPES = ["Helmet Missing", "Signal Jump", "Wrong Way Driving", "Overspeeding", "Triple Riding"]
+
+
+def simulate_traffic(base, hour):
     if 8 <= hour < 10:
         multiplier = random.uniform(1.6, 2.2)
     elif 17 <= hour < 20:
@@ -75,10 +102,10 @@ def simulate_traffic(base: int, hour: int) -> int:
     noise = random.gauss(0, 3)
     return max(0, round(base * multiplier + noise))
 
-def find_route(from_id: str, to_id: str, traffic_map: dict) -> list:
-    """Dijkstra-based shortest path using traffic as edge weight."""
-    adj = {j["id"]: j["neighbours"] for j in JUNCTIONS}
+
+def find_route(from_id, to_id, traffic_map):
     import heapq
+    adj = {j["id"]: j["neighbours"] for j in JUNCTIONS}
     dist = {j["id"]: float("inf") for j in JUNCTIONS}
     prev = {}
     dist[from_id] = 0
@@ -94,7 +121,6 @@ def find_route(from_id: str, to_id: str, traffic_map: dict) -> list:
                 dist[nb] = nd
                 prev[nb] = node
                 heapq.heappush(pq, (nd, nb))
-    # Reconstruct path
     path = []
     cur = to_id
     while cur in prev:
@@ -103,17 +129,12 @@ def find_route(from_id: str, to_id: str, traffic_map: dict) -> list:
     path.append(from_id)
     return list(reversed(path))
 
-def compute_bus_eta(route: dict, traffic_map: dict) -> dict:
-    """Compute dynamic ETA for each bus route based on stop traffic."""
+
+def compute_bus_eta(route, traffic_map):
     total_traffic = sum(traffic_map.get(s, 0) for s in route["stops"])
-    # ETA increases by 30s for every extra vehicle at stops
     delay_min = (total_traffic / 10.0) * 0.5
     eta = round(route["base_eta_min"] + delay_min)
-    congestion_level = (
-        "Heavy" if total_traffic > 100 else
-        "Moderate" if total_traffic > 40 else
-        "Clear"
-    )
+    congestion_level = "Heavy" if total_traffic > 100 else "Moderate" if total_traffic > 40 else "Clear"
     return {
         "route_id": route["route_id"],
         "route_name": route["name"],
@@ -124,48 +145,101 @@ def compute_bus_eta(route: dict, traffic_map: dict) -> dict:
         "updated_at": datetime.datetime.utcnow().isoformat()
     }
 
-def push_update(traffic_map: dict, hour: int):
-    """Push one cycle of junction + bus updates to Firestore."""
-    batch = db.batch()
 
-    # ── Junction traffic
+def get_traffic_status(count):
+    if count > 25: return "High"
+    if count > 12: return "Moderate"
+    return "Low"
+
+
+def push_update(traffic_map, hour):
+    global sim_cycle
+    batch = db.batch()
+    now_iso = datetime.datetime.utcnow().isoformat()
+
+    # ── 1. Fetch Global Green Corridor ────────────────────────────────────────
+    corridor_active = False
+    active_path = []
+    try:
+        corr_doc = db.collection("settings").document("green_corridor").get()
+        if corr_doc.exists:
+            corr_data = corr_doc.to_dict()
+            if corr_data.get("active"):
+                corridor_active = True
+                active_path = find_route(corr_data["start_id"], corr_data["end_id"], traffic_map)
+    except: pass
+
+    # ── 2. Junction traffic ───────────────────────────────────────────────────
     for junc in JUNCTIONS:
         count = traffic_map[junc["id"]]
+
+        # Check if individual admin has overridden the signal (fallback)
+        try:
+            doc = db.collection("junctions").document(junc["id"]).get()
+            if doc.exists:
+                existing = doc.to_dict()
+                signal_override = existing.get("signal_override", "AUTO")
+            else:
+                signal_override = "AUTO"
+        except:
+            signal_override = "AUTO"
+
+        # Determine signal phase
+        if corridor_active and junc["id"] in active_path:
+            # Smart clearing: decide side based on next junction in path
+            idx = active_path.index(junc["id"])
+            if idx < len(active_path) - 1:
+                # Simple logic for now: all-green if part of corridor
+                signal_phase = "GREEN_ALL" 
+            else:
+                signal_phase = "GREEN_ALL"  # Goal reached
+        elif signal_override != "AUTO":
+            signal_phase = signal_override  # Admin manual override
+        else:
+            signal_phase = random.choice(["GREEN_NS", "GREEN_EW"])
+
+        n_count = round(count * random.uniform(0.20, 0.30))
+        s_count = round(count * random.uniform(0.20, 0.30))
+        e_count = round(count * random.uniform(0.20, 0.30))
+        w_count = round(count * random.uniform(0.15, 0.25))
+
         ref = db.collection("junctions").document(junc["id"])
         batch.set(ref, {
             "location": junc["name"],
             "junction_id": junc["id"],
+            "lat": junc["lat"],
+            "lng": junc["lng"],
             "total_vehicles": count,
-            "north": round(count * random.uniform(0.20, 0.30)),
-            "south": round(count * random.uniform(0.20, 0.30)),
-            "east":  round(count * random.uniform(0.20, 0.30)),
-            "west":  round(count * random.uniform(0.15, 0.25)),
-            "congestion_level": (
-                "High" if count > 50 else
-                "Moderate" if count > 20 else
-                "Low"
-            ),
-            "signal_phase": random.choice(["GREEN_NS", "GREEN_EW", "YELLOW", "RED"]),
-            "updated_at": datetime.datetime.utcnow().isoformat(),
+            "north": n_count,
+            "south": s_count,
+            "east":  e_count,
+            "west":  w_count,
+            "n_status": get_traffic_status(n_count),
+            "s_status": get_traffic_status(s_count),
+            "e_status": get_traffic_status(e_count),
+            "w_status": get_traffic_status(w_count),
+            "congestion_level": get_traffic_status(count),
+            "signal_phase": signal_phase,
+            "signal_override": signal_override,
+            "green_corridor_active": corridor_active and junc["id"] in active_path,
+            "updated_at": now_iso,
             "hour": hour,
         }, merge=True)
 
-    # ── Bus route ETAs
+    # ── 2. Bus route ETAs ─────────────────────────────────────────────────────
     for route in BUS_ROUTES:
         eta_data = compute_bus_eta(route, traffic_map)
         ref = db.collection("bus_routes").document(route["route_id"])
         batch.set(ref, eta_data, merge=True)
 
-    # ── Best AI route suggestion (CBS → Mumbai Naka as demo)
+    # ── 3. AI route suggestion ────────────────────────────────────────────────
     route_path = find_route("cbs_circle", "mumbai_naka", traffic_map)
     path_names = [next(j["name"] for j in JUNCTIONS if j["id"] == r) for r in route_path]
     total_on_path = sum(traffic_map.get(r, 0) for r in route_path)
     suggestion_ref = db.collection("route_suggestions").document("ai_suggested")
     batch.set(suggestion_ref, {
-        "from": "CBS Circle",
-        "to": "Mumbai Naka",
-        "path": path_names,
-        "path_ids": route_path,
+        "from": "CBS Circle", "to": "Mumbai Naka",
+        "path": path_names, "path_ids": route_path,
         "total_vehicles": total_on_path,
         "recommendation": (
             f"⚠️ Heavy traffic ({total_on_path} vehicles). Take alternate via {path_names[1] if len(path_names)>1 else 'bypass'}. ETA: ~{30 + total_on_path // 5}m."
@@ -174,36 +248,138 @@ def push_update(traffic_map: dict, hour: int):
             if total_on_path > 30 else
             f"🟢 Clear route. Via {' → '.join(path_names)}. ETA: ~12m."
         ),
-        "updated_at": datetime.datetime.utcnow().isoformat()
+        "updated_at": now_iso
     }, merge=True)
 
     batch.commit()
-    print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] ✅ Updated {len(JUNCTIONS)} junctions + {len(BUS_ROUTES)} bus routes")
 
-def main():
-    print("🚦 MargVedha Traffic Simulation API Started")
-    print("   Updating Firestore every 30 seconds...")
-    print("   Press Ctrl+C to stop.\n")
-    cycle = 0
-    while True:
+    # ── 4. Incidents (separate batch — randomly create/clear) ─────────────────
+    if sim_cycle % 3 == 0:  # Every 3rd cycle (~90 seconds)
+        inc_batch = db.batch()
+        # Clear old incidents
+        for junc in random.sample(JUNCTIONS, min(3, len(JUNCTIONS))):
+            ref = db.collection("incidents").document(f"inc_{junc['id']}")
+            inc_batch.set(ref, {"active": False, "updated_at": now_iso}, merge=True)
+
+        # Create new random incidents (2-4 active at a time)
+        for junc in random.sample(JUNCTIONS, random.randint(2, 4)):
+            inc_type = random.choice(INCIDENT_TYPES)
+            ref = db.collection("incidents").document(f"inc_{junc['id']}")
+            inc_batch.set(ref, {
+                "junction_id": junc["id"],
+                "junction_name": junc["name"],
+                "type": inc_type["type"],
+                "severity": inc_type["severity"],
+                "description": inc_type["desc"],
+                "clearance_eta_min": random.randint(15, 90),
+                "active": True,
+                "updated_at": now_iso,
+            })
+        inc_batch.commit()
+
+    # ── 5. Violations (every cycle — ~2 new violations) ───────────────────────
+    for _ in range(random.randint(1, 3)):
+        junc = random.choice(JUNCTIONS)
+        viol_type = random.choice(VIOLATION_TYPES)
+        db.collection("violations").add({
+            "junction_id": junc["id"],
+            "junction_name": junc["name"],
+            "type": viol_type,
+            "timestamp": now_iso,
+            "status": "Challan Issued",
+            "fine_amount": random.choice([500, 1000, 2000, 5000]),
+        })
+
+    sim_cycle += 1
+    print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Cycle #{sim_cycle}: Updated {len(JUNCTIONS)} junctions + incidents + violations")
+
+
+def seed_citizen_reports():
+    """Seeds some dummy citizen reports with images for demonstration."""
+    print("[Simulation] Seeding example citizen reports...")
+    reports = [
+        {
+            "type": "Pothole",
+            "description": "Severe pothole at CBS Circle. Dangerous for night commuters.",
+            "location_name": "CBS Circle crossing",
+            "lat": 19.9975, "lng": 73.7898,
+            "image_url": "https://images.unsplash.com/photo-1544980766-72b58ad9ca11?auto=format&fit=crop&q=80&w=1000",
+            "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
+        },
+        {
+            "type": "Roadworks",
+            "description": "Unplanned roadworks on Gangapur Road. Lane 1 closed.",
+            "location_name": "Gangapur Lane 1",
+            "lat": 19.9850, "lng": 73.7900,
+            "image_url": "https://images.unsplash.com/photo-1531266752426-aad472b7bdf4?auto=format&fit=crop&q=80&w=1000",
+            "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
+        },
+        {
+            "type": "Accident",
+            "description": "Minor collision causing build-up. Traffic police informed.",
+            "location_name": "Nashik Road near Station",
+            "lat": 20.0060, "lng": 73.7720,
+            "image_url": "https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?auto=format&fit=crop&q=80&w=1000",
+            "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
+        }
+    ]
+    for r in reports:
+        # Check if reports already exist? No, just add them.
+        db.collection("citizen_reports").add(r)
+    print(f"[Simulation] Created {len(reports)} live citizen reports.")
+
+
+def simulation_loop():
+    global sim_running
+    sim_running = True
+    print("[Simulation] MargVedha Traffic Engine STARTED")
+    while sim_running:
         hour = datetime.datetime.now().hour
-        # Compute traffic snapshot for this cycle
         traffic_map = {j["id"]: simulate_traffic(j["base"], hour) for j in JUNCTIONS}
-
         push_update(traffic_map, hour)
-
-        # Print summary table
-        cycle += 1
-        print(f"\n  Cycle #{cycle} | {datetime.datetime.now().strftime('%d-%b %H:%M:%S')}")
-        print(f"  {'Junction':<25} {'Vehicles':>8}  Congestion")
-        print(f"  {'─'*45}")
-        for junc in JUNCTIONS:
-            cnt = traffic_map[junc["id"]]
-            level = "🔴 High" if cnt > 50 else "🟡 Mod" if cnt > 20 else "🟢 Low"
-            print(f"  {junc['name']:<25} {cnt:>8}  {level}")
-        print()
-
         time.sleep(30)
 
+
+# ── Flask Endpoints ───────────────────────────────────────────────────────────
+
+@app.route("/")
+def index():
+    return jsonify({
+        "service": "MargVedha Traffic Simulation Engine v2.0",
+        "status": "running" if sim_running else "stopped",
+        "cycle": sim_cycle,
+        "junctions": len(JUNCTIONS),
+    })
+
+@app.route("/start", methods=["POST"])
+def start_simulation():
+    global sim_running
+    if sim_running:
+        return jsonify({"status": "already_running", "cycle": sim_cycle})
+    t = threading.Thread(target=simulation_loop, daemon=True)
+    t.start()
+    return jsonify({"status": "started"})
+
+@app.route("/stop", methods=["POST"])
+def stop_simulation():
+    global sim_running
+    sim_running = False
+    return jsonify({"status": "stopped", "final_cycle": sim_cycle})
+
+@app.route("/api/status")
+def api_status():
+    return jsonify({
+        "running": sim_running,
+        "cycle": sim_cycle,
+        "junctions_count": len(JUNCTIONS),
+        "bus_routes_count": len(BUS_ROUTES),
+    })
+
+
 if __name__ == "__main__":
-    main()
+    seed_citizen_reports()
+    # Auto-start simulation when run directly
+    t = threading.Thread(target=simulation_loop, daemon=True)
+    t.start()
+    print("[*] Flask API at http://localhost:5000")
+    app.run(host="0.0.0.0", port=5000, threaded=True)

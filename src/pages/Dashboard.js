@@ -35,6 +35,8 @@ import {
   BarChart,
   Bar,
 } from "recharts";
+import LiveCCTVGrid from "../components/LiveCCTVGrid";
+
 
 /**
  * Unified Dashboard.jsx
@@ -189,19 +191,19 @@ const Dashboard = ({ onLogout }) => {
     setAiDecisions(null);
     setTimeout(() => {
       const decisions = {
-        summary: "Optimize signals on Nashik Road & Gangapur corridor; Create green corridor for upcoming ambulance route.",
+        summary: "Optimize signals on Tarwala / MERI Signal & ITI Signal Post Office corridor; Create green corridor for upcoming ambulance route.",
         actions: [
-          { id: 1, action: "Increase green on Nashik Rd by 20s", impact: "Reduce queue by ~30%" },
-          { id: 2, action: "Prioritize Bus Route on College Rd (demand-based)", impact: "Reduce bus delays" },
+          { id: 1, action: "Increase green on Tarwala / MERI Signal by 20s", impact: "Reduce queue by ~30%" },
+          { id: 2, action: "Prioritize Bus Route on CBS SIGNAL (demand-based)", impact: "Reduce bus delays" },
           { id: 3, action: "Activate emergency green corridor (estimated time saved: 5 min)", impact: "Life-saving" },
         ],
         suggestedSignalStates: {
-          "Gangapur Rd - North": "green",
-          "Gangapur Rd - South": "green",
-          "College Rd - East": "green",
-          "College Rd - West": "red",
-          "Nashik Rd - East": "red",
-          "Sharanpur Rd - North": "green",
+          "Tarwala / MERI Signal - North": "green",
+          "Tarwala / MERI Signal - South": "green",
+          "CBS SIGNAL - East": "green",
+          "CBS SIGNAL - West": "red",
+          "ABB Circle - East": "red",
+          "ITI Signal Post Office - North": "green",
         },
       };
       setAiDecisions(decisions);
@@ -237,16 +239,16 @@ const Dashboard = ({ onLogout }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white p-6 lg:p-10 ml-[100px] font-sans text-slate-900">
+    <div className="min-h-screen bg-[var(--bg-primary)] p-6 lg:p-10 ml-[100px] font-sans text-[var(--text-primary)] transition-colors duration-300">
       {/* Hero Section */}
       <header className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6 px-4">
         <div className="space-y-1">
-          <h1 className="text-4xl font-extrabold tracking-tight text-slate-900 flex items-center gap-3">
-            <span className="p-2 bg-blue-50 rounded-xl shadow-sm border border-blue-100">🚦</span>
+          <h1 className="text-4xl font-extrabold tracking-tight text-[var(--text-primary)] flex items-center gap-3">
+            <span className="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-xl shadow-sm border border-blue-100 dark:border-blue-800">🚦</span>
             Authority Dashboard 
             <span className="text-blue-500 animate-pulse">📶</span>
           </h1>
-          <p className="text-lg text-slate-500 font-medium ml-1">
+          <p className="text-lg text-[var(--text-secondary)] font-medium ml-1">
             Real-time monitoring • 1-hour prediction • 3D simulation preview
           </p>
         </div>
@@ -261,10 +263,14 @@ const Dashboard = ({ onLogout }) => {
         </div>
       </header>
 
+      <div className="px-4">
+        <LiveCCTVGrid />
+      </div>
+
       {/* Priority Section: Top-Level Metrics */}
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10 px-4">
         {/* Card 1: Live Traffic Overview */}
-        <div className="group relative bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden ring-1 ring-slate-900/5">
+        <div className="group relative bg-[var(--card-bg)] border border-[var(--border-color)] rounded-[2rem] p-8 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden ring-1 ring-slate-900/5">
           <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 -mr-24 -mt-24 rounded-full blur-3xl transition-opacity group-hover:opacity-60" />
           
           <div className="relative flex flex-col h-full">
@@ -274,29 +280,29 @@ const Dashboard = ({ onLogout }) => {
                   <div className="p-2.5 bg-blue-500 text-white rounded-2xl shadow-lg ring-4 ring-blue-500/10">
                     <FaChartLine size={20} />
                   </div>
-                  <h2 className="text-2xl font-bold text-slate-900">Live Traffic Overview</h2>
+                  <h2 className="text-2xl font-bold text-[var(--text-primary)]">Live Traffic Overview</h2>
                 </div>
-                <p className="text-slate-500 font-medium ml-1">Aggregate metrics from all sensors</p>
+                <p className="text-[var(--text-secondary)] font-medium ml-1">Aggregate metrics from all sensors</p>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-10">
-              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 transition-colors hover:bg-white hover:shadow-md">
+              <div className="bg-[var(--bg-primary)] p-6 rounded-3xl border border-[var(--border-color)] transition-colors hover:bg-[var(--card-bg)] hover:shadow-md">
                 <span className="text-4xl font-black text-blue-600 tabular-nums leading-none tracking-tight">{kpi.liveDensity}</span>
-                <p className="mt-2 text-sm font-semibold text-slate-600 uppercase tracking-wider">Live Density</p>
+                <p className="mt-2 text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Live Density</p>
               </div>
               
-              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 transition-colors hover:bg-white hover:shadow-md">
-                <span className="text-4xl font-black text-slate-900 tabular-nums leading-none tracking-tight">{kpi.totalVehicles}</span>
-                <p className="mt-2 text-sm font-semibold text-slate-600 uppercase tracking-wider">Total Active</p>
+              <div className="bg-[var(--bg-primary)] p-6 rounded-3xl border border-[var(--border-color)] transition-colors hover:bg-[var(--card-bg)] hover:shadow-md">
+                <span className="text-4xl font-black text-[var(--text-primary)] tabular-nums leading-none tracking-tight">{kpi.totalVehicles}</span>
+                <p className="mt-2 text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Total Active</p>
               </div>
 
-              <div className="bg-slate-50 p-6 rounded-3xl border border-slate-100 transition-colors hover:bg-white hover:shadow-md flex flex-col justify-between">
+              <div className="bg-[var(--bg-primary)] p-6 rounded-3xl border border-[var(--border-color)] transition-colors hover:bg-[var(--card-bg)] hover:shadow-md flex flex-col justify-between">
                 <div>
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold leading-4 tracking-wide uppercase ${kpi.congestion === 'Very High' ? 'bg-rose-50 text-rose-700 border border-rose-100' : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
                     {kpi.congestion}
                   </span>
-                  <p className="mt-2 text-sm font-semibold text-slate-600 uppercase tracking-wider">Status</p>
+                  <p className="mt-2 text-sm font-semibold text-[var(--text-secondary)] uppercase tracking-wider">Status</p>
                 </div>
                 <div className="flex flex-wrap gap-1.5 mt-4">
                   <span className="px-2 py-0.5 rounded bg-rose-500/10 text-rose-700 text-[10px] font-bold border border-rose-500/20">VH: {kpi.distribution.veryHigh}</span>
@@ -328,7 +334,7 @@ const Dashboard = ({ onLogout }) => {
         </div>
 
         {/* Card 2: Per-Intersection Snapshot */}
-        <div className="group relative bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden ring-1 ring-slate-900/5">
+        <div className="group relative bg-[var(--card-bg)] border border-[var(--border-color)] rounded-[2rem] p-8 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden ring-1 ring-slate-900/5">
           <div className="absolute top-0 right-0 w-48 h-48 bg-orange-500/5 -mr-24 -mt-24 rounded-full blur-3xl transition-opacity group-hover:opacity-60" />
           
           <div className="relative flex flex-col h-full">
@@ -338,15 +344,15 @@ const Dashboard = ({ onLogout }) => {
                   <div className="p-2.5 bg-orange-500 text-white rounded-2xl shadow-lg ring-4 ring-orange-500/10">
                     <FaTrafficLight size={20} />
                   </div>
-                  <h2 className="text-2xl font-bold text-slate-900">Intersection Snapshot</h2>
+                  <h2 className="text-2xl font-bold text-[var(--text-primary)]">Intersection Snapshot</h2>
                 </div>
-                <p className="text-slate-500 font-medium ml-1">Contextual monitoring per junction</p>
+                <p className="text-[var(--text-secondary)] font-medium ml-1">Contextual monitoring per junction</p>
               </div>
               <div className="relative">
                 <select 
                   value={selectedIntersection} 
                   onChange={(e) => setSelectedIntersection(e.target.value)}
-                  className="pl-4 pr-10 py-3 bg-slate-50 border-none rounded-2xl text-sm font-bold text-slate-800 shadow-inner focus:ring-4 focus:ring-orange-500/5 transition-all outline-none appearance-none cursor-pointer min-w-[220px]"
+                  className="pl-4 pr-10 py-3 bg-[var(--bg-primary)] border-none rounded-2xl text-sm font-bold text-[var(--text-primary)] shadow-inner focus:ring-4 focus:ring-orange-500/5 transition-all outline-none appearance-none cursor-pointer min-w-[220px]"
                 >
                   {intersectionsList.map((it) => (
                     <option key={it.id} value={it.id}>{it.label}</option>
@@ -359,30 +365,30 @@ const Dashboard = ({ onLogout }) => {
             </div>
 
             <div className="flex-grow">
-              <div className="overflow-hidden rounded-3xl border border-slate-100 mb-8 shadow-sm">
+              <div className="overflow-hidden rounded-3xl border border-[var(--border-color)] mb-8 shadow-sm">
                 <table className="w-full text-left">
-                  <thead className="bg-slate-50/50 border-b border-slate-100">
+                  <thead className="bg-[var(--bg-primary)] border-b border-[var(--border-color)]">
                     <tr>
-                      <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">vehicle type</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">count</th>
-                      <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">status</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">vehicle type</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest text-center">count</th>
+                      <th className="px-6 py-4 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest text-right">status</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-50">
+                  <tbody className="divide-y divide-[var(--border-color)]">
                     {[
                       { type: "Car", count: latestStats.car_count, icon: "🚗" },
                       { type: "Motorcycle", count: latestStats.motorcycle_count, icon: "🏍️" },
                       { type: "Bus", count: latestStats.bus_count, icon: "🚌" },
                       { type: "Truck", count: latestStats.truck_count, icon: "🚛" },
                     ].map((row, idx) => (
-                      <tr key={idx} className="hover:bg-slate-50/30 transition-colors group/row">
+                      <tr key={idx} className="hover:bg-[var(--bg-primary)] transition-colors group/row">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <span className="text-xl">{row.icon}</span>
-                            <span className="text-sm font-bold text-slate-700">{row.type}</span>
+                            <span className="text-sm font-bold text-[var(--text-primary)]">{row.type}</span>
                           </div>
                         </td>
-                        <td className="px-6 py-4 font-black text-slate-900 text-md text-center tabular-nums">{row.count}</td>
+                        <td className="px-6 py-4 font-black text-[var(--text-primary)] text-md text-center tabular-nums">{row.count}</td>
                         <td className="px-6 py-4 text-right">
                           <span className={`px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm border ${row.count > 20 ? 'bg-rose-500 text-white border-rose-400' : 'bg-emerald-500 text-white border-emerald-400'}`}>
                             {row.count > 20 ? "High" : "Normal"}
@@ -394,18 +400,18 @@ const Dashboard = ({ onLogout }) => {
                 </table>
               </div>
 
-              <div className="grid grid-cols-3 gap-6 bg-slate-50/50 p-4 rounded-3xl border border-slate-100">
+              <div className="grid grid-cols-3 gap-6 bg-[var(--bg-primary)] p-4 rounded-3xl border border-[var(--border-color)]">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Avg Density</p>
-                  <p className="text-xl font-black text-slate-900 leading-none tracking-tight">{liveKpi.density}%</p>
+                  <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Avg Density</p>
+                  <p className="text-xl font-black text-[var(--text-primary)] leading-none tracking-tight">{liveKpi.density}%</p>
                 </div>
-                <div className="space-y-1 border-x border-slate-200 px-4">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Cams</p>
-                  <p className="text-xl font-black text-slate-900 leading-none tracking-tight">1</p>
+                <div className="space-y-1 border-x border-[var(--border-color)] px-4">
+                  <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Active Cams</p>
+                  <p className="text-xl font-black text-[var(--text-primary)] leading-none tracking-tight">1</p>
                 </div>
                 <div className="space-y-1 px-4">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Signal Status</p>
-                  <p className="text-xl font-black text-slate-900 leading-none tracking-tight">Active</p>
+                  <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Signal Status</p>
+                  <p className="text-xl font-black text-[var(--text-primary)] leading-none tracking-tight">Active</p>
                 </div>
               </div>
             </div>
@@ -425,16 +431,16 @@ const Dashboard = ({ onLogout }) => {
       {/* Analytics & Control Section */}
       <section className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-10 px-4">
         {/* Card 3: Analytics / Prediction Chart */}
-        <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm hover:shadow-xl transition-all duration-300 ring-1 ring-slate-900/5">
+        <div className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-[2rem] p-8 shadow-sm hover:shadow-xl transition-all duration-300 ring-1 ring-slate-900/5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-indigo-500 text-white rounded-2xl shadow-lg ring-4 ring-indigo-500/10">
                   <FaChartLine size={20} />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Traffic Prediction</h2>
+                <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">Traffic Prediction</h2>
               </div>
-              <p className="text-slate-500 font-medium ml-1">Volume vs Predicted (60 min window)</p>
+              <p className="text-[var(--text-secondary)] font-medium ml-1">Volume vs Predicted (60 min window)</p>
             </div>
             <div className="flex items-center gap-3">
               <button onClick={() => navigate("/TrafficCounting")} className="px-5 py-2.5 text-slate-600 font-bold text-sm bg-slate-100 rounded-2xl hover:bg-slate-200 transition-colors">Monitor</button>
@@ -442,28 +448,28 @@ const Dashboard = ({ onLogout }) => {
             </div>
           </div>
 
-          <div className="h-[320px] w-full bg-slate-50/50 rounded-3xl p-4 border border-slate-100/50">
+          <div className="h-[320px] w-full bg-[var(--bg-primary)] rounded-3xl p-4 border border-[var(--border-color)]">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={trafficData}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border-color)" />
                 <XAxis 
                   dataKey="time" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
+                  tick={{ fill: 'var(--text-secondary)', fontSize: 12, fontWeight: 700 }}
                   dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#64748b', fontSize: 12, fontWeight: 600 }}
+                  tick={{ fill: 'var(--text-secondary)', fontSize: 12, fontWeight: 700 }}
                 />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: '#fff', borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                  itemStyle={{ fontWeight: 700 }}
+                  contentStyle={{ backgroundColor: 'var(--card-bg)', borderRadius: '1rem', border: '1px solid var(--border-color)', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)' }}
+                  itemStyle={{ fontWeight: 800, fontSize: '12px', color: 'var(--text-primary)' }}
                 />
-                <Line type="monotone" dataKey="vehicles" stroke="#4f46e5" strokeWidth={4} dot={{ r: 6, fill: '#4f46e5', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8, strokeWidth: 0 }} />
-                <Line type="monotone" dataKey="predicted" stroke="#94a3b8" strokeWidth={2} strokeDasharray="8 8" dot={false} />
+                <Line type="monotone" dataKey="vehicles" stroke="#6366f1" strokeWidth={4} dot={{ r: 6, fill: '#6366f1', strokeWidth: 2, stroke: 'var(--card-bg)' }} activeDot={{ r: 8, strokeWidth: 0 }} />
+                <Line type="monotone" dataKey="predicted" stroke="var(--text-secondary)" strokeWidth={2} strokeDasharray="5 5" dot={false} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -471,12 +477,12 @@ const Dashboard = ({ onLogout }) => {
           <div className="mt-6 flex items-center justify-between px-2">
             <div className="flex items-center gap-2">
               <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Network Health: Optimal</span>
+              <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-widest">Network Health: Optimal</span>
             </div>
             <div className="flex gap-4">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-indigo-600 rounded-sm"></div>
-                <span className="text-xs font-semibold text-slate-600">Actual</span>
+                <span className="text-xs font-semibold text-[var(--text-secondary)]">Actual</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-slate-300 rounded-sm"></div>
@@ -487,16 +493,16 @@ const Dashboard = ({ onLogout }) => {
         </div>
 
         {/* Card 4: Signal Control & AI Insights */}
-        <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm hover:shadow-xl transition-all duration-300 ring-1 ring-slate-900/5 flex flex-col">
+        <div className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-[2rem] p-8 shadow-sm hover:shadow-xl transition-all duration-300 ring-1 ring-slate-900/5 flex flex-col">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
             <div className="space-y-1">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 bg-emerald-500 text-white rounded-2xl shadow-lg ring-4 ring-emerald-500/10">
                   <FaRobot size={20} />
                 </div>
-                <h2 className="text-2xl font-bold text-slate-900 tracking-tight">AI Signal Intelligence</h2>
+                <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight">AI Signal Intelligence</h2>
               </div>
-              <p className="text-slate-500 font-medium ml-1">RL-driven intersection optimization</p>
+              <p className="text-[var(--text-secondary)] font-medium ml-1">RL-driven intersection optimization</p>
             </div>
             <button 
               onClick={() => fetchAiDecisions()}
@@ -556,69 +562,43 @@ const Dashboard = ({ onLogout }) => {
 
       {/* Feature Grid: Specialized Services */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 px-4">
-        <div className="bg-emerald-50 border border-emerald-100 rounded-3xl p-6 hover:shadow-lg transition-all border-b-4 border-b-emerald-500/30 group">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-white rounded-2xl shadow-sm text-emerald-600 group-hover:scale-110 transition-transform">
-              <FaBus size={24} />
+        {[
+          { color: "emerald", icon: <FaBus size={24} />, title: <>Bus Route<br/>Optimization</>, desc: "Dynamic planning based on passenger demand & traffic patterns.", btn: "🗺️ View Routes", path: "/BusRouteOptimization" },
+          { color: "sky", icon: <FaLock size={24} />, title: <>Secure Ticketing<br/>(Blockchain)</>, desc: "Secure & transparent ticketing for seamless public transport.", btn: "💳 Transactions", path: "/BlockChainTicketing" },
+          { color: "rose", icon: <FaExclamationTriangle size={24} />, title: <>Emergency<br/>Response</>, desc: "Incident tracking & rapid deployment for emergency services.", btn: "🚑 Alert Center", path: "/EmergencyAlerts" },
+          { color: "amber", icon: <FaMoneyBill size={24} />, title: <>Fare<br/>Adjustments</>, desc: "Real-time demand-based pricing for city transit services.", btn: "💵 Fare Updates", path: "/AutoFareAdjustments" },
+        ].map((item, idx) => (
+          <div key={idx} className={`bg-${item.color}-50 dark:bg-${item.color}-950/20 border border-${item.color}-100 dark:border-${item.color}-900/50 rounded-3xl p-6 hover:shadow-lg transition-all border-b-4 border-b-${item.color}-500/30 group`}>
+            <div className="flex items-center gap-3 mb-4">
+              <div className={`p-3 bg-white dark:bg-${item.color}-900 rounded-2xl shadow-sm text-${item.color}-600 dark:text-${item.color}-400 group-hover:scale-110 transition-transform`}>
+                {item.icon}
+              </div>
+              <h3 className="font-bold text-[var(--text-primary)] leading-tight">{item.title}</h3>
             </div>
-            <h3 className="font-bold text-slate-800 leading-tight">Bus Route<br/>Optimization</h3>
+            <p className="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">{item.desc}</p>
+            <button onClick={() => navigate(item.path)} className={`w-full py-3 bg-${item.color}-600 text-white font-bold text-sm rounded-2xl hover:bg-${item.color}-700 transition-all shadow-md`}>{item.btn}</button>
           </div>
-          <p className="text-sm text-slate-600 mb-6 leading-relaxed">Dynamic planning based on passenger demand & traffic patterns.</p>
-          <button onClick={() => navigate("/BusRouteOptimization")} className="w-full py-3 bg-emerald-600 text-white font-bold text-sm rounded-2xl hover:bg-emerald-700 transition-all shadow-md">🗺️ View Routes</button>
-        </div>
-
-        <div className="bg-sky-50 border border-sky-100 rounded-3xl p-6 hover:shadow-lg transition-all border-b-4 border-b-sky-500/30 group">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-white rounded-2xl shadow-sm text-sky-600 group-hover:scale-110 transition-transform">
-              <FaLock size={24} />
-            </div>
-            <h3 className="font-bold text-slate-800 leading-tight">Secure Ticketing<br/>(Blockchain)</h3>
-          </div>
-          <p className="text-sm text-slate-600 mb-6 leading-relaxed">Secure & transparent ticketing for seamless public transport.</p>
-          <button onClick={() => navigate("/BlockChainTicketing")} className="w-full py-3 bg-sky-600 text-white font-bold text-sm rounded-2xl hover:bg-sky-700 transition-all shadow-md">💳 Transactions</button>
-        </div>
-
-        <div className="bg-rose-50 border border-rose-100 rounded-3xl p-6 hover:shadow-lg transition-all border-b-4 border-b-rose-500/30 group">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-white rounded-2xl shadow-sm text-rose-600 group-hover:scale-110 transition-transform">
-              <FaExclamationTriangle size={24} />
-            </div>
-            <h3 className="font-bold text-slate-800 leading-tight">Emergency<br/>Response</h3>
-          </div>
-          <p className="text-sm text-slate-600 mb-6 leading-relaxed">Incident tracking & rapid deployment for emergency services.</p>
-          <button onClick={() => navigate("/EmergencyAlerts")} className="w-full py-3 bg-rose-600 text-white font-bold text-sm rounded-2xl hover:bg-rose-700 transition-all shadow-md">🚑 Alert Center</button>
-        </div>
-
-        <div className="bg-amber-50 border border-amber-100 rounded-3xl p-6 hover:shadow-lg transition-all border-b-4 border-b-amber-500/30 group">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-3 bg-white rounded-2xl shadow-sm text-amber-600 group-hover:scale-110 transition-transform">
-              <FaMoneyBill size={24} />
-            </div>
-            <h3 className="font-bold text-slate-800 leading-tight">Fare<br/>Adjustments</h3>
-          </div>
-          <p className="text-sm text-slate-600 mb-6 leading-relaxed">Real-time demand-based pricing for city transit services.</p>
-          <button onClick={() => navigate("/AutoFareAdjustments")} className="w-full py-3 bg-amber-600 text-white font-bold text-sm rounded-2xl hover:bg-amber-700 transition-all shadow-md">💵 Fare Updates</button>
-        </div>
+        ))}
       </section>
 
       {/* Uploads & Logs Section */}
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10 px-4">
         {/* Card: Uploads */}
-        <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm lg:col-span-1">
+        <div className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-[2rem] p-8 shadow-sm lg:col-span-1">
           <div className="flex items-center gap-3 mb-6">
-            <div className="p-2.5 bg-slate-100 text-slate-600 rounded-2xl">
+            <div className="p-2.5 bg-[var(--bg-primary)] text-[var(--text-secondary)] rounded-2xl">
               <FaUpload size={20} />
             </div>
-            <h2 className="text-xl font-bold text-slate-900tracking-tight">Evidence Upload</h2>
+            <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Evidence Upload</h2>
           </div>
-          <p className="text-sm text-slate-500 font-medium mb-6">Attach incident snapshots or camera footage (Max 8 thumbnails)</p>
+          <p className="text-sm text-[var(--text-secondary)] font-medium mb-6">Attach incident snapshots or camera footage (Max 8 thumbnails)</p>
           
           <div className="space-y-4">
             <div className="flex items-center justify-center w-full">
-              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-slate-200 border-dashed rounded-3xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition-all group">
+              <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-[var(--border-color)] border-dashed rounded-3xl cursor-pointer bg-[var(--bg-primary)] hover:bg-[var(--bg-secondary)] transition-all group">
                 <div className="flex flex-col items-center justify-center pt-5 pb-6">
-                  <FaUpload className="w-8 h-8 mb-3 text-slate-400 group-hover:text-blue-500 transition-colors" />
-                  <p className="mb-2 text-sm text-slate-500 font-bold tracking-tight">Click to upload</p>
+                  <FaUpload className="w-8 h-8 mb-3 text-[var(--text-secondary)] group-hover:text-blue-500 transition-colors" />
+                  <p className="mb-2 text-sm text-[var(--text-secondary)] font-bold tracking-tight">Click to upload</p>
                 </div>
                 <input type="file" multiple className="hidden" onChange={handleImageUpload} />
               </label>
@@ -648,36 +628,36 @@ const Dashboard = ({ onLogout }) => {
 
         {/* Card: Historical & Quick Actions */}
         <div className="lg:col-span-2 space-y-8">
-          <div className="bg-white border border-slate-200 rounded-[2rem] p-8 shadow-sm">
+          <div className="bg-[var(--card-bg)] border border-[var(--border-color)] rounded-[2rem] p-8 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <div className="space-y-1">
                 <div className="flex items-center gap-3">
                   <div className="p-2.5 bg-blue-500 text-white rounded-2xl shadow-lg">
                     <FaChartLine size={20} />
                   </div>
-                  <h2 className="text-xl font-bold text-slate-900 tracking-tight">Active Traffic Monitor</h2>
+                  <h2 className="text-xl font-bold text-[var(--text-primary)] tracking-tight">Active Traffic Monitor</h2>
                 </div>
-                <p className="text-slate-500 font-medium ml-1">Live camera sensors across Nashik</p>
+                <p className="text-[var(--text-secondary)] font-medium ml-1">Live camera sensors across Nashik</p>
               </div>
-              <button onClick={() => navigate("/analytics")} className="px-5 py-2.5 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-black transition-all shadow-lg">Advanced Analytics</button>
+              <button onClick={() => navigate("/analytics")} className="px-5 py-2.5 bg-[var(--text-primary)] text-[var(--bg-primary)] text-xs font-black uppercase tracking-widest rounded-2xl hover:opacity-90 transition-all shadow-lg">Advanced Analytics</button>
             </div>
 
-            <div className="overflow-hidden rounded-3xl border border-slate-100 shadow-sm">
+            <div className="overflow-hidden rounded-3xl border border-[var(--border-color)] shadow-sm">
               <table className="w-full text-left">
                 <thead>
-                  <tr className="bg-slate-50 border-b border-slate-100">
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Sensor ID</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Location</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Live Volume</th>
-                    <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] text-right">Intensity</th>
+                  <tr className="bg-[var(--bg-primary)] border-b border-[var(--border-color)]">
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Sensor ID</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Location</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em]">Live Volume</th>
+                    <th className="px-8 py-5 text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] text-right">Intensity</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100">
+                <tbody className="divide-y divide-[var(--border-color)]">
                   {cityWideStats.length > 0 ? cityWideStats.map((row) => (
                     <tr key={row.id} className="hover:bg-blue-50/20 transition-colors">
-                      <td className="px-8 py-5 font-bold text-slate-800 text-sm">{row.junctionId || 'SYS'+row.id.slice(-3)}</td>
-                      <td className="px-8 py-5 text-slate-600 font-medium text-sm">{row.junctionName}</td>
-                      <td className="px-8 py-5 tabular-nums font-black text-slate-900">{row.liveVehicleCount}</td>
+                      <td className="px-8 py-5 font-bold text-[var(--text-primary)] text-sm">{row.junctionId || 'SYS'+row.id.slice(-3)}</td>
+                      <td className="px-8 py-5 text-[var(--text-secondary)] font-medium text-sm">{row.junctionName}</td>
+                      <td className="px-8 py-5 tabular-nums font-black text-[var(--text-primary)]">{row.liveVehicleCount}</td>
                       <td className="px-8 py-5 text-right">
                         <span className={`px-3 py-1.5 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-sm ${
                           row.liveVehicleCount > 100 ? 'bg-rose-50 text-rose-700 border border-rose-200' :
@@ -699,26 +679,26 @@ const Dashboard = ({ onLogout }) => {
           </div>
           
           <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
-            <button onClick={() => navigate("/CitizenReports")} className="p-6 bg-white border border-slate-200 rounded-3xl hover:border-blue-300 hover:shadow-xl hover:-translate-y-1 transition-all group">
-              <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
+            <button onClick={() => navigate("/CitizenReports")} className="p-6 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-3xl hover:border-blue-300 hover:shadow-xl hover:-translate-y-1 transition-all group">
+              <div className="w-12 h-12 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm">
                 <FaUsers size={20} />
               </div>
-              <h4 className="font-bold text-slate-900 mb-1">Citizen Reports</h4>
-              <p className="text-xs text-slate-500 font-medium">Review community alerts</p>
+              <h4 className="font-bold text-[var(--text-primary)] mb-1">Citizen Reports</h4>
+              <p className="text-xs text-[var(--text-secondary)] font-medium">Review community alerts</p>
             </button>
-            <button onClick={() => navigate("/EmergencyCorridors")} className="p-6 bg-white border border-slate-200 rounded-3xl hover:border-rose-300 hover:shadow-xl hover:-translate-y-1 transition-all group">
-              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-all shadow-sm">
+            <button onClick={() => navigate("/EmergencyCorridors")} className="p-6 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-3xl hover:border-rose-300 hover:shadow-xl hover:-translate-y-1 transition-all group">
+              <div className="w-12 h-12 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-all shadow-sm">
                 <FaExclamationTriangle size={20} />
               </div>
-              <h4 className="font-bold text-slate-900 mb-1">Emergency Corridor</h4>
-              <p className="text-xs text-slate-500 font-medium">Activate priority pathing</p>
+              <h4 className="font-bold text-[var(--text-primary)] mb-1">Emergency Corridor</h4>
+              <p className="text-xs text-[var(--text-secondary)] font-medium">Activate priority pathing</p>
             </button>
-            <button onClick={() => navigate("/analytics")} className="hidden lg:block p-6 bg-white border border-slate-200 rounded-3xl hover:border-indigo-300 hover:shadow-xl hover:-translate-y-1 transition-all group col-span-1">
-              <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
+            <button onClick={() => navigate("/analytics")} className="hidden lg:block p-6 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-3xl hover:border-indigo-300 hover:shadow-xl hover:-translate-y-1 transition-all group col-span-1">
+              <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">
                 <FaChartLine size={20} />
               </div>
-              <h4 className="font-bold text-slate-900 mb-1">System Health</h4>
-              <p className="text-xs text-slate-500 font-medium">Global network stats</p>
+              <h4 className="font-bold text-[var(--text-primary)] mb-1">System Health</h4>
+              <p className="text-xs text-[var(--text-secondary)] font-medium">Global network stats</p>
             </button>
           </div>
         </div>
@@ -726,23 +706,23 @@ const Dashboard = ({ onLogout }) => {
 
       {/* 3D Simulation map preview */}
       <Modal show={simModalOpen} onHide={() => setSimModalOpen(false)} size="xl" centered className="premium-modal">
-        <Modal.Header closeButton className="border-b-0 pt-8 px-8">
-          <Modal.Title className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
-             <div className="p-2 bg-blue-50 text-blue-600 rounded-xl shadow-sm border border-blue-100">
+        <Modal.Header closeButton className="border-b-0 pt-8 px-8 bg-[var(--card-bg)]">
+          <Modal.Title className="text-2xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-3">
+             <div className="p-2 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-xl shadow-sm border border-blue-100 dark:border-blue-800">
                <FaMapMarkerAlt size={20} />
              </div>
              Live 3D Simulation Map
-             <span className="text-xs font-black text-blue-500 px-2 py-0.5 bg-blue-50 rounded-lg border border-blue-100 uppercase tracking-widest ml-2">Nashik City</span>
+             <span className="text-xs font-black text-blue-500 px-2 py-0.5 bg-blue-50 dark:bg-blue-900/40 rounded-lg border border-blue-100 dark:border-blue-800 uppercase tracking-widest ml-2">Nashik City</span>
           </Modal.Title>
         </Modal.Header>
         <Modal.Body style={{ minHeight: 600, padding: 0, position: "relative", background: "#111827" }}>
           <MapComponent height="600px" />
         </Modal.Body>
-        <Modal.Footer className="bg-slate-50 border-t border-slate-200 p-6 rounded-b-3xl">
-          <div className="w-full flex justify-between items-center text-slate-500">
+        <Modal.Footer className="bg-[var(--bg-primary)] border-t border-[var(--border-color)] p-6 rounded-b-3xl">
+          <div className="w-full flex justify-between items-center text-[var(--text-secondary)]">
             <small className="font-medium">Traffic overlay actively tracking 20 main junctions in Nashik.</small>
             <Button 
-              className="px-6 py-2 bg-slate-900 border-none rounded-xl font-bold text-sm tracking-wide transition-all hover:bg-black" 
+              className="px-6 py-2 bg-[var(--text-primary)] text-[var(--bg-primary)] border-none rounded-xl font-bold text-sm tracking-wide transition-all hover:opacity-90" 
               onClick={() => setSimModalOpen(false)}
             >
               Close Map
@@ -753,13 +733,13 @@ const Dashboard = ({ onLogout }) => {
 
       {/* AI Decisions modal */}
       <Modal show={aiModalOpen} onHide={() => setAiModalOpen(false)} centered size="lg" className="premium-modal">
-        <Modal.Header closeButton className="border-b-0 pt-8 px-8">
-          <Modal.Title className="text-2xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
-            <span className="p-2 bg-emerald-50 rounded-lg text-emerald-600">🤖</span>
+        <Modal.Header closeButton className="border-b-0 pt-8 px-8 bg-[var(--card-bg)] text-[var(--text-primary)]">
+          <Modal.Title className="text-2xl font-bold text-[var(--text-primary)] tracking-tight flex items-center gap-3">
+            <span className="p-2 bg-emerald-50 dark:bg-emerald-900/30 rounded-lg text-emerald-600 dark:text-emerald-400">🤖</span>
             AI Intelligence Decisions
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="px-8 pb-8">
+        <Modal.Body className="px-8 pb-8 bg-[var(--card-bg)]">
           {!aiDecisions ? (
             <div className="py-20 flex flex-col items-center justify-center space-y-4">
               <div className="relative flex h-12 w-12">
@@ -772,22 +752,22 @@ const Dashboard = ({ onLogout }) => {
             </div>
           ) : (
             <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-              <div className="bg-slate-50 rounded-2xl p-6 border border-slate-100">
-                <h6 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Strategy Summary</h6>
-                <p className="text-slate-800 font-bold leading-relaxed">{aiDecisions.summary}</p>
+              <div className="bg-[var(--bg-primary)] rounded-2xl p-6 border border-[var(--border-color)]">
+                <h6 className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest mb-2">Strategy Summary</h6>
+                <p className="text-[var(--text-primary)] font-bold leading-relaxed">{aiDecisions.summary}</p>
               </div>
 
               <div>
                 <h6 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Recommended Actions</h6>
                 <div className="space-y-3">
                   {aiDecisions.actions.map((a) => (
-                    <div key={a.id} className="flex items-start gap-4 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm hover:border-emerald-200 transition-colors">
-                      <div className="mt-1 p-1 bg-emerald-100 text-emerald-600 rounded-lg">
+                    <div key={a.id} className="flex items-start gap-4 p-4 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-2xl shadow-sm hover:border-emerald-200 transition-colors">
+                      <div className="mt-1 p-1 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg">
                         <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" /></svg>
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-slate-900">{a.action}</p>
-                        <p className="text-xs text-slate-500 font-medium mt-0.5">{a.impact}</p>
+                        <p className="text-sm font-bold text-[var(--text-primary)]">{a.action}</p>
+                        <p className="text-xs text-[var(--text-secondary)] font-medium mt-0.5">{a.impact}</p>
                       </div>
                     </div>
                   ))}
@@ -798,11 +778,11 @@ const Dashboard = ({ onLogout }) => {
                 <h6 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Signal State Matrix</h6>
                 <div className="grid grid-cols-2 gap-3">
                   {Object.keys(aiDecisions.suggestedSignalStates).map((k) => (
-                    <div key={k} className="px-4 py-3 bg-white border border-slate-100 rounded-xl flex items-center justify-between shadow-sm">
-                      <span className="text-xs font-bold text-slate-600">{k}</span>
+                    <div key={k} className="px-4 py-3 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-xl flex items-center justify-between shadow-sm">
+                      <span className="text-xs font-bold text-[var(--text-secondary)]">{k}</span>
                       <div className="flex items-center gap-2">
                          <span className={`w-2 h-2 rounded-full ${aiDecisions.suggestedSignalStates[k] === "green" ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.5)]"}`} />
-                         <span className={`text-[10px] font-black uppercase tracking-wider ${aiDecisions.suggestedSignalStates[k] === "green" ? "text-emerald-600" : "text-rose-600"}`}>
+                         <span className={`text-[10px] font-black uppercase tracking-wider ${aiDecisions.suggestedSignalStates[k] === "green" ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
                            {aiDecisions.suggestedSignalStates[k]}
                          </span>
                       </div>
@@ -813,9 +793,9 @@ const Dashboard = ({ onLogout }) => {
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer className="border-t border-slate-100 p-6">
+        <Modal.Footer className="border-t border-[var(--border-color)] p-6 bg-[var(--card-bg)]">
           <Button 
-            className="w-full py-3 bg-slate-900 border-none rounded-2xl font-bold text-sm tracking-wide transition-all hover:bg-black shadow-lg" 
+            className="w-full py-3 bg-[var(--text-primary)] text-[var(--bg-primary)] border-none rounded-2xl font-bold text-sm tracking-wide transition-all hover:opacity-90 shadow-lg" 
             onClick={() => setAiModalOpen(false)}
           >
             Acknowledge & Sync System

@@ -2,13 +2,20 @@ import pandas as pd
 import numpy as np
 from datetime import datetime, timedelta
 import random
+import os
 
 # Configuration
 JUNCTIONS = [
-    "CBS Circle", "Mumbai Naka", "Nashik Road", "Gangapur Road", "Dwarka Circle",
-    "Trimbak Naka", "Panchavati", "Satpur MIDC", "Bytco Point", "College Road",
-    "Ashok Stambh", "Rane Nagar", "Indira Nagar", "Govind Nagar", "Patherdi Phata",
-    "Adgaon Naka", "Mhasrul", "Makhmalabad", "Sinnar Phata", "Deolali Camp"
+    "Tarwala / MERI Signal",
+    "ITI Signal",
+    "Croma - Inox Signal",
+    "Udyog Bhavan, FDA office",
+    "ABB Circle",
+    "ITI Signal Post Office",
+    "CBS SIGNAL",
+    "Jailroad Signal",
+    "Ashok Stambh",
+    "Nashik Municipal Corporation"
 ]
 
 SIDES = ["North", "South", "East", "West"]
@@ -79,12 +86,17 @@ if __name__ == "__main__":
     print("Generating 5000 rows of Psychological Traffic Data...")
     df = generate_data(5000)
     
+    output_dir = "e:/MargVedhaMain/public/data"
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     # Save to public directory for Web Dashboard access
-    output_path = "e:/MargVedhaMain/public/nashik_traffic_psych_data.csv"
+    output_path = os.path.join(output_dir, "nashik_traffic_psych_data.csv")
     df.to_csv(output_path, index=False)
     print(f"Dataset successfully saved to: {output_path}")
     
     # Also save a secondary summary for quick graphs
     summary = df.groupby("Junction_Name")[["Total_Vehicles", "PM2_5_Level", "Frustration_Index"]].mean().reset_index()
-    summary.to_csv("e:/MargVedhaMain/public/junction_psych_summary.csv", index=False)
+    summary_path = os.path.join(output_dir, "junction_psych_summary.csv")
+    summary.to_csv(summary_path, index=False)
     print("Summary dataset saved for Real-time Dashboard graphs.")

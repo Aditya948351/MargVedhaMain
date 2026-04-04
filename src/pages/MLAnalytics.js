@@ -25,7 +25,7 @@ const SCATTER_DATA = [
 
 export default function MLAnalytics() {
   const downloadDataset = () => {
-    window.open("/nashik_traffic_psych_data.csv", "_blank");
+    window.open("/data/nashik_traffic_psych_data.csv", "_blank");
   };
 
   return (

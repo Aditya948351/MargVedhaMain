@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import com.margvedha.citizen.data.FirebaseRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -211,9 +212,14 @@ fun ReportScreen(navController: NavController) {
                 onClick = {
                     scope.launch {
                         submitting = true
-                        delay(1200) // simulate API call
+                        val success = FirebaseRepository.submitCitizenReport(
+                            type = selectedType,
+                            description = description,
+                            lat = 19.9975,
+                            lng = 73.7898
+                        )
                         submitting = false
-                        submitted = true
+                        submitted = success
                     }
                 },
                 modifier = Modifier.fillMaxWidth(),

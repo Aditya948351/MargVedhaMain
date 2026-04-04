@@ -1,0 +1,2 @@
+simulation_id,junction_count,traffic_pattern,incident_frequency,weather_mode,start_time,end_time
+SIM-MARGVEDHA-2026,20,Stochastic Seasonal Context Aware,0.05 per hour per junction,Dynamic,2025-04-03 14:57:50.633444,2026-04-03 13:57:50.633444

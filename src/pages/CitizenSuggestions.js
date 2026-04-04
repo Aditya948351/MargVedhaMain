@@ -1,66 +1,68 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Badge, Button, Spinner, Modal } from "react-bootstrap";
 import { FaBrain, FaUser, FaLightbulb, FaSync, FaMapMarkerAlt, FaExclamationTriangle, FaTrafficLight, FaTools, FaBus } from "react-icons/fa";
+import { db } from "../firebase";
+import { collection, onSnapshot, query, orderBy, limit } from "firebase/firestore";
 
 const SARVAM_API_KEY = "sk_wajkrjjw_D129eXthDsNC46eozPXL5nCC";
 
 const CITIZEN_SCENARIOS = [
   {
-    id: 1, name: "Ravi Kumar", age: 42, junction: "CBS Circle", hour: "08:15 AM",
+    id: 1, name: "Ravi Kumar", age: 42, junction: "CBS SIGNAL", hour: "08:15 AM",
     lang: "hi", vehicles: 78,
     feedback: "CBS चौक पर बहुत ज्यादा भीड़ है। मुझे ऑफिस जाने में 30 मिनट की देरी हो गई। सिग्नल बहुत धीरे बदलता है।",
     category: "Congestion"
   },
   {
-    id: 2, name: "Priya Deshmukh", age: 28, junction: "Gangapur Road", hour: "09:00 AM",
+    id: 2, name: "Priya Deshmukh", age: 28, junction: "ITI Signal Post Office", hour: "09:00 AM",
     lang: "mr", vehicles: 45,
     feedback: "गंगापूर रोडवर स्कूल बस उशिरा आली. मुलांना खूप वेळ थांबावे लागले. यासाठी वेगळी बस लेन हवी आहे.",
     category: "School Zone"
   },
   {
-    id: 3, name: "Suresh Patil", age: 55, junction: "Satpur MIDC", hour: "06:00 PM",
+    id: 3, name: "Suresh Patil", age: 55, junction: "ITI Signal", hour: "06:00 PM",
     lang: "mr", vehicles: 120,
     feedback: "कारखाना सुटताना MIDC गेटवर 200+ दुचाकी एकत्र येतात. हे रोज होते. वेगळ्या वेळेची गरज आहे.",
     category: "Industrial Peak"
   },
   {
-    id: 4, name: "Anjali Mehta", age: 35, junction: "Mumbai Naka", hour: "05:30 PM",
+    id: 4, name: "Anjali Mehta", age: 35, junction: "Udyog Bhavan, FDA office", hour: "05:30 PM",
     lang: "en", vehicles: 95,
     feedback: "Mumbai Naka signal timing is too short for pedestrians. Cars block the crossing. Need longer pedestrian phase.",
     category: "Pedestrian Safety"
   },
   {
-    id: 5, name: "Raj Sharma", age: 22, junction: "College Road", hour: "10:30 AM",
+    id: 5, name: "Raj Sharma", age: 22, junction: "Tarwala / MERI Signal", hour: "10:30 AM",
     lang: "en", vehicles: 30,
     feedback: "College Road is clear today but the AI app suggested a longer route. The suggestion needs improvement during off-peak hours.",
     category: "AI Routing Feedback"
   },
   {
-    id: 6, name: "Meena Joshi", age: 48, junction: "Trimbak Naka", hour: "07:00 AM",
+    id: 6, name: "Meena Joshi", age: 48, junction: "Jailroad Signal", hour: "07:00 AM",
     lang: "mr", vehicles: 15,
     feedback: "त्र्यंबक नाका येथे पाण्याची समस्या आहे. पावसाळ्यात रस्ता बुडतो. तातडीने ड्रेनेज दुरुस्ती करावी.",
     category: "Infrastructure"
   },
   {
-    id: 7, name: "Arun Ghodke", age: 38, junction: "Dwarka Circle", hour: "08:45 AM",
+    id: 7, name: "Arun Ghodke", age: 38, junction: "Croma - Inox Signal", hour: "08:45 AM",
     lang: "hi", vehicles: 60,
     feedback: "द्वारका सर्किल पर AI सिग्नल से बहुत फर्क पड़ा है। पहले 25 मिनट लगते थे, अब 10 मिनट में निकल जाता हूं।",
     category: "AI Success"
   },
   {
-    id: 8, name: "Sneha Kulkarni", age: 31, junction: "Panchavati", hour: "11:00 AM",
+    id: 8, name: "Sneha Kulkarni", age: 31, junction: "Nashik Municipal Corporation", hour: "11:00 AM",
     lang: "mr", vehicles: 22,
     feedback: "पंचवटीत N-4 बस वेळेवर येते आता. MargVedha अ‍ॅपवर ETA दाखवतो त्यामुळे प्रवास सोपा झाला आहे.",
     category: "Bus Feedback"
   },
   {
-    id: 9, name: "Vivek Nair", age: 45, junction: "Nashik Road", hour: "07:30 PM",
+    id: 9, name: "Vivek Nair", age: 45, junction: "ABB Circle", hour: "07:30 PM",
     lang: "en", vehicles: 88,
     feedback: "Evening peak on Nashik Road is unmanageable. 3 roads merge and there is no coordination. Need dedicated turn lanes.",
     category: "Infrastructure"
   },
   {
-    id: 10, name: "Kavita Bhosale", age: 26, junction: "Bytco Point", hour: "02:00 PM",
+    id: 10, name: "Kavita Bhosale", age: 26, junction: "Ashok Stambh", hour: "02:00 PM",
     lang: "mr", vehicles: 18,
     feedback: "बाइटको पॉईंटला दुपारी रिक्षांची गर्दी असते. त्यांनी नियम पाळत नाहीत. कठोर कारवाई आवश्यक आहे.",
     category: "Enforcement"
@@ -70,7 +72,8 @@ const CITIZEN_SCENARIOS = [
 const categoryColors = {
   "Congestion": "danger", "School Zone": "warning", "Industrial Peak": "warning",
   "Pedestrian Safety": "info", "AI Routing Feedback": "primary", "Infrastructure": "secondary",
-  "AI Success": "success", "Bus Feedback": "success", "Enforcement": "danger"
+  "AI Success": "success", "Bus Feedback": "success", "Enforcement": "danger",
+  "Accident": "danger", "Pothole": "warning", "Signal Issue": "danger"
 };
 
 const langLabel = { en: "🇬🇧 EN", hi: "🇮🇳 HI", mr: "🟠 MR" };
@@ -137,16 +140,36 @@ const AnalysisSection = ({ title, icon, content, color }) => (
 );
 
 export default function CitizenSuggestions() {
+  const [reports, setReports] = useState([]);
   const [aiAnalysis, setAiAnalysis] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [selectedCitizen, setSelectedCitizen] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
+  useEffect(() => {
+    const q = query(collection(db, "citizen_reports"), orderBy("timestamp", "desc"), limit(20));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setReports(data);
+    });
+    return () => unsubscribe();
+  }, []);
+
   const runAnalysis = async () => {
+    if (reports.length === 0) {
+      setError("No reports available to analyze.");
+      return;
+    }
     setLoading(true); setError(""); setAiAnalysis("");
     try {
-      const result = await callSarvam(CITIZEN_SCENARIOS);
+      // Map Firestore reports to the format Sarvam expects
+      const formattedReports = reports.map(r => ({
+        junction: r.type || "Unknown",
+        category: r.type || "General",
+        feedback: r.description || "No description provided."
+      }));
+      const result = await callSarvam(formattedReports);
       setAiAnalysis(result);
       setLastUpdated(new Date().toLocaleTimeString("en-IN"));
     } catch (e) {
@@ -156,7 +179,9 @@ export default function CitizenSuggestions() {
     }
   };
 
-  useEffect(() => { runAnalysis(); }, []);
+  useEffect(() => {
+    if (reports.length > 0) runAnalysis();
+  }, [reports.length === 1]); // Auto-run on first data load
 
   const parseAnalysis = (text) => {
     const sections = { urgent: "", signals: "", infra: "", transport: "" };
@@ -177,9 +202,9 @@ export default function CitizenSuggestions() {
   const parsed = parseAnalysis(aiAnalysis);
 
   const hourStats = {
-    total: CITIZEN_SCENARIOS.length,
-    highTraffic: CITIZEN_SCENARIOS.filter(c => c.vehicles > 60).length,
-    categories: [...new Set(CITIZEN_SCENARIOS.map(c => c.category))].length
+    total: reports.length,
+    highTraffic: reports.filter(c => c.type === "Congestion" || c.type === "Accident").length,
+    categories: [...new Set(reports.map(c => c.type))].length
   };
 
   return (
@@ -244,7 +269,9 @@ export default function CitizenSuggestions() {
               </div>
             </Card.Header>
             <Card.Body className="p-0" style={{ maxHeight: "680px", overflowY: "auto" }}>
-              {CITIZEN_SCENARIOS.map((c) => (
+              {reports.length === 0 ? (
+                <div className="text-center p-5 text-muted italic">Waiting for reports from mobile app...</div>
+              ) : reports.map((c) => (
                 <div
                   key={c.id}
                   className="p-4 border-bottom border-secondary transition-all"
@@ -253,16 +280,24 @@ export default function CitizenSuggestions() {
                 >
                   <div className="d-flex justify-content-between align-items-start mb-2">
                     <div className="d-flex align-items-center gap-3">
-                      <div className="p-2 px-3 rounded bg-primary text-white fw-bold small">{c.name[0]}</div>
+                      <div className="p-2 px-3 rounded bg-primary text-white fw-bold small">R</div>
                       <div>
-                        <div className="text-white fw-bold small">{c.name}</div>
-                        <div className="text-muted xsmall">{c.junction} • {c.hour}</div>
+                        <div className="text-white fw-bold small">Report #{c.id.substring(0, 4).toUpperCase()}</div>
+                        <div className="text-muted xsmall">{c.timestamp ? new Date(c.timestamp).toLocaleString() : "Just now"}</div>
                       </div>
                     </div>
-                    <Badge bg={categoryColors[c.category] || "secondary"} className="text-uppercase" style={{ fontSize: '0.6rem' }}>{c.category}</Badge>
+                    <Badge bg={categoryColors[c.type] || "secondary"} className="text-uppercase" style={{ fontSize: '0.6rem' }}>{c.type}</Badge>
                   </div>
+                  {c.image_url && (
+                    <img 
+                      src={c.image_url} 
+                      alt="Report" 
+                      className="rounded mb-3 w-100 shadow-sm" 
+                      style={{ maxHeight: '150px', objectFit: 'cover' }}
+                    />
+                  )}
                   <div className="text-light small opacity-75" style={{ lineHeight: '1.5' }}>
-                    {c.feedback}
+                    {c.description}
                   </div>
                 </div>
               ))}
@@ -314,24 +349,18 @@ export default function CitizenSuggestions() {
           <Modal.Title className="fw-bold">{selectedCitizen?.name}</Modal.Title>
         </Modal.Header>
         <Modal.Body className="bg-dark text-light p-4">
-          <Row className="mb-4 g-4">
-            <Col md={6}>
-              <div className="p-4 bg-white bg-opacity-5 rounded-lg border border-white border-opacity-10 h-100">
-                <div className="text-primary xsmall fw-bold text-uppercase ls-2 mb-2">Location</div>
-                <div className="text-white h5 fw-bold mb-1"><FaMapMarkerAlt className="me-2 text-primary" />{selectedCitizen?.junction}</div>
-              </div>
-            </Col>
-            <Col md={6}>
-              <div className="p-4 bg-white bg-opacity-5 rounded-lg border border-white border-opacity-10 h-100">
-                <div className="text-info xsmall fw-bold text-uppercase ls-2 mb-2">Metrics</div>
-                <div className="text-white h5 fw-bold mb-1">{selectedCitizen?.vehicles} Vehicles Scanned</div>
-              </div>
-            </Col>
-          </Row>
           <div className="mb-2">
             <div className="text-white xsmall fw-bold text-uppercase ls-2 mb-3">Citizen Feedback</div>
-            <div className="p-4 rounded bg-white bg-opacity-5 border border-white border-opacity-10" style={{ fontSize: '1.2rem', lineHeight: '1.6', fontStyle: 'italic' }}>
-              "{selectedCitizen?.feedback}"
+            {selectedCitizen?.image_url && (
+              <img 
+                src={selectedCitizen.image_url} 
+                alt="Detail" 
+                className="rounded mb-4 w-100 shadow-lg border border-secondary" 
+                style={{ maxHeight: '300px', objectFit: 'cover' }}
+              />
+            )}
+            <div className="p-4 rounded bg-white bg-opacity-5 border border-white border-opacity-10" style={{ fontSize: '1.1rem', lineHeight: '1.6', fontStyle: 'italic' }}>
+              "{selectedCitizen?.description}"
             </div>
           </div>
         </Modal.Body>

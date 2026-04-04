@@ -15,9 +15,9 @@ const responseTimeData = [
 ];
 
 const initialAlerts = [
-  { id: "EM-1042", type: "Ambulance", location: "Mumbai Naka to Civil Hospital", status: "Active Preemption", priority: "Critical", icon: <FaAmbulance /> },
-  { id: "EM-1043", type: "Fire Engine", location: "Satpur MIDC Sector 2", status: "Pending Route Clear", priority: "Critical", icon: <FaFireExtinguisher /> },
-  { id: "EM-1044", type: "Police Convoy", location: "Dwarka Circle", status: "Active Preemption", priority: "High", icon: <FaShieldAlt /> },
+  { id: "EM-1042", type: "Ambulance", location: "Udyog Bhavan, FDA office to Civil Hospital", status: "Active Preemption", priority: "Critical", icon: <FaAmbulance /> },
+  { id: "EM-1043", type: "Fire Engine", location: "ITI Signal Sector 2", status: "Pending Route Clear", priority: "Critical", icon: <FaFireExtinguisher /> },
+  { id: "EM-1044", type: "Police Convoy", location: "Croma - Inox Signal", status: "Active Preemption", priority: "High", icon: <FaShieldAlt /> },
 ];
 
 const EmergencyAlerts = () => {

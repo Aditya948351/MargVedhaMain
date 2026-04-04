@@ -13,10 +13,10 @@ const cameraIcon = new L.Icon({
 
 
 const intersections = [
-  { name: "Vidya Vikas Circle", lat: 20.01021, lon: 73.76414 },
-  { name: "Spectrum", lat: 20.00724, lon: 73.77148 },
-  { name: "Intersection 3", lat: 20.00387, lon: 73.77042 },
-  { name: "Theatre", lat: 20.00587, lon: 73.76331 }
+  { name: "Tarwala / MERI Signal", lat: 20.0266, lon: 73.8008 },
+  { name: "ITI Signal", lat: 19.9931021, lon: 73.7400 },
+  { name: "Croma - Inox Signal", lat: 19.9794898, lon: 73.807147 },
+  { name: "ABB Circle", lat: 19.9938375, lon: 73.7540119 }
 ];
 
 
@@ -24,7 +24,7 @@ const shortestPath = intersections.map(point => [point.lat, point.lon]);
 
 const TrafficMonitoringMap = () => {
   return (
-    <MapContainer center={[20.00724, 73.77148]} zoom={15} style={{ height: "400px", width: "100%" }}>
+    <MapContainer center={[20.00, 73.78]} zoom={13} style={{ height: "400px", width: "100%" }}>
       
       <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
 

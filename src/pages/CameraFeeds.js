@@ -33,17 +33,17 @@ const CameraFeed = () => {
   };
 
   return (
-    <div className="p-4">
+    <div className="p-4 bg-[var(--bg-color)] min-vh-100 text-[var(--text-primary)]">
       
-      <h2>
+      <h2 className="text-[var(--text-primary)] fw-bold">
         <FaTrafficLight className="text-danger" /> Traffic Camera Feeds
       </h2>
-      <p>Monitor live camera feeds from different traffic signals.</p>
+      <p className="text-[var(--text-secondary)]">Monitor live camera feeds from different traffic signals.</p>
 
       
-      <Card className="shadow-lg mb-4">
+      <Card className="bg-[var(--card-bg)] border-[var(--border-color)] shadow-lg mb-4">
         <Card.Body>
-          <Card.Title>
+          <Card.Title className="text-[var(--text-primary)] fw-bold">
             <FaMapMarkerAlt className="text-primary" /> Signal Locations on Map
           </Card.Title>
           <MapContainer
@@ -63,9 +63,9 @@ const CameraFeed = () => {
 
      
       {signalLocations.map((signal) => (
-        <Card key={signal.id} className="shadow-lg mb-4">
+        <Card key={signal.id} className="bg-[var(--card-bg)] border-[var(--border-color)] shadow-lg mb-4">
           <Card.Body>
-            <Card.Title>
+            <Card.Title className="text-[var(--text-primary)] fw-bold">
               <FaTrafficLight className="text-danger" /> {signal.name} - Camera {signal.camera}
             </Card.Title>
             <Row>
@@ -85,12 +85,12 @@ const CameraFeed = () => {
 
      
       <Modal show={showVideo} onHide={() => setShowVideo(false)} size="lg" centered>
-        <Modal.Header closeButton>
-          <Modal.Title>
+        <Modal.Header closeButton className="bg-[var(--card-bg)] border-[var(--border-color)] text-[var(--text-primary)]">
+          <Modal.Title className="fw-bold">
             {selectedSignal?.name} - Camera {selectedSignal?.camera} Feed
           </Modal.Title>
         </Modal.Header>
-        <Modal.Body className="text-center">
+        <Modal.Body className="text-center bg-[var(--bg-primary)] p-0">
           {selectedSignal ? (
             <video key={videoKey} width="100%" controls autoPlay muted>
               <source src="./video_feed1.mp4" type="video/mp4" />

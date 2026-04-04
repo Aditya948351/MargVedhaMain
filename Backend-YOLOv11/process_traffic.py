@@ -142,7 +142,7 @@ def process_video(source_path, model_path, output_path, line_coords, firebase_ce
 
 if __name__ == "__main__":
     # Default parameters based on cam1_north config
-    SOURCE = "data/cam1.mp4"
+    SOURCE = "india2.mp4"
     WEIGHTS = "weights/yolov11m.pt"
     OUTPUT = "output_cam1.mp4"
     LINE = [0, 360, 1280, 360] # Horizontal line in the middle

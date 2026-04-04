@@ -5,28 +5,51 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bg-color: #f4f7f6;
-  --text-primary: #1e293b;
+  /* Light Mode (Default) */
+  --bg-primary: #f8fafc;
+  --bg-secondary: #ffffff;
+  --card-bg: #ffffff;
+  --text-primary: #0f172a;
   --text-secondary: #64748b;
+  --border-color: #e2e8f0;
   --sidebar-bg: #0f172a;
   --sidebar-text: #cbd5e1;
-  --sidebar-text-hover: #ffffff;
-  --sidebar-active: #1e293b;
-  --sidebar-active-border: #3b82f6;
   
-  --primary: #2b7cff;
-  --primary-hover: #1e60ef;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
   --success: #10b981;
   --warning: #f59e0b;
   --danger: #ef4444;
-  --card-bg: #ffffff;
+  --indigo: #6366f1;
   
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.3);
+}
+
+body.dark {
+  /* Dark Mode */
+  --bg-primary: #020617; /* Deeper slate */
+  --bg-secondary: #0f172a;
+  --card-bg: #1e293b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: #334155;
+  --sidebar-bg: #020617;
+  --sidebar-text: #94a3b8;
   
-  box-shadow: var(--shadow-md);
-  transition: box-shadow 0.3s ease;
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.1);
+
+  color-scheme: dark;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .card:hover {

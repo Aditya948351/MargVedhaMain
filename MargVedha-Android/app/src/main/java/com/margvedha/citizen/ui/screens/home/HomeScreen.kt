@@ -22,25 +22,25 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.margvedha.citizen.data.dummy.DummyRepository
+import com.margvedha.citizen.data.FirebaseRepository
 import com.margvedha.citizen.data.model.Alert
 import com.margvedha.citizen.data.model.TrafficStatus
+import androidx.compose.runtime.collectAsState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
     val scope = rememberCoroutineScope()
-    var trafficStatus by remember { mutableStateOf<TrafficStatus?>(null) }
-    var alerts by remember { mutableStateOf<List<Alert>>(emptyList()) }
     var loading by remember { mutableStateOf(true) }
 
-    LaunchedEffect(Unit) {
-        scope.launch {
-            trafficStatus = DummyRepository.getTrafficStatus()
-            alerts = DummyRepository.getAlerts().take(3)
-            loading = false
-        }
+    // Live Firestore streams
+    val trafficStatus by FirebaseRepository.getLiveTrafficStatus().collectAsState(initial = null)
+    val alerts by FirebaseRepository.getLiveIncidents().collectAsState(initial = emptyList())
+    val junctionStatus by FirebaseRepository.getJunctionStatus().collectAsState(initial = emptyMap())
+
+    LaunchedEffect(trafficStatus) {
+        if (trafficStatus != null) loading = false
     }
 
     Scaffold(
@@ -152,13 +152,13 @@ fun HomeScreen(navController: NavController) {
                     Modifier.fillMaxWidth().padding(16.dp),
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    MiniStat("42", "Active\nSignals", Color(0xFF2563EB))
+                    MiniStat("${junctionStatus.size}", "Active\nJunctions", Color(0xFF2563EB))
                     VertDivider()
-                    MiniStat("8", "Open\nIncidents", Color(0xFFEF4444))
+                    MiniStat("${alerts.size}", "Live\nIncidents", Color(0xFFEF4444))
                     VertDivider()
-                    MiniStat("28.4", "Avg Speed\n(km/h)", Color(0xFF10B981))
+                    MiniStat("${trafficStatus?.averageSpeedKmh ?: "--"}", "Avg Speed\n(km/h)", Color(0xFF10B981))
                     VertDivider()
-                    MiniStat("94%", "AI\nAccuracy", Color(0xFF7C3AED))
+                    MiniStat("${junctionStatus.values.sum()}", "Total\nVehicles", Color(0xFF7C3AED))
                 }
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
             }
