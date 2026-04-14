@@ -1,0 +1,33 @@
+services:
+  backend:
+    build:
+      context: ./Backend-YOLOv11
+      dockerfile: Dockerfile
+    container_name: margvedha_backend
+    ports:
+      - "5000:5000"
+    volumes:
+      # Mount outputs dir to sync videos and images directly
+      - ./Backend-YOLOv11/outputs:/app/outputs
+      # Sync the active config directly so we don't have to rebuild it
+      - ./Backend-YOLOv11/cameras_config.json:/app/cameras_config.json
+    environment:
+      - PYTHONUNBUFFERED=1
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: margvedha_frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      # Allows live reloading so code changes sync instantly to container
+      - ./src:/app/src
+      - ./public:/app/public
+    environment:
+      # React binds to 0.0.0.0 locally but strictly requires this when in Docker
+      - HOST=0.0.0.0
+      - INITIAL_COLOR_MODE=dark
+      - WATCHPACK_POLLING=true # Required for live-reload on Windows hosts
+

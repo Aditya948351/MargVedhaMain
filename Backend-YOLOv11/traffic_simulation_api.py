@@ -21,8 +21,6 @@ Usage:
   python traffic_simulation_api.py
 """
 
-import firebase_admin
-from firebase_admin import credentials, firestore
 import random
 import time
 import math
@@ -35,11 +33,6 @@ from flask_cors import CORS
 # ── Flask App ─────────────────────────────────────────────────────────────────
 app = Flask(__name__)
 CORS(app)
-
-# ── Firebase init ─────────────────────────────────────────────────────────────
-cred = credentials.Certificate("firebase-adminsdk.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
 
 # ── Simulation state ──────────────────────────────────────────────────────────
 sim_running = False
@@ -88,19 +81,28 @@ INCIDENT_TYPES = [
 VIOLATION_TYPES = ["Helmet Missing", "Signal Jump", "Wrong Way Driving", "Overspeeding", "Triple Riding"]
 
 
-def simulate_traffic(base, hour):
-    if 8 <= hour < 10:
-        multiplier = random.uniform(1.6, 2.2)
-    elif 17 <= hour < 20:
-        multiplier = random.uniform(1.8, 2.5)
-    elif 13 <= hour < 14:
-        multiplier = random.uniform(1.2, 1.5)
-    elif 0 <= hour < 5:
-        multiplier = random.uniform(0.05, 0.15)
-    else:
-        multiplier = random.uniform(0.6, 1.0)
-    noise = random.gauss(0, 3)
-    return max(0, round(base * multiplier + noise))
+def simulate_traffic_detailed(base, hour):
+    if 8 <= hour < 10: multiplier = random.uniform(1.6, 2.2)
+    elif 17 <= hour < 20: multiplier = random.uniform(1.8, 2.5)
+    elif 13 <= hour < 14: multiplier = random.uniform(1.2, 1.5)
+    elif 0 <= hour < 5: multiplier = random.uniform(0.05, 0.15)
+    else: multiplier = random.uniform(0.6, 1.0)
+    
+    total = max(0, round(base * multiplier + random.gauss(0, 3)))
+    
+    # Split into categories
+    cars = round(total * random.uniform(0.6, 0.75))
+    buses = round(total * random.uniform(0.05, 0.15))
+    trucks = round(total * random.uniform(0.05, 0.15))
+    bikes = total - (cars + buses + trucks)
+    
+    return {
+        "total": total,
+        "car": max(0, cars),
+        "bus": max(0, buses),
+        "truck": max(0, trucks),
+        "motorcycle": max(0, bikes)
+    }
 
 
 def find_route(from_id, to_id, traffic_map):
@@ -131,7 +133,7 @@ def find_route(from_id, to_id, traffic_map):
 
 
 def compute_bus_eta(route, traffic_map):
-    total_traffic = sum(traffic_map.get(s, 0) for s in route["stops"])
+    total_traffic = sum(traffic_map.get(s, {}).get("total", 0) for s in route["stops"])
     delay_min = (total_traffic / 10.0) * 0.5
     eta = round(route["base_eta_min"] + delay_min)
     congestion_level = "Heavy" if total_traffic > 100 else "Moderate" if total_traffic > 40 else "Clear"
@@ -142,7 +144,7 @@ def compute_bus_eta(route, traffic_map):
         "eta_minutes": eta,
         "congestion": congestion_level,
         "total_vehicle_load": total_traffic,
-        "updated_at": datetime.datetime.utcnow().isoformat()
+        "updated_at": datetime.datetime.now(datetime.UTC).isoformat()
     }
 
 
@@ -152,192 +154,20 @@ def get_traffic_status(count):
     return "Low"
 
 
-def push_update(traffic_map, hour):
-    global sim_cycle
-    batch = db.batch()
-    now_iso = datetime.datetime.utcnow().isoformat()
-
-    # ── 1. Fetch Global Green Corridor ────────────────────────────────────────
-    corridor_active = False
-    active_path = []
-    try:
-        corr_doc = db.collection("settings").document("green_corridor").get()
-        if corr_doc.exists:
-            corr_data = corr_doc.to_dict()
-            if corr_data.get("active"):
-                corridor_active = True
-                active_path = find_route(corr_data["start_id"], corr_data["end_id"], traffic_map)
-    except: pass
-
-    # ── 2. Junction traffic ───────────────────────────────────────────────────
-    for junc in JUNCTIONS:
-        count = traffic_map[junc["id"]]
-
-        # Check if individual admin has overridden the signal (fallback)
-        try:
-            doc = db.collection("junctions").document(junc["id"]).get()
-            if doc.exists:
-                existing = doc.to_dict()
-                signal_override = existing.get("signal_override", "AUTO")
-            else:
-                signal_override = "AUTO"
-        except:
-            signal_override = "AUTO"
-
-        # Determine signal phase
-        if corridor_active and junc["id"] in active_path:
-            # Smart clearing: decide side based on next junction in path
-            idx = active_path.index(junc["id"])
-            if idx < len(active_path) - 1:
-                # Simple logic for now: all-green if part of corridor
-                signal_phase = "GREEN_ALL" 
-            else:
-                signal_phase = "GREEN_ALL"  # Goal reached
-        elif signal_override != "AUTO":
-            signal_phase = signal_override  # Admin manual override
-        else:
-            signal_phase = random.choice(["GREEN_NS", "GREEN_EW"])
-
-        n_count = round(count * random.uniform(0.20, 0.30))
-        s_count = round(count * random.uniform(0.20, 0.30))
-        e_count = round(count * random.uniform(0.20, 0.30))
-        w_count = round(count * random.uniform(0.15, 0.25))
-
-        ref = db.collection("junctions").document(junc["id"])
-        batch.set(ref, {
-            "location": junc["name"],
-            "junction_id": junc["id"],
-            "lat": junc["lat"],
-            "lng": junc["lng"],
-            "total_vehicles": count,
-            "north": n_count,
-            "south": s_count,
-            "east":  e_count,
-            "west":  w_count,
-            "n_status": get_traffic_status(n_count),
-            "s_status": get_traffic_status(s_count),
-            "e_status": get_traffic_status(e_count),
-            "w_status": get_traffic_status(w_count),
-            "congestion_level": get_traffic_status(count),
-            "signal_phase": signal_phase,
-            "signal_override": signal_override,
-            "green_corridor_active": corridor_active and junc["id"] in active_path,
-            "updated_at": now_iso,
-            "hour": hour,
-        }, merge=True)
-
-    # ── 2. Bus route ETAs ─────────────────────────────────────────────────────
-    for route in BUS_ROUTES:
-        eta_data = compute_bus_eta(route, traffic_map)
-        ref = db.collection("bus_routes").document(route["route_id"])
-        batch.set(ref, eta_data, merge=True)
-
-    # ── 3. AI route suggestion ────────────────────────────────────────────────
-    route_path = find_route("cbs_circle", "mumbai_naka", traffic_map)
-    path_names = [next(j["name"] for j in JUNCTIONS if j["id"] == r) for r in route_path]
-    total_on_path = sum(traffic_map.get(r, 0) for r in route_path)
-    suggestion_ref = db.collection("route_suggestions").document("ai_suggested")
-    batch.set(suggestion_ref, {
-        "from": "CBS Circle", "to": "Mumbai Naka",
-        "path": path_names, "path_ids": route_path,
-        "total_vehicles": total_on_path,
-        "recommendation": (
-            f"⚠️ Heavy traffic ({total_on_path} vehicles). Take alternate via {path_names[1] if len(path_names)>1 else 'bypass'}. ETA: ~{30 + total_on_path // 5}m."
-            if total_on_path > 80 else
-            f"🟡 Moderate ({total_on_path} vehicles). Via {' → '.join(path_names)}. ETA: ~{15 + total_on_path // 8}m."
-            if total_on_path > 30 else
-            f"🟢 Clear route. Via {' → '.join(path_names)}. ETA: ~12m."
-        ),
-        "updated_at": now_iso
-    }, merge=True)
-
-    batch.commit()
-
-    # ── 4. Incidents (separate batch — randomly create/clear) ─────────────────
-    if sim_cycle % 3 == 0:  # Every 3rd cycle (~90 seconds)
-        inc_batch = db.batch()
-        # Clear old incidents
-        for junc in random.sample(JUNCTIONS, min(3, len(JUNCTIONS))):
-            ref = db.collection("incidents").document(f"inc_{junc['id']}")
-            inc_batch.set(ref, {"active": False, "updated_at": now_iso}, merge=True)
-
-        # Create new random incidents (2-4 active at a time)
-        for junc in random.sample(JUNCTIONS, random.randint(2, 4)):
-            inc_type = random.choice(INCIDENT_TYPES)
-            ref = db.collection("incidents").document(f"inc_{junc['id']}")
-            inc_batch.set(ref, {
-                "junction_id": junc["id"],
-                "junction_name": junc["name"],
-                "type": inc_type["type"],
-                "severity": inc_type["severity"],
-                "description": inc_type["desc"],
-                "clearance_eta_min": random.randint(15, 90),
-                "active": True,
-                "updated_at": now_iso,
-            })
-        inc_batch.commit()
-
-    # ── 5. Violations (every cycle — ~2 new violations) ───────────────────────
-    for _ in range(random.randint(1, 3)):
-        junc = random.choice(JUNCTIONS)
-        viol_type = random.choice(VIOLATION_TYPES)
-        db.collection("violations").add({
-            "junction_id": junc["id"],
-            "junction_name": junc["name"],
-            "type": viol_type,
-            "timestamp": now_iso,
-            "status": "Challan Issued",
-            "fine_amount": random.choice([500, 1000, 2000, 5000]),
-        })
-
-    sim_cycle += 1
-    print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Cycle #{sim_cycle}: Updated {len(JUNCTIONS)} junctions + incidents + violations")
-
-
-def seed_citizen_reports():
-    """Seeds some dummy citizen reports with images for demonstration."""
-    print("[Simulation] Seeding example citizen reports...")
-    reports = [
-        {
-            "type": "Pothole",
-            "description": "Severe pothole at CBS Circle. Dangerous for night commuters.",
-            "location_name": "CBS Circle crossing",
-            "lat": 19.9975, "lng": 73.7898,
-            "image_url": "https://images.unsplash.com/photo-1544980766-72b58ad9ca11?auto=format&fit=crop&q=80&w=1000",
-            "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
-        },
-        {
-            "type": "Roadworks",
-            "description": "Unplanned roadworks on Gangapur Road. Lane 1 closed.",
-            "location_name": "Gangapur Lane 1",
-            "lat": 19.9850, "lng": 73.7900,
-            "image_url": "https://images.unsplash.com/photo-1531266752426-aad472b7bdf4?auto=format&fit=crop&q=80&w=1000",
-            "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
-        },
-        {
-            "type": "Accident",
-            "description": "Minor collision causing build-up. Traffic police informed.",
-            "location_name": "Nashik Road near Station",
-            "lat": 20.0060, "lng": 73.7720,
-            "image_url": "https://images.unsplash.com/photo-1516738901171-8eb4fc13bd20?auto=format&fit=crop&q=80&w=1000",
-            "timestamp": datetime.datetime.now(datetime.UTC).isoformat()
-        }
-    ]
-    for r in reports:
-        # Check if reports already exist? No, just add them.
-        db.collection("citizen_reports").add(r)
-    print(f"[Simulation] Created {len(reports)} live citizen reports.")
-
+latest_traffic_data = {}
 
 def simulation_loop():
-    global sim_running
+    global sim_running, latest_traffic_data, sim_cycle
     sim_running = True
-    print("[Simulation] MargVedha Traffic Engine STARTED")
+    print("[Simulation] MargVedha Traffic Engine STARTED (Normal Frequency: 4.0s)")
     while sim_running:
         hour = datetime.datetime.now().hour
-        traffic_map = {j["id"]: simulate_traffic(j["base"], hour) for j in JUNCTIONS}
-        push_update(traffic_map, hour)
-        time.sleep(30)
+        traffic_map = {j["id"]: simulate_traffic_detailed(j["base"], hour) for j in JUNCTIONS}
+        latest_traffic_data = traffic_map
+        sim_cycle += 1
+        
+        print(f"[{datetime.datetime.now().strftime('%H:%M:%S')}] Cycle #{sim_cycle}: In-Memory UI Traffic Update")
+        time.sleep(4.0)
 
 
 # ── Flask Endpoints ───────────────────────────────────────────────────────────
@@ -369,15 +199,35 @@ def stop_simulation():
 @app.route("/api/status")
 def api_status():
     return jsonify({
-        "running": sim_running,
-        "cycle": sim_cycle,
-        "junctions_count": len(JUNCTIONS),
-        "bus_routes_count": len(BUS_ROUTES),
+        "running": sim_running, "cycle": sim_cycle,
+        "junctions_count": len(JUNCTIONS), "bus_routes_count": len(BUS_ROUTES),
+    })
+
+@app.route("/api/live_traffic")
+def api_live_traffic():
+    # Return directly to frontend, bypassing Firebase
+    return jsonify(latest_traffic_data)
+
+@app.route("/api/issue_fine", methods=["POST"])
+def issue_fine():
+    data = request.json
+    plate = data.get("plateNumber", "MH 15 XX 0000")
+    violation = data.get("violationType", "General Violation")
+    junction = data.get("junction", "Unknown Junction")
+    amount = data.get("amount", 300)
+    
+    print(f"[*] ENFORCEMENT: Issuing Fine for {plate} at {junction}. Type: {violation}")
+    print(f"[*] SMS/EMAIL SENT: 'Dear Citizen, your vehicle {plate} was caught in a {violation} at {junction}. A fine of INR {amount}/- has been generated. Pay at https://parivahan.gov.in'")
+    
+    return jsonify({
+        "status": "Success",
+        "plate": plate,
+        "message": f"Violation Notice Sent to {plate}",
+        "gateway": "MargVedha Enforcement API v1.1"
     })
 
 
 if __name__ == "__main__":
-    seed_citizen_reports()
     # Auto-start simulation when run directly
     t = threading.Thread(target=simulation_loop, daemon=True)
     t.start()

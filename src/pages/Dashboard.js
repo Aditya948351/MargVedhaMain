@@ -253,12 +253,12 @@ const Dashboard = ({ onLogout }) => {
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <div className="px-6 py-3 bg-emerald-50 rounded-2xl border border-emerald-100 shadow-sm flex items-center gap-3">
+          <div className="px-6 py-3 bg-emerald-50 rounded-2xl border border-emerald-200 shadow-sm flex items-center gap-3">
             <div className="relative flex h-3 w-3">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 shadow-sm border border-emerald-300"></span>
             </div>
-            <span className="text-sm font-semibold text-emerald-700 tracking-wide uppercase">System Hub Live</span>
+            <span className="text-sm font-black text-emerald-700 tracking-wide uppercase">System Hub Live</span>
           </div>
         </div>
       </header>
@@ -513,19 +513,19 @@ const Dashboard = ({ onLogout }) => {
           </div>
 
           <div className="space-y-6 flex-grow">
-            <div className="bg-slate-900 rounded-3xl p-6 shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-20 group-hover:opacity-40 transition-opacity">
-                <FaTrafficLight size={80} className="text-slate-400" />
+            <div className="bg-slate-50 border border-slate-200 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <FaTrafficLight size={80} className="text-slate-900" />
               </div>
-              <h3 className="text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Live Signal Matrix</h3>
+              <h3 className="text-slate-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">Live Signal Matrix</h3>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 relative z-10">
                 {Object.keys(signalState).map((k) => (
-                  <div key={k} className="bg-slate-800/50 backdrop-blur-md border border-slate-700/50 rounded-2xl p-4 flex flex-col gap-2 transition-transform hover:scale-[1.02]">
+                  <div key={k} className="bg-white border border-slate-200 rounded-2xl p-4 flex flex-col gap-2 transition-transform hover:scale-[1.02] shadow-sm">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold text-slate-500 truncate mr-2">{k}</span>
-                      <div className={`w-2.5 h-2.5 rounded-full shadow-[0_0_12px_rgba(0,0,0,0.5)] ${signalState[k] === 'green' ? 'bg-emerald-400 shadow-emerald-400/50' : 'bg-rose-500 shadow-rose-500/50'}`}></div>
+                      <div className={`w-2.5 h-2.5 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.1)] ${signalState[k] === 'green' ? 'bg-emerald-500 shadow-emerald-500/30' : 'bg-rose-500 shadow-rose-500/30'}`}></div>
                     </div>
-                    <span className={`text-xs font-black uppercase tracking-wider ${signalState[k] === 'green' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    <span className={`text-xs font-black uppercase tracking-wider ${signalState[k] === 'green' ? 'text-emerald-600' : 'text-rose-600'}`}>
                       {signalState[k]}
                     </span>
                   </div>
@@ -563,19 +563,19 @@ const Dashboard = ({ onLogout }) => {
       {/* Feature Grid: Specialized Services */}
       <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10 px-4">
         {[
-          { color: "emerald", icon: <FaBus size={24} />, title: <>Bus Route<br/>Optimization</>, desc: "Dynamic planning based on passenger demand & traffic patterns.", btn: "🗺️ View Routes", path: "/BusRouteOptimization" },
-          { color: "sky", icon: <FaLock size={24} />, title: <>Secure Ticketing<br/>(Blockchain)</>, desc: "Secure & transparent ticketing for seamless public transport.", btn: "💳 Transactions", path: "/BlockChainTicketing" },
-          { color: "rose", icon: <FaExclamationTriangle size={24} />, title: <>Emergency<br/>Response</>, desc: "Incident tracking & rapid deployment for emergency services.", btn: "🚑 Alert Center", path: "/EmergencyAlerts" },
-          { color: "amber", icon: <FaMoneyBill size={24} />, title: <>Fare<br/>Adjustments</>, desc: "Real-time demand-based pricing for city transit services.", btn: "💵 Fare Updates", path: "/AutoFareAdjustments" },
+          { color: "emerald", icon: <FaBus size={24} />, title: <>Bus Route<br/>Optimization</>, desc: "Dynamic planning based on passenger demand.", btn: "🗺️ View Routes", path: "/BusRouteOptimization" },
+          { color: "sky", icon: <FaLock size={24} />, title: <>Secure Ticketing<br/>(Blockchain)</>, desc: "Secure ticketing for seamless transit.", btn: "💳 Transactions", path: "/BlockChainTicketing" },
+          { color: "rose", icon: <FaExclamationTriangle size={24} />, title: <>Emergency<br/>Response</>, desc: "Incident tracking & deployment.", btn: "🚑 Alert Center", path: "/EmergencyAlerts" },
+          { color: "amber", icon: <FaMoneyBill size={24} />, title: <>Fare<br/>Adjustments</>, desc: "Real-time demand-based pricing.", btn: "💵 Fare Updates", path: "/AutoFareAdjustments" },
         ].map((item, idx) => (
-          <div key={idx} className={`bg-${item.color}-50 dark:bg-${item.color}-950/20 border border-${item.color}-100 dark:border-${item.color}-900/50 rounded-3xl p-6 hover:shadow-lg transition-all border-b-4 border-b-${item.color}-500/30 group`}>
+          <div key={idx} className={`bg-${item.color}-50 border border-${item.color}-200 rounded-3xl p-6 hover:shadow-lg transition-all border-b-4 border-b-${item.color}-500/30 group`}>
             <div className="flex items-center gap-3 mb-4">
-              <div className={`p-3 bg-white dark:bg-${item.color}-900 rounded-2xl shadow-sm text-${item.color}-600 dark:text-${item.color}-400 group-hover:scale-110 transition-transform`}>
+              <div className={`p-3 bg-white rounded-2xl shadow-sm text-${item.color}-600 group-hover:scale-110 transition-transform`}>
                 {item.icon}
               </div>
-              <h3 className="font-bold text-[var(--text-primary)] leading-tight">{item.title}</h3>
+              <h3 className="font-bold text-slate-900 leading-tight">{item.title}</h3>
             </div>
-            <p className="text-sm text-[var(--text-secondary)] mb-6 leading-relaxed">{item.desc}</p>
+            <p className="text-sm text-slate-500 mb-6 leading-relaxed">{item.desc}</p>
             <button onClick={() => navigate(item.path)} className={`w-full py-3 bg-${item.color}-600 text-white font-bold text-sm rounded-2xl hover:bg-${item.color}-700 transition-all shadow-md`}>{item.btn}</button>
           </div>
         ))}
@@ -686,12 +686,12 @@ const Dashboard = ({ onLogout }) => {
               <h4 className="font-bold text-[var(--text-primary)] mb-1">Citizen Reports</h4>
               <p className="text-xs text-[var(--text-secondary)] font-medium">Review community alerts</p>
             </button>
-            <button onClick={() => navigate("/EmergencyCorridors")} className="p-6 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-3xl hover:border-rose-300 hover:shadow-xl hover:-translate-y-1 transition-all group">
-              <div className="w-12 h-12 bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-all shadow-sm">
+            <button onClick={() => navigate("/EmergencyCorridors")} className="p-6 bg-white border border-slate-200 rounded-3xl hover:border-rose-300 hover:shadow-xl hover:-translate-y-1 transition-all group">
+              <div className="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-rose-600 group-hover:text-white transition-all shadow-sm">
                 <FaExclamationTriangle size={20} />
               </div>
-              <h4 className="font-bold text-[var(--text-primary)] mb-1">Emergency Corridor</h4>
-              <p className="text-xs text-[var(--text-secondary)] font-medium">Activate priority pathing</p>
+              <h4 className="font-bold text-slate-900 mb-1">Emergency Corridor</h4>
+              <p className="text-xs text-slate-500 font-medium">Activate priority pathing</p>
             </button>
             <button onClick={() => navigate("/analytics")} className="hidden lg:block p-6 bg-[var(--card-bg)] border border-[var(--border-color)] rounded-3xl hover:border-indigo-300 hover:shadow-xl hover:-translate-y-1 transition-all group col-span-1">
               <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mb-4 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm">

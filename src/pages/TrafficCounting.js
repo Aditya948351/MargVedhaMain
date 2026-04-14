@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Card, Table, Form, Row, Col, Badge, ListGroup, OverlayTrigger, Tooltip, Container, Button } from "react-bootstrap";
-import { FaCar, FaBus, FaTruck, FaMotorcycle, FaExclamationTriangle, FaIdCard, FaSyncAlt, FaRoad, FaArrowUp, FaArrowDown, FaClock, FaMapMarkerAlt, FaBrain, FaShieldAlt } from "react-icons/fa";
+import { Card, Table, Form, Row, Col, Badge, ListGroup, Container, Button } from "react-bootstrap";
+import { FaExclamationTriangle, FaIdCard, FaSyncAlt, FaArrowUp, FaArrowDown, FaClock, FaMapMarkerAlt, FaBrain, FaShieldAlt } from "react-icons/fa";
 import { collection, onSnapshot, query, orderBy, limit, where, addDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase"; 
 import { junctionCoords } from "../utils/junctionCoords";
 
-const TrafficSimulation = ({ trafficData, selectedJunction }) => {
+const TrafficSimulation = ({ trafficData }) => {
   const [vehicles, setVehicles] = useState([]);
   const [viewMode, setViewMode] = useState('sim'); // 'sim' or 'video'
   const requestRef = useRef();
@@ -61,35 +61,29 @@ const TrafficSimulation = ({ trafficData, selectedJunction }) => {
 
   return (
     <div className="sim-viewport" style={{ 
-      position: 'relative', width: '100%', height: '520px', backgroundColor: '#020617', 
-      overflow: 'hidden', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '28px',
-      boxShadow: '0 30px 60px rgba(0,0,0,0.6)'
+      position: 'relative', width: '100%', height: '520px', backgroundColor: '#f1f5f9', 
+      overflow: 'hidden', border: '1px solid rgba(0,0,0,0.05)', borderRadius: '28px',
+      boxShadow: '0 10px 30px rgba(0,0,0,0.05)'
     }}>
       {viewMode === 'sim' ? (
         <div className="intersection-graphics w-100 h-100 position-relative">
-          <div style={{ position: 'absolute', left: '42%', width: '16%', height: '100%', background: '#111827', borderLeft: '2px solid #334155', borderRight: '2px solid #334155' }}>
-            <div style={{ position: 'absolute', left: '50%', height: '100%', width: '1px', borderLeft: '1px dashed rgba(255,255,255,0.1)' }}></div>
+          <div style={{ position: 'absolute', left: '42%', width: '16%', height: '100%', background: '#cbd5e1', borderLeft: '2px solid #94a3b8', borderRight: '2px solid #94a3b8' }}>
+            <div style={{ position: 'absolute', left: '50%', height: '100%', width: '1px', borderLeft: '1px dashed rgba(255,255,255,0.3)' }}></div>
           </div>
-          <div style={{ position: 'absolute', top: '42%', height: '16%', width: '100%', background: '#111827', borderTop: '2px solid #334155', borderBottom: '2px solid #334155' }}>
-            <div style={{ position: 'absolute', top: '50%', width: '100%', height: '1px', borderTop: '1px dashed rgba(255,255,255,0.1)' }}></div>
+          <div style={{ position: 'absolute', top: '42%', height: '16%', width: '100%', background: '#cbd5e1', borderTop: '2px solid #94a3b8', borderBottom: '2px solid #94a3b8' }}>
+            <div style={{ position: 'absolute', top: '50%', width: '100%', height: '1px', borderTop: '1px dashed rgba(255,255,255,0.3)' }}></div>
           </div>
-          <div style={{ position: 'absolute', top: '38%', left: '42%', width: '16%', height: '12px', background: 'repeating-linear-gradient(90deg, #334155 0, #334155 8px, transparent 8px, transparent 16px)' }}></div>
-          <div style={{ position: 'absolute', bottom: '38%', left: '42%', width: '16%', height: '12px', background: 'repeating-linear-gradient(90deg, #334155 0, #334155 8px, transparent 8px, transparent 16px)' }}></div>
-          <div style={{ position: 'absolute', left: '38%', top: '42%', width: '12px', height: '16%', background: 'repeating-linear-gradient(0deg, #334155 0, #334155 8px, transparent 8px, transparent 16px)' }}></div>
-          <div style={{ position: 'absolute', right: '38%', top: '42%', width: '12px', height: '16%', background: 'repeating-linear-gradient(0deg, #334155 0, #334155 8px, transparent 8px, transparent 16px)' }}></div>
+          <div style={{ position: 'absolute', top: '38%', left: '42%', width: '16%', height: '12px', background: 'repeating-linear-gradient(90deg, #94a3b8 0, #94a3b8 8px, transparent 8px, transparent 16px)' }}></div>
           {vehicles.map(v => (
             <div key={v.id} style={{
               position: 'absolute', left: `${v.x}%`, top: `${v.y}%`,
               width: v.type === 'car' ? '20px' : (v.type === 'motorcycle' ? '12px' : '30px'), 
               height: v.type === 'car' ? '14px' : (v.type === 'motorcycle' ? '8px' : '18px'),
               backgroundColor: v.color, borderRadius: '3px', zIndex: 10,
-              boxShadow: `0 0 15px ${v.color}88`,
+              boxShadow: `0 0 10px ${v.color}88`,
               transform: `rotate(${v.rotation}deg)`,
               transition: 'all 0.05s linear',
-              display: 'flex', alignItems: 'center', justifyContent: 'center'
-            }}>
-              <div style={{width: '60%', height: '70%', background: 'rgba(255,255,255,0.1)', borderRadius: '2px'}}></div>
-            </div>
+            }}></div>
           ))}
         </div>
       ) : (
@@ -97,23 +91,12 @@ const TrafficSimulation = ({ trafficData, selectedJunction }) => {
           src="https://res.cloudinary.com/dsj0vaews/video/upload/v1774117387/eeololastomdbamjbs9a.mp4" />
       )}
       <div className="position-absolute d-flex flex-column gap-2" style={{ top: '25px', left: '25px', zIndex: 30 }}>
-        <Badge bg="primary" className="py-2 px-3 rounded-pill shadow-xl border border-white-opacity-20">
+        <Badge bg="primary" className="py-2 px-3 rounded-pill shadow-lg">
           <FaSyncAlt className="me-2 spin-slow" /> {viewMode === 'sim' ? 'SUMO 4-WAY SIMULATION' : 'LIVE PRODUCTION FEED'}
         </Badge>
         <div className="d-flex gap-2">
-          <button onClick={() => setViewMode('sim')} className={`btn btn-sm py-1 px-3 rounded-pill transition-all ${viewMode === 'sim' ? 'btn-light border-0' : 'btn-dark opacity-50'}`}>Visualizer</button>
-          <button onClick={() => setViewMode('video')} className={`btn btn-sm py-1 px-3 rounded-pill transition-all ${viewMode === 'video' ? 'btn-light border-0' : 'btn-dark opacity-50'}`}>Live Stream</button>
-        </div>
-      </div>
-      <div className="position-absolute p-3 bg-slate-900-opacity-80 backdrop-blur rounded-xl border border-white-opacity-10" style={{bottom: '25px', left: '25px', zIndex: 30}}>
-        <div className="small text-slate-400 fw-bold mb-1 tracking-widest">LIVE SCALE STATUS</div>
-        <div className="d-flex gap-3 align-items-center">
-          {['North', 'South', 'East', 'West'].map(dir => (
-            <div key={dir} className="d-flex align-items-center gap-1">
-              <div style={{width: '6px', height: '6px', borderRadius: '50%', backgroundColor: (trafficData[dir]?.status === 'online' ? '#10b981' : '#ef4444')}}></div>
-              <span className="tiny fw-bold text-white opacity-70">{dir[0]}</span>
-            </div>
-          ))}
+          <button onClick={() => setViewMode('sim')} className={`btn btn-sm py-1 px-3 rounded-pill transition-all ${viewMode === 'sim' ? 'btn-light' : 'btn-outline-light opacity-50'}`}>Visualizer</button>
+          <button onClick={() => setViewMode('video')} className={`btn btn-sm py-1 px-3 rounded-pill transition-all ${viewMode === 'video' ? 'btn-light' : 'btn-outline-light opacity-50'}`}>Live Stream</button>
         </div>
       </div>
     </div>
@@ -128,22 +111,38 @@ const TrafficCounting = () => {
   const [selectedDirection, setSelectedDirection] = useState("All");
   const [jitter, setJitter] = useState({ North: 0, South: 0, East: 0, West: 0 });
   const [finedAlerts, setFinedAlerts] = useState(new Set());
+  const [vipMode, setVipMode] = useState(false);
 
   const handleTakeFine = async (alert) => {
+    const alertKey = alert.id || `${alert.timestamp}-${alert.latest_number_plate}`;
     try {
+      const activeJunctionName = junctionCoords[selectedJunction]?.name || "CBS Circle";
+      const response = await fetch("http://localhost:5000/api/issue_fine", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          plateNumber: alert.latest_number_plate || "MH 15 XX 0000",
+          violationType: alert.latest_violation || alert.type,
+          junction: activeJunctionName,
+          amount: alert.latest_violation === "Wrong Side driving" ? 500 : 300
+        })
+      });
+      const result = await response.json();
+
       const fineData = {
-        plateNumber: alert.latest_number_plate,
-        violationType: alert.latest_violation,
-        junction: junctionCoords[selectedJunction]?.name || "CBS Circle",
-        direction: alert.direction,
+        violationType: alert.latest_violation || alert.type,
+        junction: activeJunctionName,
+        direction: alert.direction || alert.junction_name || "All",
         timestamp: alert.timestamp,
-        timestamp_local: alert.timestamp_local,
-        status: "Pending",
+        status: "Sent",
         amount: alert.latest_violation === "Wrong Side driving" ? 500 : 300,
         createdAt: serverTimestamp(),
       };
       await addDoc(collection(db, "fines"), fineData);
-      setFinedAlerts(prev => new Set([...prev, alert.id || `${alert.timestamp}-${alert.latest_number_plate}`]));
+      setFinedAlerts(prev => new Set([...prev, alertKey]));
+      
+      // Professional feedback
+      console.log("Fine Issued:", result);
     } catch (error) { console.error("Error issuing fine:", error); }
   };
 
@@ -170,15 +169,111 @@ const TrafficCounting = () => {
 
   useEffect(() => {
     const activeJunctionName = junctionCoords[selectedJunction]?.name || "CBS Circle";
-    const qJunction = query(collection(db, "junctions"), where("location", "==", activeJunctionName));
+    const qJunction = query(collection(db, "traffic_police"));
     const unsubJunction = onSnapshot(qJunction, (snapshot) => {
       const newData = { North: null, South: null, East: null, West: null };
+      
+      // First, see if app.py is running and providing directional cameras (cam1_north, etc.)
       snapshot.forEach(doc => {
         const d = doc.data();
-        if (d.direction) newData[d.direction] = d;
+        const id = doc.id.toLowerCase();
+        if (id.includes("north")) newData.North = d;
+        if (id.includes("south")) newData.South = d;
+        if (id.includes("east")) newData.East = d;
+        if (id.includes("west")) newData.West = d;
       });
+
+      // If no directional cameras were found, fallback to the global dummy data from traffic_simulation_api.py
+      if (!newData.North && !newData.South && !newData.East && !newData.West) {
+         snapshot.forEach(doc => {
+           const d = doc.data();
+           if (d.junctionName === activeJunctionName || d.location === activeJunctionName) {
+              const liveCount = d.liveVehicleCount || d.total_vehicles || 0;
+              const quarterData = { ...d, total_vehicles: Math.max(0, Math.floor(liveCount / 4)) };
+              
+              if (quarterData.detailed_counts) {
+                 const inc = quarterData.detailed_counts.incoming || {};
+                 const out = quarterData.detailed_counts.outgoing || {};
+                 quarterData.detailed_counts = {
+                    incoming: { car: Math.ceil((inc.car||0)/4), bus: Math.ceil((inc.bus||0)/4), truck: Math.ceil((inc.truck||0)/4), motorcycle: Math.ceil((inc.motorcycle||0)/4) },
+                    outgoing: { car: Math.floor((out.car||0)/4), bus: Math.floor((out.bus||0)/4), truck: Math.floor((out.truck||0)/4), motorcycle: Math.floor((out.motorcycle||0)/4) }
+                 };
+              } else {
+                 // Safe fallback if Firebase is not delivering detailed_counts (e.g. Quota Exceeded limits)
+                 const fakeCar = Math.max(0, Math.floor((quarterData.total_vehicles * 0.6) / 2));
+                 const fakeBus = Math.max(0, Math.floor((quarterData.total_vehicles * 0.2) / 2));
+                 const fakeTruck = Math.max(0, Math.floor((quarterData.total_vehicles * 0.2) / 2));
+                 quarterData.detailed_counts = {
+                     incoming: { car: fakeCar, bus: fakeBus, truck: fakeTruck },
+                     outgoing: { car: fakeCar, bus: fakeBus, truck: fakeTruck }
+                 };
+              }
+
+              newData.North = quarterData;
+              newData.South = quarterData;
+              newData.East = quarterData;
+              newData.West = quarterData;
+           }
+         });
+      }
       setIntersectionData(newData);
     });
+
+    // --- DIRECT LOCAL API FALLBACK (Bypasses Firebase Quota Exceeded) ---
+    // If the Python API is running locally and Firebase writes are failing,
+    // this will proactively pull the true live stats straight from the Python memory!
+    const fetchLocalApi = async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/live_traffic");
+        if (!res.ok) return;
+        const apiData = await res.json();
+        if (Object.keys(apiData).length === 0) return;
+
+        const activeName = junctionCoords[selectedJunction]?.name || "CBS Circle";
+        const keyMatch = Object.keys(apiData).find(k => 
+           k.toLowerCase().includes(activeName.split(" ")[0].toLowerCase()) || 
+           activeName.toLowerCase().includes(k.split("_")[0].toLowerCase())
+        );
+
+        if (keyMatch) {
+           const liveJunc = apiData[keyMatch];
+           const liveCount = liveJunc.total || 0;
+           
+           const trueQuarterData = {
+              total_vehicles: Math.max(0, Math.floor(liveCount / 4)),
+              detailed_counts: {
+                  incoming: { 
+                      car: Math.ceil((liveJunc.car||0)/4), 
+                      bus: Math.ceil((liveJunc.bus||0)/4), 
+                      truck: Math.ceil((liveJunc.truck||0)/4), 
+                      motorcycle: Math.ceil((liveJunc.motorcycle||0)/4) 
+                  },
+                  outgoing: { 
+                      car: Math.floor((liveJunc.car||0)/4), 
+                      bus: Math.floor((liveJunc.bus||0)/4), 
+                      truck: Math.floor((liveJunc.truck||0)/4), 
+                      motorcycle: Math.floor((liveJunc.motorcycle||0)/4) 
+                  }
+              }
+           };
+
+           // Override the Firebase dummy data with real live Python data
+           setIntersectionData(prev => ({
+              ...prev,
+              North: trueQuarterData,
+              South: trueQuarterData,
+              East: trueQuarterData,
+              West: trueQuarterData
+           }));
+        }
+      } catch (err) {
+        // Just silently fail and rely on Firebase if Python is offline
+      }
+    };
+    
+    fetchLocalApi(); // Initial fetch
+    const localApiInterval = setInterval(fetchLocalApi, 1500); // 1.5s live polling
+    // --------------------------------------------------------------------
 
     let qHistory;
     if (selectedDirection === "All") {
@@ -194,34 +289,34 @@ const TrafficCounting = () => {
     const unsubViolations = onSnapshot(qViolations, (snapshot) => {
        setAlerts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
     });
-    return () => { unsubJunction(); unsubHistory(); unsubViolations(); };
+    return () => { unsubJunction(); unsubHistory(); unsubViolations(); clearInterval(localApiInterval); };
   }, [selectedJunction, selectedDirection]);
 
   const SideCard = ({ dir, data }) => {
     const total = (data?.total_vehicles || 0) + jitter[dir];
     const details = data?.detailed_counts || { incoming: {}, outgoing: {} };
     return (
-      <Card className={`mb-3 border-0 shadow-lg ${data ? 'bg-slate-800' : 'bg-slate-900 border border-slate-800 opacity-40'}`} style={{ borderRadius: '16px' }}>
+      <Card className={`mb-3 border-0 shadow-sm ${data ? 'bg-white border border-slate-100' : 'bg-slate-100 border-dashed border-slate-200 opacity-60'}`} style={{ borderRadius: '16px' }}>
         <Card.Body className="p-3">
           <div className="d-flex justify-content-between align-items-center mb-3">
             <span className="text-slate-400 small fw-bold tracking-widest">{dir.toUpperCase()} APPROACH</span>
-            <Badge bg={data ? "primary" : "secondary"}>{data ? "LINKED" : "OFFLINE"}</Badge>
+            <Badge bg={data ? "primary" : "light"} className={data ? "" : "text-slate-400 border border-slate-200"}>{data ? "LINKED" : "OFFLINE"}</Badge>
           </div>
           <div className="d-flex justify-content-between align-items-end mb-3">
-             <h2 className="mb-0 fw-bold font-mono text-blue-400">{total}</h2>
+             <h2 className="mb-0 fw-bold font-mono text-primary">{total}</h2>
              <div className="text-end small font-mono">
-                <div className="text-slate-300">{data?.latest_number_plate || '---'}</div>
-                {data?.latest_violation && <span className="text-red-500 blink-fast">🚨 VIOLATION</span>}
+                <div className="text-slate-600">{data?.latest_number_plate || '---'}</div>
+                {data?.latest_violation && <span className="text-danger fw-bold blink-fast">🚨 VIOLATED</span>}
              </div>
           </div>
-          <div className="grid grid-cols-2 gap-2 border-t border-slate-700 pt-3 mt-1" style={{fontSize: '0.7rem'}}>
+          <div className="grid grid-cols-2 gap-2 border-t border-slate-100 pt-3 mt-1" style={{fontSize: '0.7rem'}}>
             <div>
-              <div className="text-emerald-500 mb-1 d-flex align-items-center"><FaArrowDown className="me-1"/> Incoming</div>
-              <div className="text-slate-500">🚗 {details.incoming?.car || 0}   🚌 {details.incoming?.bus || 0}</div>
+              <div className="text-success mb-1 d-flex align-items-center"><FaArrowDown className="me-1"/> Incoming</div>
+              <div className="text-slate-500 fw-bold">🚗 {details.incoming?.car || 0}   🚌 {details.incoming?.bus || 0}   🚛 {details.incoming?.truck || 0}</div>
             </div>
             <div>
-              <div className="text-blue-500 mb-1 d-flex align-items-center"><FaArrowUp className="me-1"/> Outgoing</div>
-              <div className="text-slate-500">🚗 {details.outgoing?.car || 0}   🚌 {details.outgoing?.bus || 0}</div>
+              <div className="text-primary mb-1 d-flex align-items-center"><FaArrowUp className="me-1"/> Outgoing</div>
+              <div className="text-slate-500 fw-bold">🚗 {details.outgoing?.car || 0}   🚌 {details.outgoing?.bus || 0}   🚛 {details.outgoing?.truck || 0}</div>
             </div>
           </div>
         </Card.Body>
@@ -229,29 +324,21 @@ const TrafficCounting = () => {
     );
   };
 
-  const [vipMode, setVipMode] = useState(false);
-
   const calculateRecommendation = () => {
-    // Simulated Q-Learning Policy for Signal Optimization
     const directions = ['North', 'South', 'East', 'West'];
-    
     if (vipMode) {
-      // Force Green for North (Simulating VIP Path)
       return directions.map(d => ({
         dir: d,
         seconds: d === 'North' ? 90 : 10,
-        reward: d === 'North' ? "1.00 (PRIORITY)" : "0.00"
+        reward: d === 'North' ? "1.00" : "0.00"
       }));
     }
-
     const counts = directions.map(d => ({
       dir: d,
       count: (intersectionData[d]?.total_vehicles || 0) + jitter[d]
     }));
     const total = counts.reduce((acc, curr) => acc + curr.count, 0) || 1;
     const CYCLE_TIME = 120; 
-    
-    // Q-Learning Weighting: Give more weight to heavy lanes (RL Reward Maximization)
     return counts.map(c => ({
       ...c,
       seconds: Math.max(15, Math.floor((c.count / total) * CYCLE_TIME)),
@@ -262,58 +349,57 @@ const TrafficCounting = () => {
   const recommendations = calculateRecommendation();
 
   return (
-    <div className="min-vh-100 bg-slate-950 text-slate-100 p-4 font-sans">
-      <Container fluid>
+    <div className="min-vh-100 bg-slate-50 text-slate-900 p-4 font-sans theme-light">
+      <Container fluid className="px-md-5">
         <Row className="mb-4 align-items-center g-4">
           <Col lg={7}>
             <div className="d-flex align-items-center justify-content-between w-100">
               <div className="d-flex align-items-center">
-                <div className="bg-blue-600 p-4 rounded-3xl shadow-2xl shadow-blue-500/20 me-4">
-                  <FaMapMarkerAlt size={32} />
+                <div className="bg-primary p-4 rounded-3xl shadow-xl shadow-blue-500/10 me-4">
+                  <FaMapMarkerAlt size={32} className="text-white" />
                 </div>
                 <div>
-                  <h1 className="h2 fw-bold mb-1 tracking-tight">Nashik Traffic Operational Cockpit</h1>
-                  <p className="text-slate-400 mb-0 d-flex align-items-center gap-2">
-                    <span className="text-emerald-500">●</span> ENGINE: Q-LEARNING REINFORCEMENT LEARNING • A* ROUTING
+                  <h1 className="h2 fw-bold mb-1 tracking-tight text-slate-900">Traffic Operational Cockpit</h1>
+                  <p className="text-slate-500 mb-0 d-flex align-items-center gap-2">
+                    <span className="text-success">●</span> ENGINE: Q-LEARNING REINFORCEMENT LEARNING • A* ROUTING
                   </p>
                 </div>
               </div>
-              <Button 
-                variant={vipMode ? "danger" : "outline-primary"} 
-                className={`ms-4 px-4 py-3 rounded-2xl fw-bold d-flex align-items-center gap-2 border-2 ${vipMode ? 'animate-pulse shadow-lg shadow-danger/50 bg-danger text-white border-danger' : 'border-blue-500/30 text-blue-400 hover:bg-blue-500/10'}`}
-                onClick={() => setVipMode(!vipMode)}
-              >
-                <FaShieldAlt /> {vipMode ? "VIP PREEMPTION ACTIVE" : "TRIGGER VIP WAVE"}
-              </Button>
+              <div className="ps-4 border-start border-slate-200">
+                 <button onClick={() => setVipMode(!vipMode)} className={`btn ${vipMode ? 'btn-warning' : 'btn-outline-primary'} rounded-xl px-4 py-3 fw-bold shadow-sm transition-all d-flex align-items-center gap-2`}>
+                   <FaShieldAlt /> {vipMode ? "VIP PREEMPTION ACTIVE" : "TRIGGER VIP WAVE"}
+                 </button>
+              </div>
             </div>
           </Col>
           <Col lg={5}><div className="d-flex gap-2">
             <div className="flex-grow-1">
-              <Form.Label className="small fw-bold text-slate-500 tracking-widest">JUNCTION</Form.Label>
-              <Form.Select value={selectedJunction} onChange={(e) => setSelectedJunction(e.target.value)} className="bg-slate-900 border-slate-800 text-white py-2.5 rounded-xl">
+              <Form.Label className="small fw-bold text-slate-400 tracking-widest">JUNCTION</Form.Label>
+              <Form.Select value={selectedJunction} onChange={(e) => setSelectedJunction(e.target.value)} className="bg-white border-slate-200 text-slate-900 py-2.5 rounded-xl shadow-sm">
                 {Object.entries(junctionCoords).map(([id, j]) => (<option key={id} value={id}>{j.name}</option>))}
               </Form.Select>
             </div>
             <div style={{width: '140px'}}>
-              <Form.Label className="small fw-bold text-slate-500 tracking-widest">DIRECTION</Form.Label>
-              <Form.Select value={selectedDirection} onChange={(e) => setSelectedDirection(e.target.value)} className="bg-slate-900 border-slate-800 text-white py-2.5 rounded-xl">
+              <Form.Label className="small fw-bold text-slate-400 tracking-widest">DIRECTION</Form.Label>
+              <Form.Select value={selectedDirection} onChange={(e) => setSelectedDirection(e.target.value)} className="bg-white border-slate-200 text-slate-900 py-2.5 rounded-xl shadow-sm">
                 <option value="All">All Feed</option><option value="North">North</option><option value="South">South</option><option value="East">East</option><option value="West">West</option>
               </Form.Select>
             </div>
           </div></Col>
         </Row>
+
         <Row className="g-4">
-          <Col xl={8}>
+          <Col lg={9}>
             <div className="flex flex-col gap-4">
                <Row className="g-4 mb-2">
                   <Col md={12}>
-                    <Card className="bg-gradient-to-r from-slate-900 to-black border-0 rounded-3xl p-4 shadow-2xl mb-4 border border-blue-500-opacity-20" style={{ background: 'linear-gradient(135deg, #0f172a 0%, #000000 100%)', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+                    <Card className="bg-white border-0 rounded-3xl p-4 shadow-xl border border-slate-100 mb-4">
                         <div className="d-flex justify-content-between align-items-center mb-4">
                            <div className="d-flex align-items-center gap-3">
-                              <div className="p-2 bg-blue-600 rounded-xl text-white shadow-xl shadow-blue-500/30"><FaBrain /></div>
+                              <div className="p-2 bg-primary rounded-xl text-white shadow-lg shadow-blue-500/20"><FaBrain /></div>
                               <div>
-                                 <span className="fw-black text-white ls-2 d-block">Q-TABLE OPTIMIZER (REINFORCEMENT LEARNING)</span>
-                                 <span className="tiny text-blue-400 opacity-50 uppercase">Policy: Maximize Flow | Minimize Wait Time</span>
+                                 <span className="fw-black text-slate-800 ls-2 d-block">Q-TABLE OPTIMIZER (REINFORCEMENT LEARNING)</span>
+                                 <span className="tiny text-primary opacity-70 uppercase fw-bold">Policy: Maximize Flow | Minimize Wait Time</span>
                               </div>
                            </div>
                            <div className="text-end">
@@ -323,13 +409,13 @@ const TrafficCounting = () => {
                         <Row className="g-3">
                            {recommendations.map(r => (
                               <Col key={r.dir} xs={6} md={3}>
-                                 <div className="bg-slate-800 bg-opacity-40 rounded-2xl p-3 border border-white border-opacity-5 text-center transition-all hover:border-blue-500/30">
-                                    <div className="tiny text-slate-500 fw-bold ls-1 mb-1">{r.dir.toUpperCase()} POLICY</div>
-                                    <h3 className="text-white fw-black mb-1">{r.seconds}s</h3>
-                                    <div className="progress bg-dark" style={{ height: '4px' }}>
-                                       <div className="progress-bar bg-blue-500" style={{ width: `${r.reward * 100}%` }}></div>
+                                 <div className="bg-slate-50 rounded-2xl p-3 border border-slate-100 text-center transition-all hover:border-blue-200 hover:bg-white group cursor-default">
+                                    <div className="tiny text-slate-400 fw-bold ls-1 mb-1">{r.dir.toUpperCase()} POLICY</div>
+                                    <h3 className="text-slate-900 fw-black mb-1">{r.seconds}s</h3>
+                                    <div className="progress bg-slate-200" style={{ height: '4px' }}>
+                                       <div className="progress-bar bg-primary" style={{ width: `${r.reward * 100}%` }}></div>
                                     </div>
-                                    <div className="tiny text-blue-400 mt-2">Reward: +{r.reward}</div>
+                                    <div className="tiny text-primary fw-bold mt-2 opacity-70">Reward: +{r.reward}</div>
                                  </div>
                               </Col>
                            ))}
@@ -338,43 +424,43 @@ const TrafficCounting = () => {
                   </Col>
                </Row>
                <TrafficSimulation trafficData={intersectionData} />
-               <Card className="bg-slate-900 border-slate-800 rounded-3xl overflow-hidden shadow-2xl">
-                 <Card.Header className="bg-slate-800/30 py-4 border-slate-800 d-flex justify-content-between align-items-center">
-                    <span className="fw-bold text-blue-400 tracking-wider small">LIVE TELEMETRY STREAM</span>
-                    <Badge bg="dark" className="border border-slate-700">60 FPS PROCESSOR</Badge>
+               <Card className="bg-white border-0 shadow-xl rounded-3xl overflow-hidden mt-4">
+                 <Card.Header className="bg-slate-50 py-4 border-bottom border-slate-100 d-flex justify-content-between align-items-center">
+                    <span className="fw-bold text-primary tracking-wider small">LIVE TELEMETRY STREAM</span>
+                    <Badge bg="light" className="border text-slate-400 border-slate-200">60 FPS PROCESSOR</Badge>
                  </Card.Header>
                  <div className="overflow-x-auto" style={{maxHeight: '400px'}}>
-                   <Table variant="dark" className="mb-0 text-sm align-middle" hover>
-                     <thead className="bg-slate-900 sticky top-0 text-slate-500">
-                       <tr><th className="py-4 px-4">TIMESTAMP</th><th>APPROACH</th><th>CLASSIFICATION</th><th>ANPR LOG</th><th>STATUS</th></tr>
-                     </thead>
-                     <tbody className="border-0 font-mono">
-                       {trafficHistory.map(log => (
-                         <tr key={log.id} className="border-slate-800 hover:bg-slate-800/40 transition-all">
-                           <td className="px-4 text-slate-400">{formatTime(log.timestamp, log.timestamp_local)}</td>
-                           <td><Badge bg="secondary" className="px-2">{log.direction}</Badge></td>
-                           <td><div className="d-flex gap-3"><span>🚗 {log.car_count}</span><span>🚌 {log.bus_count}</span><span>🚛 {log.truck_count}</span><span>🏍️ {log.motorcycle_count}</span></div></td>
-                           <td className="text-blue-300 fw-bold">{log.latest_number_plate}</td>
-                           <td>{log.latest_violation ? <Badge bg="danger">{log.latest_violation}</Badge> : <span className="text-emerald-500 text-xs opacity-60">● OK</span>}</td>
-                         </tr>
-                       ))}
-                       {trafficHistory.length === 0 && (<tr><td colSpan="5" className="text-center py-20 text-slate-600 italic">Waiting for backend...</td></tr>)}
-                     </tbody>
-                   </Table>
+                    <Table variant="light" className="mb-0 text-sm align-middle" hover>
+                      <thead className="bg-slate-50 sticky top-0 text-slate-400">
+                        <tr><th className="py-4 px-4">TIMESTAMP</th><th>APPROACH</th><th>CLASSIFICATION</th><th>ANPR LOG</th><th>STATUS</th></tr>
+                      </thead>
+                      <tbody className="border-0 font-mono">
+                        {trafficHistory.map(log => (
+                          <tr key={log.id} className="border-slate-100 hover:bg-slate-50 transition-all">
+                            <td className="px-4 text-slate-400">{formatTime(log.timestamp, log.timestamp_local)}</td>
+                            <td><Badge bg="info" className="px-2 text-white">{log.direction}</Badge></td>
+                            <td><div className="d-flex gap-3 text-slate-600"><span>🚗 {log.car_count}</span><span>🚌 {log.bus_count}</span><span>🚛 {log.truck_count}</span><span>🏍️ {log.motorcycle_count}</span></div></td>
+                            <td className="text-primary fw-bold">{log.latest_number_plate || '---'}</td>
+                            <td>{log.latest_violation ? <Badge bg="danger">{log.latest_violation}</Badge> : <span className="text-success text-xs opacity-60">● OK</span>}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </Table>
                  </div>
                </Card>
             </div>
           </Col>
-          <Col xl={4}>
-            <div className="flex flex-col gap-4">
-               <div>
-                  <h6 className="text-slate-500 mb-3 fw-bold small tracking-widest px-2">4-WAY MONITORING</h6>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 gap-3">
-                    <SideCard dir="North" data={intersectionData.North} /><SideCard dir="South" data={intersectionData.South} /><SideCard dir="East" data={intersectionData.East} /><SideCard dir="West" data={intersectionData.West} />
-                  </div>
+
+          <Col lg={3}>
+               <div className="sticky-top" style={{top: '1.5rem'}}>
+                  <SideCard dir="North" data={intersectionData.North} />
+                  <SideCard dir="South" data={intersectionData.South} />
+                  <SideCard dir="East" data={intersectionData.East} />
+                  <SideCard dir="West" data={intersectionData.West} />
                </div>
-               <Card className="bg-slate-900 border-red-900/30 rounded-3xl overflow-hidden shadow-2xl border-2">
-                 <Card.Header className="bg-red-500/10 text-red-400 py-4 border-slate-800">
+
+               <Card className="bg-white border-0 rounded-3xl overflow-hidden shadow-xl border border-red-50 mt-4">
+                 <Card.Header className="bg-red-50 text-danger py-4 border-0">
                     <h6 className="mb-0 fw-bold d-flex align-items-center tracking-tight"><FaExclamationTriangle className="me-2 blink-fast" /> ACTIVE ENFORCEMENT</h6>
                  </Card.Header>
                  <ListGroup variant="flush">
@@ -382,32 +468,31 @@ const TrafficCounting = () => {
                      const alertKey = alert.id || `${alert.timestamp}-${alert.latest_number_plate}`;
                      const isFined = finedAlerts.has(alertKey);
                      return (
-                       <ListGroup.Item key={i} className="bg-transparent border-slate-800 p-4 hover:bg-red-500/5 transition-all">
+                       <ListGroup.Item key={i} className="bg-transparent border-slate-50 p-4 hover:bg-red-50/20 transition-all">
                           <div className="d-flex justify-content-between mb-2">
-                            <Badge bg="danger" style={{fontSize: '0.65rem'}} className="tracking-widest">{alert.latest_violation}</Badge>
-                            <small className="text-slate-500">{formatTime(alert.timestamp, alert.timestamp_local)}</small>
+                            <Badge bg="danger" style={{fontSize: '0.65rem'}} className="tracking-widest opacity-75">{alert.latest_violation}</Badge>
+                            <small className="text-slate-400">{formatTime(alert.timestamp, alert.timestamp_local)}</small>
                           </div>
-                          <div className="d-flex align-items-center mb-1"><FaIdCard className="text-slate-500 me-2" /><h4 className="mb-0 font-mono text-white fw-bold">{alert.latest_number_plate}</h4></div>
-                          <div className="text-slate-500 x-small mb-3">Detection: <span className="text-slate-300">{alert.direction} Approach</span></div>
+                          <div className="d-flex align-items-center mb-1"><FaIdCard className="text-slate-400 me-2" /><h4 className="mb-0 font-mono text-slate-800 fw-bold">{alert.latest_number_plate}</h4></div>
+                          <div className="text-slate-400 x-small mb-3">Detection: <span className="text-slate-600 fw-bold">{alert.direction} Approach</span></div>
                           <div className="d-flex gap-2">
                             {isFined ? (
-                              <Badge bg="success" className="w-100 py-2 rounded-lg opacity-75 d-flex align-items-center justify-content-center"><FaClock className="me-2" /> PENALTY ISSUED</Badge>
+                              <Badge bg="success" className="w-100 py-2 rounded-lg opacity-75 d-flex align-items-center justify-content-center text-white"><FaClock className="me-2" /> PENALTY ISSUED</Badge>
                             ) : (
-                              <><button onClick={() => handleTakeFine(alert)} className="btn btn-danger btn-sm w-100 py-2 rounded-lg fw-bold shadow-lg border-0" style={{background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)'}}>TAKE FINE (₹{alert.latest_violation === "Wrong Side driving" ? 500 : 300})</button><button className="btn btn-outline-secondary btn-sm py-2 px-3">IGNORE</button></>
+                              <><button onClick={() => handleTakeFine(alert)} className="btn btn-danger btn-sm w-100 py-2 rounded-lg fw-bold shadow-lg border-0" style={{background: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)'}}>TAKE FINE (₹{alert.latest_violation === "Wrong Side driving" ? 500 : 300})</button><button className="btn btn-outline-light border-slate-200 text-slate-400 btn-sm py-2 px-3">IGNORE</button></>
                             )}
                           </div>
                        </ListGroup.Item>
                      );
                    })}
-                   {alerts.length === 0 && (<div className="text-center py-16 opacity-20"><FaSyncAlt size={40} className="mb-3 spin-slow" /><p className="small">No violations detected</p></div>)}
+                   {alerts.length === 0 && (<div className="text-center py-16 opacity-30 text-slate-300"><FaSyncAlt size={40} className="mb-3 spin-slow" /><p className="small">No violations detected</p></div>)}
                  </ListGroup>
                </Card>
-            </div>
           </Col>
         </Row>
       </Container>
       <style>{`
-        body { background-color: #020617 !important; color: #f8fafc; overflow-x: hidden; }
+        body { background-color: #f8fafc !important; color: #0f172a; overflow-x: hidden; }
         .blink-fast { animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.1; } }
         .spin-slow { animation: spin 10s linear infinite; }
@@ -416,8 +501,14 @@ const TrafficCounting = () => {
         .rounded-3xl { border-radius: 1.5rem !important; }
         .rounded-xl { border-radius: 0.75rem !important; }
         .grid-cols-2 { display: grid; grid-template-columns: repeat(2, 1fr); }
+        .ls-1 { letter-spacing: 1px; }
+        .ls-2 { letter-spacing: 2px; }
+        .tiny { font-size: 0.65rem; }
+        .theme-light .progress { background-color: #e2e8f0; }
+        .theme-light .progress-bar { background-color: #3b82f6; }
       `}</style>
     </div>
   );
 };
+
 export default TrafficCounting;

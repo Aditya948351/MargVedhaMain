@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, CircleMarker, Polyline } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import { junctionCoords } from "../utils/junctionCoords";
 
@@ -16,16 +16,46 @@ L.Icon.Default.mergeOptions({
 
 const SignalMapView = ({ height = "450px" }) => {
   const [junctions, setJunctions] = useState([]);
+  const [corridor, setCorridor] = useState({ active: false });
 
   useEffect(() => {
-    const unsub = onSnapshot(collection(db, "junctions"), (snapshot) => {
-      setJunctions(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    const poll = setInterval(async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/live_traffic");
+        if (res.ok) {
+           const apiData = await res.json();
+           const formatted = Object.keys(apiData).map(k => {
+               const name = k.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+               const total = apiData[k].total || 0;
+               return {
+                  id: k, junction_id: k, location: name, 
+                  total_vehicles: total,
+                  congestion_level: total > 25 ? "High" : total > 12 ? "Moderate" : "Low",
+                  signal_phase: "AUTO"
+               };
+           });
+           setJunctions(formatted);
+        }
+      } catch(e) {}
+    }, 1500);
+
+    const unsubSettings = onSnapshot(doc(db, "settings", "green_corridor"), (d) => {
+      if (d.exists()) {
+        setCorridor(d.data());
+      }
     });
-    return () => unsub();
+
+    return () => {
+      clearInterval(poll);
+      unsubSettings();
+    };
   }, []);
 
   const getSignalColor = (j) => {
-    if (j.green_corridor_active) return "#3b82f6"; // Blue pulse for corridor
+    if (j.green_corridor_active || 
+       (corridor.active && (j.junction_id === corridor.start_id || j.junction_id === corridor.end_id))) {
+      return "#3b82f6"; // Blue pulse for corridor or endpoints
+    }
     const phase = j.signal_phase || "";
     if (phase.includes("GREEN")) return "#10b981";
     if (phase === "YELLOW") return "#f59e0b";
@@ -106,10 +136,10 @@ const SignalMapView = ({ height = "450px" }) => {
             <CircleMarker
               key={j.id}
               center={[coords.lat, coords.lng]}
-              radius={j.green_corridor_active ? 14 : 10}
+              radius={(j.green_corridor_active || (corridor.active && (j.junction_id === corridor.start_id || j.junction_id === corridor.end_id))) ? 14 : 10}
               fillColor={color}
-              color={j.green_corridor_active ? "#60a5fa" : "rgba(255,255,255,0.3)"}
-              weight={j.green_corridor_active ? 3 : 2}
+              color={(j.green_corridor_active || (corridor.active && (j.junction_id === corridor.start_id || j.junction_id === corridor.end_id))) ? "#60a5fa" : "rgba(255,255,255,0.3)"}
+              weight={(j.green_corridor_active || (corridor.active && (j.junction_id === corridor.start_id || j.junction_id === corridor.end_id))) ? 3 : 2}
               opacity={1}
               fillOpacity={0.85}
             >

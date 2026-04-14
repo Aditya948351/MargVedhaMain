@@ -80,10 +80,10 @@ const LiveCCTVGrid = () => {
   }, []);
 
   const cameras = [
-    { id: "cam1_north", title: "North Direction", src: "/data/cam1.mp4" },
-    { id: "cam2_south", title: "South Direction", src: "/data/cam2.mp4" },
-    { id: "cam3_east", title: "East Direction", src: "/data/cam3.mp4" },
-    { id: "cam4_west", title: "West Direction", src: "/data/cam4.mp4" }
+    { id: "cam1_north", title: "North Direction", src: "http://localhost:5000/video_feed/cam1_north" },
+    { id: "cam2_south", title: "South Direction", src: "http://localhost:5000/video_feed/cam2_south" },
+    { id: "cam3_east", title: "East Direction", src: "http://localhost:5000/video_feed/cam3_east" },
+    { id: "cam4_west", title: "West Direction", src: "http://localhost:5000/video_feed/cam4_west" }
   ];
 
   return (

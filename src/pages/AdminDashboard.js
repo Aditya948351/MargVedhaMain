@@ -19,14 +19,28 @@ const AdminDashboard = () => {
   const [corridorEnd, setCorridorEnd] = useState("");
   const [corridorActive, setCorridorActive] = useState(false);
 
-  // Live Firestore listener
+  // Live API Poller (Bypassing Firebase)
   useEffect(() => {
-    const unsubJunctions = onSnapshot(collection(db, "junctions"), (snapshot) => {
-      const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-      data.sort((a, b) => (b.total_vehicles || 0) - (a.total_vehicles || 0));
-      setJunctions(data);
-      setLoading(false);
-    });
+    const poll = setInterval(async () => {
+      try {
+        const res = await fetch("http://localhost:5000/api/live_traffic");
+        if (res.ok) {
+           const apiData = await res.json();
+           const formatted = Object.keys(apiData).map(k => {
+               const name = k.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+               const total = apiData[k].total || 0;
+               return {
+                  id: k, junction_id: k, location: name, 
+                  total_vehicles: total,
+                  congestion_level: total > 25 ? "High" : total > 12 ? "Moderate" : "Low",
+                  signal_phase: "AUTO"
+               };
+           }).sort((a,b) => b.total_vehicles - a.total_vehicles);
+           setJunctions(formatted);
+           setLoading(false);
+        }
+      } catch(e) {}
+    }, 1500);
 
     const unsubSettings = onSnapshot(doc(db, "settings", "green_corridor"), (d) => {
       if (d.exists()) {
@@ -35,7 +49,7 @@ const AdminDashboard = () => {
     });
 
     return () => {
-      unsubJunctions();
+      clearInterval(poll);
       unsubSettings();
     };
   }, []);
@@ -128,9 +142,9 @@ const AdminDashboard = () => {
           <p className="text-secondary fw-bold mb-0 opacity-75">Nashik Central Command • Real-Time AI Traffic Ecosystem</p>
         </div>
         <div className="d-flex gap-2 align-items-center flex-wrap">
-          <Badge bg="dark" className="p-2 rounded-2xl border border-white border-opacity-10 d-flex align-items-center gap-2">
+          <Badge bg="light" className="p-2 rounded-2xl border border-slate-200 d-flex align-items-center gap-2 shadow-sm">
             <FaCircle style={{ color: simRunning ? "#10b981" : "#64748b", fontSize: 8 }} />
-            <span className={`fw-black ${simRunning ? "text-emerald-400" : "text-secondary"}`} style={{ fontSize: 11 }}>
+            <span className={`fw-black ${simRunning ? "text-emerald-600" : "text-slate-400"}`} style={{ fontSize: 11 }}>
               {simRunning ? `ENGINE ON • CYCLE ${simCycle}` : "ENGINE OFFLINE"}
             </span>
           </Badge>
@@ -208,10 +222,10 @@ const AdminDashboard = () => {
       {/* Signal Map (Embedded) */}
       <Row className="mb-4">
         <Col lg={12}>
-          <Card className="bg-dark-card border-0 shadow-2xl">
-            <Card.Header className="bg-transparent border-0 text-slate-300 fw-black py-3 ls-1 d-flex justify-content-between align-items-center">
+          <Card className="bg-white border-0 shadow-xl rounded-3xl overflow-hidden">
+            <Card.Header className="bg-slate-50 border-bottom border-slate-100 text-slate-600 fw-black py-3 ls-1 d-flex justify-content-between align-items-center">
               <span>🗺️ LIVE SIGNAL MAP — 20 JUNCTIONS</span>
-              <Badge bg="dark" className="border border-white border-opacity-10 px-3 py-2">
+              <Badge bg="white" className="border border-slate-200 text-slate-500 px-3 py-2 shadow-sm">
                 <FaCircle style={{ color: "#10b981", fontSize: 6 }} className="me-2" />REAL-TIME
               </Badge>
             </Card.Header>
@@ -225,17 +239,17 @@ const AdminDashboard = () => {
       {/* Charts + Signal Control */}
       <Row className="mb-4 g-4">
         <Col lg={7}>
-          <Card className="bg-dark-card border-0 shadow-2xl">
-            <Card.Header className="bg-transparent border-0 text-slate-300 fw-black py-3 ls-1">
-              LIVE TRAFFIC VOLUME BY JUNCTION
+          <Card className="bg-white border-0 shadow-xl rounded-3xl overflow-hidden">
+            <Card.Header className="bg-slate-50 border-bottom border-slate-100 text-slate-600 fw-black py-3 ls-1 text-uppercase">
+              Live Traffic Volume by Junction
             </Card.Header>
             <Card.Body style={{ height: "350px" }}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
-                  <XAxis dataKey="name" stroke="#64748b" fontSize={10} angle={-25} textAnchor="end" height={60} />
-                  <YAxis stroke="#64748b" fontSize={11} />
-                  <Tooltip contentStyle={{ backgroundColor: "rgba(15,23,42,0.95)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: "12px" }} itemStyle={{ color: "#fff" }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                  <XAxis dataKey="name" stroke="#94a3b8" fontSize={10} angle={-25} textAnchor="end" height={60} />
+                  <YAxis stroke="#94a3b8" fontSize={11} />
+                  <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #e2e8f0", borderRadius: "12px", boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)" }} itemStyle={{ color: "#1e293b" }} />
                   <Bar dataKey="vehicles" radius={[6, 6, 0, 0]} name="Vehicles">
                     {chartData.map((entry, i) => (
                       <Cell key={i} fill={getBarColor(entry.vehicles)} />
@@ -247,34 +261,34 @@ const AdminDashboard = () => {
           </Card>
         </Col>
         <Col lg={5}>
-          <Card className="bg-dark-card border-0 shadow-2xl" style={{ maxHeight: 440, overflowY: "auto" }}>
-            <Card.Header className="bg-transparent border-0 text-slate-300 fw-black py-3 ls-1">
-              🚦 SIGNAL OVERRIDE CONTROL
+          <Card className="bg-white border-0 shadow-xl rounded-3xl overflow-hidden" style={{ maxHeight: 440, overflowY: "auto" }}>
+            <Card.Header className="bg-slate-50 border-bottom border-slate-100 text-slate-600 fw-black py-3 ls-1 text-uppercase">
+              🚦 Signal Override Control
             </Card.Header>
             <Card.Body className="p-0">
               <Table hover responsive className="mb-0 table-borderless" size="sm">
-                <thead style={{ position: "sticky", top: 0, background: "#1e293b", zIndex: 1 }}>
+                <thead style={{ position: "sticky", top: 0, background: "#f8fafc", zIndex: 1 }}>
                   <tr>
-                    <th className="ps-3 small fw-black" style={{ color: "#64748b" }}>Junction</th>
-                    <th className="small fw-black text-center" style={{ color: "#64748b" }}>Phase</th>
-                    <th className="small fw-black text-center" style={{ color: "#64748b" }}>Override</th>
+                    <th className="ps-3 small fw-black text-slate-500">Junction</th>
+                    <th className="small fw-black text-center text-slate-500">Phase</th>
+                    <th className="small fw-black text-center text-slate-500">Override</th>
                   </tr>
                 </thead>
                 <tbody>
                   {junctions.map(j => (
-                    <tr key={j.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.03)" }}>
-                      <td className="ps-3">
-                        <div className="fw-bold small text-light">{j.location}</div>
-                        <div style={{ fontSize: 9, color: "#64748b" }}>{j.total_vehicles || 0} vehicles</div>
+                    <tr key={j.id} className="border-bottom border-slate-50">
+                      <td className="ps-3 py-3">
+                        <div className="fw-bold small text-slate-800">{j.location}</div>
+                        <div style={{ fontSize: 9, color: "#94a3b8" }} className="fw-medium">{j.total_vehicles || 0} vehicles tracked</div>
                       </td>
-                      <td className="text-center">
-                        <Badge bg="dark" className="border border-white border-opacity-10 px-2 py-1 small"
+                      <td className="text-center py-3">
+                        <Badge bg="light" className="border border-slate-200 px-2 py-1 small fw-bold"
                           style={{ color: (j.signal_phase || "").includes("GREEN") ? "#10b981" : "#ef4444" }}>
                           {j.signal_phase || "—"}
                         </Badge>
                       </td>
-                      <td className="text-center">
-                        <Form.Select size="sm" style={{ width: 120, background: "#0f172a", color: "#e2e8f0", border: "1px solid rgba(255,255,255,0.1)", fontSize: 10 }}
+                      <td className="text-center py-3">
+                        <Form.Select size="sm" style={{ width: 130, background: "#fff", color: "#475569", border: "1px solid #e2e8f0", fontSize: 10, borderRadius: "10px" }}
                           value={j.signal_override || "AUTO"}
                           onChange={(e) => handleSignalOverride(j.junction_id, e.target.value)}>
                           <option value="AUTO">🤖 AUTO</option>
@@ -296,53 +310,53 @@ const AdminDashboard = () => {
       {/* Junction Telemetry Table */}
       <Row>
         <Col xl={12}>
-          <Card className="bg-dark-card border-0 shadow-2xl">
-            <Card.Header className="bg-transparent border-bottom border-white border-opacity-10 py-3 px-4 d-flex justify-content-between align-items-center">
-              <h5 className="mb-0 fw-black ls-1">JUNCTION TELEMETRY & DIRECTIONAL FLOW</h5>
-              <Badge className="bg-indigo-600 bg-opacity-20 text-indigo-400 border border-indigo-500 border-opacity-30 px-3 py-2 rounded-lg">
-                LIVE FIRESTORE
+          <Card className="bg-white border-0 shadow-xl rounded-3xl overflow-hidden">
+            <Card.Header className="bg-slate-50 border-bottom border-slate-100 py-4 px-4 d-flex justify-content-between align-items-center">
+              <h5 className="mb-0 fw-black ls-1 text-slate-800 text-uppercase" style={{ fontSize: "0.9rem" }}>Junction Telemetry & Directional Flow</h5>
+              <Badge className="bg-indigo-50 text-indigo-600 border border-indigo-100 px-3 py-2 rounded-xl fw-bold">
+                LIVE FIRESTORE FEED
               </Badge>
             </Card.Header>
-            <Card.Body className="p-0 overflow-hidden" style={{ maxHeight: 450, overflowY: "auto" }}>
+            <Card.Body className="p-0" style={{ maxHeight: 450, overflowY: "auto" }}>
               {loading ? (
                 <div className="text-center p-5"><Spinner animation="border" variant="primary" /></div>
               ) : (
                 <Table hover responsive className="mb-0 table-borderless">
-                  <thead style={{ position: "sticky", top: 0, background: "#1e293b", zIndex: 1 }}>
+                  <thead style={{ position: "sticky", top: 0, background: "#f8fafc", zIndex: 1 }}>
                     <tr>
-                      <th className="ps-4">Intersection</th>
-                      <th className="text-center">North</th>
-                      <th className="text-center">South</th>
-                      <th className="text-center">East</th>
-                      <th className="text-center">West</th>
-                      <th className="text-center">Total</th>
-                      <th className="pe-4">Status</th>
+                      <th className="ps-4 text-slate-500">Intersection</th>
+                      <th className="text-center text-slate-500">North</th>
+                      <th className="text-center text-slate-500">South</th>
+                      <th className="text-center text-slate-500">East</th>
+                      <th className="text-center text-slate-500">West</th>
+                      <th className="text-center text-slate-500">Total</th>
+                      <th className="pe-4 text-slate-500">Status</th>
                     </tr>
                   </thead>
                   <tbody>
                     {junctions.map(j => (
-                      <tr key={j.id}>
-                        <td className="ps-4">
-                          <div className="fw-black text-indigo-400">{j.location}</div>
-                          <div className="tiny text-slate-500 fw-bold">{j.junction_id}</div>
+                      <tr key={j.id} className="border-bottom border-slate-50">
+                        <td className="ps-4 py-3">
+                          <div className="fw-black text-indigo-600">{j.location}</div>
+                          <div className="tiny text-slate-400 fw-bold">{j.junction_id}</div>
                         </td>
-                        <td className="text-center">
-                          <Badge bg="dark" className="border border-white border-opacity-10 text-slate-300 px-2 py-1">
+                        <td className="text-center py-3">
+                          <Badge bg="light" className="border border-slate-200 text-slate-600 px-2 py-1 fw-bold">
                             {j.north || 0}
                           </Badge>
                         </td>
-                        <td className="text-center">
-                          <Badge bg="dark" className="border border-white border-opacity-10 text-slate-300 px-2 py-1">
+                        <td className="text-center py-3">
+                          <Badge bg="light" className="border border-slate-200 text-slate-600 px-2 py-1 fw-bold">
                             {j.south || 0}
                           </Badge>
                         </td>
-                        <td className="text-center">
-                          <Badge bg="dark" className="border border-white border-opacity-10 text-slate-300 px-2 py-1">
+                        <td className="text-center py-3">
+                          <Badge bg="light" className="border border-slate-200 text-slate-600 px-2 py-1 fw-bold">
                             {j.east || 0}
                           </Badge>
                         </td>
-                        <td className="text-center">
-                          <Badge bg="dark" className="border border-white border-opacity-10 text-slate-300 px-2 py-1">
+                        <td className="text-center py-3">
+                          <Badge bg="light" className="border border-slate-200 text-slate-600 px-2 py-1 fw-bold">
                             {j.west || 0}
                           </Badge>
                         </td>
@@ -369,16 +383,17 @@ const AdminDashboard = () => {
 
       {/* Green Corridor Modal */}
       <Modal show={showCorridorModal} onHide={() => setShowCorridorModal(false)} centered>
-        <Modal.Header closeButton style={{ background: "#1e293b", color: "#e2e8f0", border: "none" }}>
-          <Modal.Title className="fw-black">🚑 Activate Green Corridor</Modal.Title>
+        <Modal.Header closeButton className="bg-white border-bottom border-slate-100 rounded-t-3xl">
+          <Modal.Title className="fw-black text-slate-800">🚑 Activate Green Corridor</Modal.Title>
         </Modal.Header>
-        <Modal.Body style={{ background: "#1e293b", color: "#e2e8f0" }}>
-          <p className="small text-secondary">Ambulance Route Planning: Select the entry and exit points to calculate the fastest path and clear signals.</p>
+        <Modal.Body className="bg-white p-4">
+          <p className="small text-slate-500 fw-medium mb-4">Ambulance Route Planning: Select the entry and exit points to calculate the fastest path and clear signals.</p>
           
-          <div className="mb-3">
-            <label className="xsmall fw-black text-indigo-400 ls-1 mb-2">PICKUP POINT (START)</label>
+          <div className="mb-4">
+            <label className="xsmall fw-black text-indigo-600 ls-1 mb-2 text-uppercase">Pickup Point (Start)</label>
             <Form.Select
-              style={{ background: "#0f172a", color: "#e2e8f0", border: "1px solid rgba(255,255,255,0.1)" }}
+              className="rounded-xl border-slate-200"
+              style={{ background: "#fff", color: "#1e293b", fontSize: "0.9rem", padding: "12px" }}
               value={corridorStart}
               onChange={(e) => setCorridorStart(e.target.value)}>
               <option value="">Choose Start Junction...</option>
@@ -389,9 +404,10 @@ const AdminDashboard = () => {
           </div>
 
           <div>
-            <label className="xsmall fw-black text-amber-400 ls-1 mb-2">DESTINATION (END)</label>
+            <label className="xsmall fw-black text-amber-600 ls-1 mb-2 text-uppercase">Destination (End)</label>
             <Form.Select
-              style={{ background: "#0f172a", color: "#e2e8f0", border: "1px solid rgba(255,255,255,0.1)" }}
+              className="rounded-xl border-slate-200"
+              style={{ background: "#fff", color: "#1e293b", fontSize: "0.9rem", padding: "12px" }}
               value={corridorEnd}
               onChange={(e) => setCorridorEnd(e.target.value)}>
               <option value="">Choose End Junction...</option>
@@ -401,9 +417,9 @@ const AdminDashboard = () => {
             </Form.Select>
           </div>
         </Modal.Body>
-        <Modal.Footer style={{ background: "#1e293b", border: "none" }}>
-          <Button variant="secondary" onClick={() => setShowCorridorModal(false)}>Cancel</Button>
-          <Button variant="info" className="fw-bold px-4" onClick={triggerGreenCorridor} disabled={!corridorStart || !corridorEnd}>
+        <Modal.Footer className="bg-slate-50 border-top border-slate-100 rounded-b-3xl">
+          <Button variant="light" className="fw-bold text-slate-500 px-4" onClick={() => setShowCorridorModal(false)}>Cancel</Button>
+          <Button variant="info" className="fw-bold px-4 text-white shadow-md rounded-xl" onClick={triggerGreenCorridor} disabled={!corridorStart || !corridorEnd}>
             <FaAmbulance className="me-2" />Activate Emergency Path
           </Button>
         </Modal.Footer>

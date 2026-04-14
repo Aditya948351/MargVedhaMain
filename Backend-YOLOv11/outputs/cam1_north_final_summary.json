@@ -1,0 +1,9 @@
+{
+  "camera_id": "cam1_north",
+  "camera_name": "Camera 1 - North",
+  "counts": {
+    "incoming": {},
+    "outgoing": {}
+  },
+  "events": []
+}

@@ -83,10 +83,16 @@ service cloud.firestore {
       allow write: if true;  // Citizens can write without auth
     }
 
+    // --- COMMUNITY HUB (Social Feed) ---
+    match /community_posts/{document=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
     // --- GLOBAL SETTINGS ---
     match /settings/{document=**} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.email == 'admin@nashikcity.gov.in';
     }
   }
 }

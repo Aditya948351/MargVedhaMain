@@ -32,6 +32,9 @@ import IncidentHub from "./pages/IncidentHub";
 import PublicTransport from "./pages/PublicTransport";
 import LstmStudio from "./pages/LstmStudio";
 import Enforcement from "./pages/Enforcement";
+import MLTrainers from "./pages/MLTrainers";
+import LandingPage from "./pages/LandingPage";
+import DeveloperPortal from "./pages/DeveloperPortal";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -60,13 +63,10 @@ function App() {
 
       <div className={user ? "content-area" : ""}>
         <Routes>
-          {/* Public Route */}
-          <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-
-          {/* Protected Routes */}
-          <Route path="/" element={
-            user ? (user.email === 'admin@nashikcity.gov.in' ? <Navigate to="/admin" /> : <Navigate to="/dashboard" />) : <Navigate to="/login" />
-          } />
+          {/* Public Landing & Login */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/developers" element={<DeveloperPortal />} />
+          <Route path="/login" element={user ? (user.email === 'admin@nashikcity.gov.in' ? <Navigate to="/admin" /> : <Navigate to="/dashboard" />) : <Login />} />
           
           <Route path="/admin" element={
             user && user.email === 'admin@nashikcity.gov.in' ? <AdminDashboard /> : <Navigate to={user ? "/dashboard" : "/login"} />
@@ -77,11 +77,15 @@ function App() {
           } />
 
           {/* New 8 Module Admin Architecture & Dashboard Architecture */}
-          <Route path="/network-analytics" element={user && user.email === 'admin@nashikcity.gov.in' ? <NetworkAnalytics /> : <Navigate to="/login" />} />
-          <Route path="/incident-hub" element={user && user.email === 'admin@nashikcity.gov.in' ? <IncidentHub /> : <Navigate to="/login" />} />
-          <Route path="/public-transport" element={user && user.email === 'admin@nashikcity.gov.in' ? <PublicTransport /> : <Navigate to="/login" />} />
+          {/* Operational Modules - Shared Access */}
+          <Route path="/network-analytics" element={user ? <NetworkAnalytics /> : <Navigate to="/login" />} />
+          <Route path="/incident-hub" element={user ? <IncidentHub /> : <Navigate to="/login" />} />
+          <Route path="/public-transport" element={user ? <PublicTransport /> : <Navigate to="/login" />} />
+          <Route path="/enforcement" element={user ? <Enforcement /> : <Navigate to="/login" />} />
+          
+          {/* Admin-Only Strategy Modules */}
+          <Route path="/ml-trainers" element={user && user.email === 'admin@nashikcity.gov.in' ? <MLTrainers /> : <Navigate to="/login" />} />
           <Route path="/lstm-studio" element={user && user.email === 'admin@nashikcity.gov.in' ? <LstmStudio /> : <Navigate to="/login" />} />
-          <Route path="/enforcement" element={user && user.email === 'admin@nashikcity.gov.in' ? <Enforcement /> : <Navigate to="/login" />} />
           <Route path="/EcoImpact" element={user && user.email === 'admin@nashikcity.gov.in' ? <EnvironmentalImpact /> : <Navigate to="/login" />} />
           <Route path="/suggestions" element={user && user.email === 'admin@nashikcity.gov.in' ? <CitizenSuggestions /> : <Navigate to="/login" />} />
           <Route path="/intelligence" element={user && user.email === 'admin@nashikcity.gov.in' ? <CityIntelligence /> : <Navigate to="/login" />} />
@@ -96,6 +100,12 @@ function App() {
           <Route path="/reports" element={user ? <Reports /> : <Navigate to="/login" />} />
           <Route path="/settings" element={user ? <Settings /> : <Navigate to="/login" />} />
           <Route path="/live-feed" element={user ? <LiveFeed /> : <Navigate to="/login" />} />
+          <Route path="/TrafficCounting" element={user ? <TrafficCounting /> : <Navigate to="/login" />} />
+          <Route path="/traffic-counting" element={user ? <TrafficCounting /> : <Navigate to="/login" />} />
+          <Route path="/BusRouteOptimization" element={user ? <BusRouteOptimization /> : <Navigate to="/login" />} />
+          <Route path="/BlockChainTicketing" element={user ? <BlockChainTicketing /> : <Navigate to="/login" />} />
+          <Route path="/EmergencyAlerts" element={user ? <EmergencyAlerts /> : <Navigate to="/login" />} />
+          <Route path="/AutoFareAdjustments" element={user ? <AutoFareAdjustments /> : <Navigate to="/login" />} />
         </Routes>
       </div>
     </div>

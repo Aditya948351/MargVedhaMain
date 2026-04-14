@@ -70,25 +70,34 @@ fun SocialScreen(navController: NavController) {
     // ── Real-time Firestore listener ───────────────────────────────────────
     DisposableEffect(Unit) {
         val reg = db.collection("community_posts")
-            .orderBy("timestamp", Query.Direction.DESCENDING)
+            // Temporarily removed orderBy to troubleshoot empty feed issues
+            // .orderBy("timestamp", Query.Direction.DESCENDING)
             .limit(50)
             .addSnapshotListener { snap, err ->
-                if (err != null) { Log.e("Social", err.message ?: "error"); return@addSnapshotListener }
-                livePosts = snap?.documents?.mapNotNull { doc ->
-                    CommunityPost(
-                        id       = doc.id,
-                        author   = doc.getString("author") ?: "Citizen",
-                        title    = doc.getString("title") ?: "",
-                        content  = doc.getString("content") ?: "",
-                        location = doc.getString("location") ?: "",
-                        category = doc.getString("category") ?: "General",
-                        lang     = doc.getString("lang") ?: "EN",
-                        likes    = doc.getLong("likes")?.toInt() ?: 0,
-                        comments = doc.getLong("comments")?.toInt() ?: 0,
-                        imageUrl = doc.getString("imageUrl"),
-                        timestamp = doc.getTimestamp("timestamp")
-                    )
-                } ?: emptyList()
+                if (err != null) { 
+                    Log.e("Social", "Firestore Error: ${err.message}")
+                    isLoading = false
+                    return@addSnapshotListener 
+                }
+                if (snap != null && !snap.isEmpty) {
+                    livePosts = snap.documents.mapNotNull { doc ->
+                        CommunityPost(
+                            id       = doc.id,
+                            author   = doc.getString("author") ?: "Citizen",
+                            title    = doc.getString("title") ?: "",
+                            content  = doc.getString("content") ?: "",
+                            location = doc.getString("location") ?: "",
+                            category = doc.getString("category") ?: "General",
+                            lang     = doc.getString("lang") ?: "EN",
+                            likes    = doc.getLong("likes")?.toInt() ?: 0,
+                            comments = doc.getLong("comments")?.toInt() ?: 0,
+                            imageUrl = doc.getString("imageUrl"),
+                            timestamp = doc.getTimestamp("timestamp")
+                        )
+                    }
+                } else {
+                   livePosts = emptyList()
+                }
                 isLoading = false
             }
         onDispose { reg.remove() }
@@ -101,6 +110,14 @@ fun SocialScreen(navController: NavController) {
         topBar = {
             TopAppBar(
                 title = { Text("Community Hub", fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    Icon(
+                        Icons.Default.Traffic, 
+                        contentDescription = "MargVedha Logo",
+                        modifier = Modifier.padding(start = 12.dp, end = 12.dp).size(28.dp),
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                },
                 actions = { IconButton(onClick = {}) { Icon(Icons.Default.Search, "Search") } },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.surface)
             )
@@ -109,7 +126,8 @@ fun SocialScreen(navController: NavController) {
             FloatingActionButton(
                 onClick = { showDialog = true },
                 containerColor = MaterialTheme.colorScheme.primary,
-                shape = CircleShape
+                shape = CircleShape,
+                modifier = Modifier.padding(bottom = 110.dp)
             ) { Icon(Icons.Default.Add, "New Post") }
         }
     ) { padding ->
@@ -126,8 +144,11 @@ fun SocialScreen(navController: NavController) {
                 Column {
                     Text("नाशिक / Nashik / नासिक", fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
                     Text("Live urban traffic reports from citizens", fontSize = 13.sp, color = MaterialTheme.colorScheme.onSurface.copy(0.55f))
-                    Spacer(Modifier.height(12.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Spacer(Modifier.height(20.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
                         listOf(null to "All", "MR" to "मराठी", "HI" to "हिंदी", "EN" to "English").forEach { (lang, label) ->
                             FilterChip(
                                 selected = selectedLang == lang,
@@ -165,7 +186,7 @@ fun SocialScreen(navController: NavController) {
                 items(displayPosts, key = { it.id }) { post -> PostCard(post, db) }
             }
 
-            item { Spacer(Modifier.height(100.dp)) }
+            item { Spacer(Modifier.height(160.dp)) }
         }
     }
 
@@ -319,8 +340,9 @@ fun PostCard(post: CommunityPost, db: FirebaseFirestore) {
                     contentDescription = "Post Image",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
-                        .clip(RoundedCornerShape(12.dp)),
+                        .height(220.dp)
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(MaterialTheme.colorScheme.surfaceVariant.copy(0.5f)),
                     contentScale = ContentScale.Crop
                 )
             }
