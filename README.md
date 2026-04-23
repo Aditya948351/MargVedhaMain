@@ -1,108 +1,156 @@
-# 🚦 Marg Vedha 3.0 – Smart City Traffic Intelligence & Ecosystem Operations
+<div align="center">
 
-> **Official Technical Specification & System Architecture Document**  
-> *Prepared for Copyright, Documentation, and Scaling Reference.*
+# 🚦 Marg Vedha 3.0
+**Smart City Traffic Intelligence & Ecosystem Operations Platform**
+
+[![React](https://img.shields.io/badge/React-19.0-blue.svg?style=for-the-badge&logo=react)](https://reactjs.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-Hosting%2FFirestore-orange.svg?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
+[![Python](https://img.shields.io/badge/Python-Backend-3776AB.svg?style=for-the-badge&logo=python)](https://python.org/)
+[![YOLOv11](https://img.shields.io/badge/YOLOv11-BoTSORT-FFD700.svg?style=for-the-badge)](https://github.com/ultralytics/ultralytics)
+
+Marg Vedha is a fully orchestrated **Unified Urban Operations Platform** designed for emerging smart cities. It fuses cutting-edge Computer Vision, agentic AI/Reinforcement Learning, and citizen engagement to transform chaotic intersections into optimized, self-regulating grids.
+
+[Live Website](https://traffic-optimization-1e1bd.web.app) • [Issue Tracker](https://github.com/Aditya948351/MargVedhaMain/issues)
+</div>
 
 ---
 
-## 📌 1. Problem Statement
-Urban metropolises in India—specifically emerging smart cities like Nashik—face cascading traffic congestion resulting in exponential fuel wastage, skyrocketing CO₂ emissions, critically delayed emergency services, and unpredictable public transit schedules. 
+## 📌 1. The Challenge & Our Solution
 
-Traditional signal timing is rigid and incapable of handling anomalous flow (festivals, accidents, parking bottlenecks). A hyper-dynamic, **Agentic AI-driven traffic intelligence system** is required to fuse micro-level computer vision data with macro-level urban economic policies.
+Urban metropolises face cascading traffic congestion resulting in exponential fuel wastage, escalating CO₂ emissions, critically delayed emergency services, and unpredictable public transit schedules. Rigid, traditional signal timing is incapable of handling anomalous urban flow (festivals, accidents, parking bottlenecks).
 
----
+**Marg Vedha 3.0** solves this. It is a hyper-dynamic, **Agentic AI-driven traffic intelligence system** that merges micro-level vehicle telemetry with macro-level urban economic policies. 
 
-## 💡 2. The Marg Vedha Solution
-Marg Vedha is not just a traffic counter; it is a **complete Unified Urban Operations Platform**. By integrating computer vision (YOLOv11), Reinforcement Learning (Q-Learning), predictive machine learning, and citizen feedback loops, we dynamically operate and optimize the entirety of a city's intersection grid in real time.
-
-### 🔑 Core Innovations
-- **Vision-Based Intelligence:** Lane-wise multi-class vehicle profiling, helmet violation detection, wrong-way detection, and signal jump analysis using **YOLOv11 + BoT-SORT**.
-- **Agentic AI Signal Control:** Adaptive RL algorithms (Q-Learning) continuously calculating the optimal Reward vs. Queue Delay to distribute green lights proactively across networks.
-- **Economic & Transit Integration:** Dynamic calculation of auto-rickshaw fare surges (Demand/Supply ratios) and real-time Bus Route tracking algorithms to prioritize public transit over private congestion.
-- **Environmental & Pedestrian Fairness:** Active tracking of CO₂ footprint reductions and pedestrian crossing delays to ensure equitable urban flow.
+### ✨ Core Innovations
+- **Vision-Based Intelligence:** Lane-wise multi-class vehicle profiling, helmet violation detection, wrong-way driving flags, and signal jump analysis using **YOLOv11 + BoT-SORT**.
+- **Agentic AI Signal Control:** Adaptive Reinforcement Learning algorithms (Q-Learning) continuously calculate optimal Green ratios versus Queue Delay to distribute clearance proactively across an entire network.
+- **Economic & Transit Integration:** Dynamic calculation of auto-rickshaw fare surges (based on local Demand/Supply ratios) and real-time Bus Route tracking algorithms to securely prioritize public transit.
+- **Environmental & Pedestrian Fairness:** Active tracking of CO₂ footprint reductions and pedestrian crossing delays to maintain equitable city flow.
 - **Central Authority Command:** A localized Web Dashboard enabling City Police and Administrators to visualize the entire grid simultaneously.
 
 ---
 
-## 🏗️ 3. Software Architecture & Tech Stack
+## 🏗️ 2. System Architecture & Tech Stack
 
-### AI & Machine Learning Pipeline
-- **Object Detection & Tracking:** YOLOv11, BoT-SORT
-- **Predictive Analytics & RL:** PyTorch, Q-Learning Decision Nodes, Random Forest for Traffic Patterns
+Marg Vedha 3.0 operates rapidly across a tightly coupled hardware and software hierarchy engineered for zero-latency urban operations:
 
-### Backend & Infrastructure
-- **Core Engine:** Python (Multi-threaded Data Simulation & Ingestion pipeline)
-- **Database / Sync:** Google Cloud Firebase (Firestore Realtime listeners)
-- **Geospatial Processing:** ISRO Bhuvan APIs
+```mermaid
+graph TD
+    %% Hardware & Ingestion
+    C1[CCTV Grid / YOLO Cameras] -->|RTSP Stream| CV(CV Pipeline: YOLOv11 + BoT-SORT)
+    
+    %% AI Backend Layer
+    CV -->|Json Payloads| PY(Python Microservice / Data Engine)
+    PY <-->|Q-Learning & Forecasings| AI[RL Prediction Models]
+    PY -->|Push Updates| FB[(Firebase / Firestore)]
+    
+    %% Frontend Layer
+    FB -->|Realtime Subscriptions| WEB[React.js Web Dashboards]
+    WEB --> ADMIN[Admin Network View]
+    WEB --> OFF[Officer Live Command]
+    WEB --> APP[Citizen Interfaces]
+```
 
-### Frontend & Application Layer
-- **Control Dashboard:** React.js, TailwindCSS, Bootstrap, Recharts (for fluid real-time telemetry rendering without page-loads, parsing JSON streams directly).
-- **Visualization:** Three.js for 3D junction previews.
-- **Citizen Interface:** Kotlin-based Android applications capturing crowdsourced anomaly reports.
-
----
-
-## 📊 4. The 20-Node Data Schema (The "Nashik Grid" Model)
-To support infinite scalability, Marg Vedha normalizes urban data into **20 discrete, interconnected database models/CSVs**, constantly bound by `timestamp`, `junction_id`, and `direction`. The model was built and simulated upon 20 major Nashik intersections (e.g., CBS, Dwarka, ITI, Meher, Mumbai Naka, Ashok Stambh).
-
-### A. Core Telemetry & Geography
-1. `road_infrastructure.csv` (Physical Reality): Lanes, width, bus-lane availability, pedestrian bounds.
-2. `route_mapping.csv` (Network Graph): Distance, travel time, road conditions.
-3. `junction_direction_data.csv` (Live Traffic): High-granularity state of Q-Length, count, max wait, and violations (Signal Jump, Helmet, Wrong Way).
-4. `junction_overview.csv` (Junction Totals): Aggregate intersection health.
-5. `network_data.csv` (Macro Flow): Congestion index comparing neighboring junctions.
-
-### B. Urban Dynamics & Transport
-6. `transport_data.csv` (Bus/Auto System): Tracking bus delays, priority flags, and auto-rickshaw density loops.
-7. `fare_policy.csv` (Economics): Adjusting dynamic fares based on geographic congestion multipliers.
-8. `incident_data.csv` (Anomalies): Accidents, clearance times, lane blocks.
-9. `event_data.csv` (Real-World Chaos): Festivals, rallies, matches dynamically throwing variables into the traffic net.
-10. `parking_data.csv`: Quantifying illegal unorganized parking and its direct chokehold on transit lanes. 
-11. `pedestrian_data.csv`: Volumes and wait-time limits to force signal fairness.
-
-### C. Artificial Intelligence & Algorithms
-12. `ml_predictions.csv` (Forecasting): Predicted queueing over the next 5-, 10-, and 30-minute intervals.
-13. `rl_decisions.csv` (Agent Actions): State, Action, Q-Value, and exact Green Time split distribution across N/S/E/W.
-14. `traffic_history.csv` (Training Ground): Historical time-series mapping for offline model tuning.
-
-### D. Governance & System Health
-15. `violation_log.csv` (Enforcement): Real-time e-Challan logging mechanisms.
-16. `environment_data.csv` (Visibility): Rain, fog, or school zone speed limits altering ML logic.
-17. `fuel_emission_data.csv` (Sustainability tracking): Idle-time reduction converting directly to CO₂ saved.
-18. `user_feedback.csv`: Real-world input routed from the Kotlin Citizen App.
-19. `system_logs.csv`: Component latency, crash rates.
-20. `simulation_config.csv`: Base settings for demonstration controllers and sandbox variables.
+### 💻 Technologies
+*   **AI/ML Pipeline:** YOLOv11 (Ultralytics), BoT-SORT Tracking, PyTorch (Q-Learning & Forensics), Random Forest Models.
+*   **Backend & Data Services:** Python Ingestion Pipeline, Google Cloud Firebase (Realtime database listeners, Auth, Hosting). Geographical processing via ISRO Bhuvan APIs.
+*   **Web Application:** React.js, TailwindCSS, Bootstrap 5, Recharts (for robust JSON streaming analytics), React-Leaflet.
+*   **Citizen Engagement:** Kotlin-based Android applications capturing crowdsourced anomaly reports.
 
 ---
 
-## 💻 5. User Roles & Interfaces
-The platform segregates data presentation intuitively based on the targeted stakeholder:
+## 🌐 3. Command Center Interfaces & Navigation
 
-1. **City Administrators / Mayors:** Access to the macro **Network View**, observing cross-junction comparisons (`NetworkView`), Environmental impact, and Economic policies (`FarePolicy`).
-2. **Traffic Police HQ:** Access to the **Live CCTV Grid**, receiving active overlays, instant `incident_data` alerts, and exact violation logs.
-3. **Local Junction Officers:** Access to the **Directional Modal View**, pinpointing exactly which bounded direction (North, South, East, West) is generating a gridlock.
-4. **Citizens (App):** Push notifications for Green Corridors, live Public Transport tracking, and localized issue ticketing.
+The platform features a multi-tiered UI explicitly customized for specific roles (Admins vs. Officers). It heavily utilizes persistent sidebar layouts and role-based React Routing logic.
 
----
+### 🏠 Primary Operational Dashboards
+| Interface Module          | Route             | Purpose & Key Features                                                                                                                      |
+| :------------------------ | :---------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Global Dashboard**      | `/`               | The KPI command center. Features real-time flow charts (Recharts), active signal statuses, AI recommendations, and links to all USP panels. |
+| **Tactical Map Location** | `/google-map`     | Interactive Leaflet grid maps displaying marker pins per signal. Provides live signal status (Green/Red/Warning).                           |
+| **Historical Reports**    | `/reports`        | Deep analytics hub handling Peak Hours, Incident rates, and Signal performances over scalable time-windows.                                 |
+| **Traffic Alerts**        | `/traffic-alerts` | Alert inbox managing public crowdsourced incidents (Accidents, Weather, Faults).                                                            |
+| **Camera Feeds**          | `/camera-feeds`   | Integration points mapping straight to live bounding-box CCTV/YOLO video feeds.                                                             |
 
-## 📈 6. Target Impact & ROI
-- **74% Improvement in Operational Flow:** Backed by simulated agentic optimizations smoothing stop-and-go waves.
-- **Carbon Offsetting:** Decreasing intersection idle time drastically lowers urban CO₂ emissions.
-- **Smart Policing:** AI-based tracking replaces manual violation spotting, increasing e-Challan efficiency and public compliance.
-- **Scalability:** The 20-Schema setup utilizes generic IDs (`J1`, `J2`), meaning MargVedha can map 50 or 5,000 intersections flawlessly without architectural alterations.
-
----
-
-## 🌐 7. Quick Links
-- **Website/Portal:** [Marg Vedha Live](https://nocopymarg-vedha.vercel.app/)  
-- **Documentation/Repos:** 
-  - [3D Traffic Simulation](https://github.com/Aditya948351/3D-Traffic-Simulation)
-  - [Main Hub](https://github.com/Aditya948351/MargVedhaMain)
-- **Interactive ML Previews:** [Marg Vedha AI HuggingFace](https://huggingface.co/spaces/starkbyte45896/Marg-Vedha)
+### 🌟 Unique Selling Propositions (USP Panels)
+Designed strictly for top-level authority command centers:
+1. **🚑 Emergency Corridors (`/EmergencyAlerts`):** Allows dispatch to trace ambulances and trigger a **"Freeze All Signals"** Crisis Mode path clearance.
+2. **🚌 Bus Route Prioritization (`/BusRouteOptimization`):** Monitors AI-driven bus preemption, charting Wait Time vs Traffic Density.
+3. **💰 Dynamic Congestion Fares (`/AutoFareAdjustments`):** Gives the mayor/authority exact dials to alter regional multiplier fares or trigger a Global Freeze.
+4. **🔗 Transit Ticketing Audit (`/BlockChainTicketing`):** Integrates blockchain records (via Polygon PoS) for decentralized ledger ticket verification and fraud prevention tracking.
 
 ---
 
-## 👨‍💻 Team – Marg Vedha 3.0
-Built for scale, speed, and safety.
-- **Aditya** – Lead ML Architecture & Android Engineering
-- *Supported by a cross-functional team across Full-Stack Web, CV Modeling, and Urban Systems Planning.*
+## 🗄️ 4. The "Nashik Grid" Data Schema (20-Node Architecture)
+
+Marg Vedha relies on a unified approach mapping variables to 20 discrete database models bound mathematically across `timestamp`, `junction_id`, and `direction`.
+
+1. **Physical Reality:** `road_infrastructure`, `route_mapping`.
+2. **Live Traffic Elements:** `junction_direction_data` (hyper-local state of queue length, violations), `junction_overview`, `network_data`.
+3. **Transport & Economics:** `transport_data` (Bus delays), `fare_policy` (Surge models), `parking_data`, `pedestrian_data`.
+4. **Chaos & Anomalies:** `incident_data`, `event_data` (Festivals/Match days).
+5. **AI Predictions & Agent Status:** `ml_predictions`, `rl_decisions`, `traffic_history`.
+6. **Governance & Audit:** `violation_log` (e-Challans), `environment_data`, `fuel_emission_data`, `user_feedback`, `system_logs`, `simulation_config`.
+
+---
+
+## 🚀 5. Getting Started (Installation & Deployment)
+
+To run the unified dashboard environment on your local system, follow these deployment steps:
+
+### Prerequisites
+*   [Node.js](https://nodejs.org/en/) (v18 or higher)
+*   [Firebase CLI](https://firebase.google.com/docs/cli) (`npm install -g firebase-tools`)
+*   Python 3.10+ (for background AI processing models)
+
+### Step 1: Clone & Install Frontend
+```bash
+# Clone the repository
+git clone https://github.com/Aditya948351/MargVedhaMain.git
+cd MargVedhaMain
+
+# Install dependencies via npm
+npm install
+```
+
+### Step 2: Configure Environment
+Secure your Firebase credentials. Replace or ensure the current configuration targets your active Firebase project in your `.firebaserc` and local `.env` variables if necessary:
+```bash
+firebase login
+firebase use traffic-optimization-1e1bd
+```
+
+### Step 3: Run Development Server
+```bash
+npm start
+```
+The application will boot up at `http://localhost:3000`.
+
+### Step 4: Build & Deploy to Firebase
+Ensure all static components compile before deployment:
+```bash
+npm run build
+firebase deploy --only hosting
+```
+
+---
+
+## 📈 6. Impact & ROI Summary
+*   **74% Improvement in Operational Flow:** Stalls mitigated via simulated agentic optimizations.
+*   **Measurable Carbon Offsetting:** Idle fuel consumption drastically restricted, curbing urban CO₂ levels.
+*   **Equitable Transit Execution:** Bus flow wait-times reduced, prioritizing volume over single-passenger automobiles.
+*   **Scale-Ready:** 100% cloud-hosted schema natively accommodates expanding from 50 to 5,000 city junctions flawlessly.
+
+---
+
+## 👨‍💻 7. The Marg Vedha Team
+
+> *Built for scale, tuned for speed, and designed for safety.*
+
+**Lead Architect & Engineer:** Aditya Patil
+*(Cross-functional expertise stretching from Multi-Class Computer Vision Modeling to Full-Stack Web Deployment and Urban Systems Planning.)*
+
+---
+<div align="center">
+  <sub>© 2026 Marg Vedha Engine. Proprietary documentation. All rights reserved.</sub>
+</div>
