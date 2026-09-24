@@ -1,6 +1,0 @@
-route_id,from_junction,to_junction,distance,avg_travel_time,road_type,speed_limit
-Route-1,J1,J10,13.94,54,Highway,80
-Route-2,J12,J6,6.01,40,Arterial,60
-Route-3,J14,J20,12.77,40,Arterial,60
-Route-4,J18,J10,2.91,52,Local,40
-Route-5,J18,J11,4.07,42,Highway,80

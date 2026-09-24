@@ -41,3 +41,10 @@ MargVedha-Android/local.properties
 MargVedha-Android/*.hprof
 MargVedha-Android/hs_err_pid*
 MargVedha-Android/replay_pid*
+
+# Media and Data files
+*.mp4
+*.csv
+*.pdf
+*.ipynb
+traffic-optimization-1e1bd-*.json

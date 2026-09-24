@@ -30,16 +30,19 @@ const Login = () => {
     }
   };
 
-  const handleDemoLogin = async () => {
+  const handleDemoLogin = async (role) => {
     setError("");
     setLoading(true);
 
+    const demoEmail = role === 'admin' ? 'admin@nashikcity.gov.in' : 'police1@nashikcity.gov.in';
+    const demoPassword = role === 'admin' ? 'AdminPassword@123' : 'PolicePassword@123';
+
     try {
-      await signInWithEmailAndPassword(auth, 'admin@nashikcity.gov.in', 'AdminPassword@123');
+      await signInWithEmailAndPassword(auth, demoEmail, demoPassword);
       navigate("/dashboard");
     } catch (err) {
       console.error(err);
-      setError("Failed to log in with demo account.");
+      setError(`Failed to log in with ${role} demo account.`);
     } finally {
       setLoading(false);
     }
@@ -98,15 +101,26 @@ const Login = () => {
               <small>OR</small>
             </div>
 
-            <Button 
-              variant="outline-secondary" 
-              type="button" 
-              className="btn-demo-login w-100 py-2 fw-semibold"
-              onClick={handleDemoLogin}
-              disabled={loading}
-            >
-              {loading ? "Authenticating..." : "Demo Login (Admin)"}
-            </Button>
+            <div className="d-flex gap-2">
+              <Button 
+                variant="outline-secondary" 
+                type="button" 
+                className="btn-demo-login w-50 py-2 fw-semibold"
+                onClick={() => handleDemoLogin('admin')}
+                disabled={loading}
+              >
+                {loading ? "..." : "Demo Admin"}
+              </Button>
+              <Button 
+                variant="outline-secondary" 
+                type="button" 
+                className="btn-demo-login w-50 py-2 fw-semibold"
+                onClick={() => handleDemoLogin('officer')}
+                disabled={loading}
+              >
+                {loading ? "..." : "Demo Officer"}
+              </Button>
+            </div>
           </Form>
 
           <div className="login-footer">
