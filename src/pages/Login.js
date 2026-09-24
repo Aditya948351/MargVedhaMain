@@ -30,6 +30,21 @@ const Login = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setError("");
+    setLoading(true);
+
+    try {
+      await signInWithEmailAndPassword(auth, 'admin@nashikcity.gov.in', 'AdminPassword@123');
+      navigate("/dashboard");
+    } catch (err) {
+      console.error(err);
+      setError("Failed to log in with demo account.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="login-page">
       <div className="login-container">
@@ -77,6 +92,20 @@ const Login = () => {
               disabled={loading}
             >
               {loading ? "Authenticating..." : "Login to Portal"}
+            </Button>
+
+            <div className="divider text-center my-3 text-muted">
+              <small>OR</small>
+            </div>
+
+            <Button 
+              variant="outline-secondary" 
+              type="button" 
+              className="btn-demo-login w-100 py-2 fw-semibold"
+              onClick={handleDemoLogin}
+              disabled={loading}
+            >
+              {loading ? "Authenticating..." : "Demo Login (Admin)"}
             </Button>
           </Form>
 
