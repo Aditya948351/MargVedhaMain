@@ -49,3 +49,4 @@ MargVedha-Android/replay_pid*
 *.ipynb
 traffic-optimization-1e1bd-*.json
 .env
+MargVedha-Android/app/google-services.json
