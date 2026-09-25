@@ -48,3 +48,4 @@ MargVedha-Android/replay_pid*
 *.pdf
 *.ipynb
 traffic-optimization-1e1bd-*.json
+.env
